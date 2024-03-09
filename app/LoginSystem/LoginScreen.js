@@ -52,7 +52,7 @@ const LoginScreen = ({ navigation }) => {
     setHasTriedToSubmit(true); // Update the submission attempt state for the required message
     const isValid = validateForm();
 
-    const url = "http://192.168.100.70:8443/auth/signin";
+    const url = "http://192.168.100.37:8443/auth/signin";
 
     const data = {
       email: email,
@@ -64,7 +64,7 @@ const LoginScreen = ({ navigation }) => {
       .then((response) => {
         // Handle successful response
         console.log(response.data);
-        navigation.navigate("Mainscreen");
+       navigation.replace("Mainscreen");
       })
       .catch((error) => {
         // Handle error
@@ -72,13 +72,13 @@ const LoginScreen = ({ navigation }) => {
         console.error("Error:", error);
       });
 
-    if (isValid && email === "moh@gmail.com" && password === "pass123") {
-      console.log("Form submitted successfully!");
-      navigation.navigate("Mainscreen");
+    if (isValid) {
+    
+      
       setEmail("");
       setPassword("");
     } else {
-      console.log("Form has errors. Please correct them.");
+      
     }
   };
   const showError = (errorKey) => hasTriedToSubmit && errors[errorKey];

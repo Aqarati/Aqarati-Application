@@ -114,7 +114,7 @@ const SignupScreen = ({ navigation }) => {
     setErrors(newErrors);
 
     if (formIsValid) {
-      const url = "http://192.168.100.70:8443/auth/signup";
+      const url = "http://192.168.100.37:8443/auth/signup";
 
       const data = {
         email: email,
