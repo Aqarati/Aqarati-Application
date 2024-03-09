@@ -11,6 +11,20 @@ import {
 import COLORS from "../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
+import * as SecureStore from "expo-secure-store";
+
+async function saveToken(key, value) {
+  await SecureStore.setItemAsync(key, value);
+}
+
+async function getValueFor(key) {
+  let result = await SecureStore.getItemAsync(key);
+  if (result) {
+    alert("🔐 Here's your value 🔐 \n" + result);
+  } else {
+    alert("No values stored under that key.");
+  }
+}
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -65,21 +79,15 @@ const LoginScreen = ({ navigation }) => {
         // Handle successful response
         console.log(response.data);
         navigation.navigate("Mainscreen");
+
+        console.log(response.data.token);
+        saveToken("token", response.data.token);
       })
       .catch((error) => {
         // Handle error
         //Todo :Hndle error passwrod
         console.error("Error:", error);
       });
-
-    if (isValid && email === "moh@gmail.com" && password === "pass123") {
-      console.log("Form submitted successfully!");
-      navigation.navigate("Mainscreen");
-      setEmail("");
-      setPassword("");
-    } else {
-      console.log("Form has errors. Please correct them.");
-    }
   };
   const showError = (errorKey) => hasTriedToSubmit && errors[errorKey];
   const formIsValid =
