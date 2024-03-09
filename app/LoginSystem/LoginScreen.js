@@ -12,8 +12,9 @@ import COLORS from "../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import * as LocalAuthentication from "expo-local-authentication";
 
-async function saveToken(key, value) {
+async function save(key, value) {
   await SecureStore.setItemAsync(key, value);
 }
 
@@ -62,6 +63,41 @@ const LoginScreen = ({ navigation }) => {
     return isValid;
   };
 
+  useEffect(() => {
+    checkForBiometrics();
+  }, []);
+
+  const checkForBiometrics = async () => {
+    const compatible = await LocalAuthentication.hasHardwareAsync();
+    if (!compatible) {
+      console.error("Biometric authentication not available");
+      return;
+    }
+
+    const enrolled = await LocalAuthentication.isEnrolledAsync();
+    if (!enrolled) {
+      console.error("No biometrics enrolled");
+      return;
+    }
+
+    authenticate();
+  };
+
+  const authenticate = async () => {
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Authenticate using Face ID",
+    });
+
+    if (result.success) {
+      console.log("Authentication successful");
+      navigation.navigate("Mainscreen");
+      // Handle successful authentication
+    } else {
+      console.log("Authentication failed");
+      // Handle authentication failure
+    }
+  };
+
   const handleSubmit = async () => {
     setHasTriedToSubmit(true); // Update the submission attempt state for the required message
     const isValid = validateForm();
@@ -81,7 +117,9 @@ const LoginScreen = ({ navigation }) => {
         navigation.navigate("Mainscreen");
 
         console.log(response.data.token);
-        saveToken("token", response.data.token);
+        save("token", response.data.token);
+        save("email", data.email);
+        save("passwrod", data.password);
       })
       .catch((error) => {
         // Handle error

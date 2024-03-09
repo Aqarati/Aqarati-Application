@@ -14,6 +14,10 @@ import COLORS from "../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 
+async function save(key, value) {
+  await SecureStore.setItemAsync(key, value);
+}
+
 const SignupScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -126,6 +130,9 @@ const SignupScreen = ({ navigation }) => {
         .then((response) => {
           // Handle successful response
           console.log(response.data);
+          save("token", response.data.token);
+          save("email", data.email);
+          save("passwrod", data.password);
         })
         .catch((error) => {
           // Handle error
