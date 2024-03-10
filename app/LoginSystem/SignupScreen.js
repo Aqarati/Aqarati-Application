@@ -123,6 +123,7 @@ const SignupScreen = ({ navigation }) => {
       const data = {
         email: email,
         password: password,
+        username: username,
       };
 
       const response = await axios
