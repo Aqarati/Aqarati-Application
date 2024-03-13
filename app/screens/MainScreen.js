@@ -7,11 +7,13 @@ import {
   TouchableOpacity,
   View,
   Image,
+  
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome5';
 import  { useState } from 'react';
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import COLORS from '../../assets/Colors/colors'
+import COLORS from '../../assets/Colors/colors';
+
+
 const initialItems = [
   {
     img: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80',
@@ -83,39 +85,46 @@ const categories = [
     img: 'https://img.icons8.com/?size=256&id=J3w76cMS9cUS&format=png',
     label: 'Building',
     color: COLORS.primary,
+    screen :'rentapartment'
   },
   {
     img: 'https://img.icons8.com/?size=256&id=wFfu6zXx15Yk&format=png',
     label: 'Home',
     color: COLORS.primary,
+    screen :'renthome'
   },
   {
     img: 'https://img.icons8.com/?size=256&id=n8CmSai8XFrN&format=png',
     label: 'Land',
     color: COLORS.primary,
+    screen : 'ownland'
   },
   {
     img: 'https://img.icons8.com/?size=256&id=ErXKPcLO7sA5&format=png',
     label: 'Own',
     color: COLORS.primary,
+    screen:'ownhome'
   },
   {
     img: 'https://img.icons8.com/?size=256&id=20037&format=png',
     label: 'Invest',
     color: COLORS.primary,
+    screen : 'invest'
   },
   
  
 ];
 
-export default function Example({ navigation }) {
+export default function MainScreen({ navigation }) {
+
+
   const handleCardPress = (itemDetails) => {
     navigation.navigate('Details', { itemDetails });
   };
   
   const [items, setItems] = useState(initialItems);
  // State to track the opened card
-   const [openedCardIndex, setOpenedCardIndex] = useState(null);
+
   const handleLikePress = (index) => {
     const newItems = [...items];
     newItems[index].saved = !newItems[index].saved;
@@ -124,10 +133,26 @@ export default function Example({ navigation }) {
 
  
   return (
-    <SafeAreaView style={{ backgroundColor: '#f2f2f2' }}>
-      
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Places to stay</Text>
+    
+    <SafeAreaView style={{ backgroundColor: '#fff' }}>
+    
+      <ScrollView contentContainerStyle={[styles.container,{paddingBottom: 60}]}>
+        
+        
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+  <View style={profilestyle.container}>
+    
+    <View style={profilestyle.header}>
+    <Text style={styles.title}>Places to stay</Text>
+    <TouchableOpacity onPress={() => navigation.navigate('profilescreen')}>
+  <Image
+    source={require('../../assets/images/moh.jpg')}
+    style={profilestyle.avatar}
+  />
+</TouchableOpacity>
+    </View>
+  </View>
+</SafeAreaView>
         <View style={Categories_styles.container}>
 
         <View style={Categories_styles.list}>
@@ -138,11 +163,11 @@ export default function Example({ navigation }) {
             contentContainerStyle={Categories_styles.listContent}
             horizontal={true}
             showsHorizontalScrollIndicator={false}>
-            {categories.map(({ img, label, color }, index) => (
+            {categories.map(({ img, label, color ,screen }, index) => (
               <TouchableOpacity
                 key={index}
                 onPress={() => {
-                  // handle onPress
+                  navigation.navigate(screen);
                 }}>
                 <View style={[Categories_styles.card, { backgroundColor: color }]}>
                   <Image source={{ uri: img }} style={Categories_styles.cardImg} />
@@ -182,7 +207,7 @@ export default function Example({ navigation }) {
                     source={{ uri: img }} />
                 </View>
 
-                <View style={styles.cardBody}>
+                <View style={styles.cardBody }>
                   <View style={styles.cardHeader}>
                     <Text style={styles.cardTitle}>{name}</Text>
 
@@ -206,12 +231,20 @@ export default function Example({ navigation }) {
                   </View>
                 </View>
               </View>
+              
             </TouchableOpacity>
           );
         })}
+      
+       
       </ScrollView>
+      
+      
     </SafeAreaView>
+    
+    
   );
+   
 }
 const Categories_styles = StyleSheet.create({
   container: {
@@ -227,10 +260,11 @@ const Categories_styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1d1d1d',
     marginBottom: 12,
+   
   },
   /** List */
   list: {
-    marginBottom: 24,
+    marginBottom: 0,
   },
   listHeader: {
     flexDirection: 'row',
@@ -273,7 +307,7 @@ const Categories_styles = StyleSheet.create({
   cardImg: {
     width: 40,
     height: 40,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   cardLabel: {
     fontWeight: '600',
@@ -282,15 +316,19 @@ const Categories_styles = StyleSheet.create({
     color: COLORS.white,
   },
 });
+
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
+    padding: 15,
+    
   },
   title: {
-    fontSize: 32,
+    fontSize: 33,
     fontWeight: '700',
     color: '#1d1d1d',
-    marginBottom: 12,
+   
+    marginEnd:70,
+    color: COLORS.primary,
   },
   /** Card */
   card: {
@@ -306,6 +344,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
     elevation: 2,
+    
+    
   },
   cardLikeWrapper: {
     position: 'absolute',
@@ -332,7 +372,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 8,
   },
   cardBody: {
-    padding: 12,
+    padding: 10,
+  
   },
   cardHeader: {
     flexDirection: 'row',
@@ -366,5 +407,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '400',
     color: '#595a63',
+  },
+});
+
+const profilestyle = StyleSheet.create({
+  container: {
+    padding: 24,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end', // Aligns children (the avatar) to the right
+    
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 9999,
   },
 });

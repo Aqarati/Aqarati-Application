@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome5';
 import COLORS from '../../assets/Colors/colors'
+import Mapviews from '../Mapview';
 const screenWidth = Dimensions.get('window').width;
 
 function DetailsScreen({ route }) {
@@ -49,6 +50,9 @@ function DetailsScreen({ route }) {
           
           {/* Add more amenities as needed */}
         </Text>
+      
+          
+      
         <TouchableOpacity onPress={makeCall} style={styles.callButton}>
           <Text style={styles.callButtonText}>Call Now</Text>
         </TouchableOpacity>

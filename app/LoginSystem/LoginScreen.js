@@ -16,9 +16,9 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import * as LocalAuthentication from "expo-local-authentication";
 import { CommonActions } from '@react-navigation/native';
-import { Alert } from "../../src/components/alert";
-import Toast from 'react-native-toast-message';
 
+import Toast from 'react-native-toast-message';
+import Tabs  from "../tabs/Tabs";
 async function save(key, value) {
   await SecureStore.setItemAsync(key, value);
 }
@@ -104,7 +104,7 @@ const LoginScreen = ({ navigation }) => {
         CommonActions.reset({
           index: 0,
           routes: [
-            { name: 'Mainscreen' }, 
+            { name: 'Tabs' }, 
           ],
         })
       );
@@ -180,7 +180,7 @@ const LoginScreen = ({ navigation }) => {
         CommonActions.reset({
           index: 0,
           routes: [
-            { name: 'Mainscreen' }, // Navigate to the main screen
+            { name: 'Tabs' }, // Navigate to the main screen
           ],
         })
       );
