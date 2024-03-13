@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   TextInput,
@@ -7,270 +7,286 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
-  Modal,
-  Pressable,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import COLORS from "../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
-
-async function save(key, value) {
-  await SecureStore.setItemAsync(key, value);
-}
-
+import * as SecureStore from "expo-secure-store"; // Assuming SecureStore is used.
+import Toast from "react-native-toast-message";
 const SignupScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
-
-  useEffect(() => {
-    // validateForm();
-    if (attemptedSubmit) {
-      const isValid = validateForm();
-      setIsFormValid(isValid);
-    }
-  }, [name, email, password, rePassword, attemptedSubmit]);
 
   const validateForm = () => {
-    let newErrors = {};
     let isValid = true;
+    let newErrors = {};
 
+    // Name validation
     if (!name.trim()) {
       newErrors.name = "Username is required.";
       isValid = false;
-    } else {
-      delete newErrors.name;
-      isValid = true;
     }
 
+    // Email validation
     if (!email.trim()) {
       newErrors.email = "Email is required.";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = "Email is invalid.";
       isValid = false;
-    } else {
-      delete newErrors.email;
     }
 
-    if (!rePassword.trim()) {
-      newErrors.rePassword = "Confirm password is required.";
-      isValid = false;
-    } else if (password !== rePassword) {
-      newErrors.rePassword = "Passwords do not match.";
-      isValid = false;
-    } else {
-      delete newErrors.rePassword;
-    }
+    // Password validation
     if (password.length < 6) {
       newErrors.password = "Password must be at least 6 characters long.";
       isValid = false;
     } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
       newErrors.password = "Password must contain at least one symbol.";
       isValid = false;
-    } else {
-      delete newErrors.password;
+    }
+
+    // RePassword validation
+    if (password !== rePassword) {
+      newErrors.rePassword = "Passwords do not match.";
+      isValid = false;
     }
 
     setErrors(newErrors);
-    // setIsFormValid(isValid);
     return isValid;
   };
 
+  const handleChange = (field, value) => {
+    // Update the respective state based on the field
+    if (field === "name") setName(value);
+    if (field === "email") setEmail(value);
+    if (field === "password") setPassword(value);
+    if (field === "rePassword") setRePassword(value);
+
+    // Perform validation immediately after state update
+    validateField(field, value);
+  };
+
+  const validateField = (field, value) => {
+    let newErrors = { ...errors }; // Copy existing errors
+
+    switch (field) {
+      case "name":
+        newErrors.name = !value.trim() ? "Username is required." : "";
+        break;
+      case "email":
+        if (!value.trim()) {
+          newErrors.email = "Email is required.";
+        } else if (!/\S+@\S+\.\S+/.test(value)) {
+          newErrors.email = "Email is invalid.";
+        } else {
+          newErrors.email = "";
+        }
+        break;
+      case "password":
+        if (value.length < 6) {
+          newErrors.password = "Password must be at least 6 characters long.";
+        } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+          newErrors.password = "Password must contain at least one symbol.";
+        } else {
+          newErrors.password = "";
+        }
+        break;
+      case "rePassword":
+        newErrors.rePassword =
+          password !== value ? "Passwords do not match." : "";
+        break;
+      default:
+        break; // No default action
+    }
+
+    setErrors(newErrors); // Update errors state
+  };
+  const SucessMessage = (name) => {
+    Toast.show({
+      type: "success",
+      text1: "Registration Success",
+      text2: `Welcome ${name} And Have A Nice Day!`,
+      autoHide: false,
+      visibilityTime: 3000,
+      position: "top",
+    });
+  };
+  const NonSucess = (error) => {
+    Toast.show({
+      type: "error",
+      text1: "Warning Message",
+      text2: `Ops Email Alerady Exists !`,
+      autoHide: false,
+      visibilityTime: 3000,
+      position: "top",
+    });
+  };
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
   const handleSubmit = async () => {
-    let newErrors = {};
-    let formIsValid = true;
-    setAttemptedSubmit(true);
-
-    if (!name.trim()) {
-      newErrors.name = "Username is required.";
-      formIsValid = false;
-    }
-
-    if (!email.trim()) {
-      newErrors.email = "Email is required.";
-      formIsValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email is invalid.";
-      formIsValid = false;
-    }
-
-    if (!rePassword.trim()) {
-      newErrors.rePassword = "Confirm password is required.";
-      formIsValid = false;
-    } else if (password !== rePassword) {
-      newErrors.rePassword = "Passwords do not match.";
-      formIsValid = false;
-    }
-    if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters long.";
-      formIsValid = false;
-    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      newErrors.password = "Password must contain at least one symbol.";
-      formIsValid = false;
-    }
-
-    setErrors(newErrors);
-
-    if (formIsValid) {
-      const url = "http://192.168.100.70:8443/auth/signup";
-
-      const data = {
-        email: email,
-        password: password,
-        username: username,
-      };
-
-      const response = await axios
-        .post(url, data)
-        .then((response) => {
-          // Handle successful response
-          console.log(response.data);
-          save("token", response.data.token);
-          save("email", data.email);
-          save("passwrod", data.password);
-        })
-        .catch((error) => {
-          // Handle error
-          console.error("Error:", error);
-        });
-
-      console.log("Form submitted successfully!");
-      console.log(`Username: ${name}, Email: ${email}, Password: ${password}`);
-
-      setName("");
-      setEmail("");
-      setPassword("");
-      setShowSuccessMessage(true);
-
-      setTimeout(() => {
-        setShowSuccessMessage(false);
-        navigation.navigate("Login");
-      }, 3000);
-    } else {
+    if (!validateForm()) {
       console.log("Form has errors. Please correct them.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://192.168.100.37:8443/auth/signup",
+        {
+          email,
+          password,
+        }
+      );
+      SucessMessage(name);
+      await sleep(3000);
+      console.log("Form submitted successfully!", response.data);
+      await SecureStore.setItemAsync("token", response.data.token);
+      await SecureStore.setItemAsync("email", email);
+      await SecureStore.setItemAsync("password", password); // Consider security implications
+      setEmail("");
+      setName("");
+      setPassword("");
+      setRePassword("");
+      navigation.navigate("Login");
+    } catch (error) {
+      NonSucess();
     }
   };
-  const allFieldsFilled =
-    name.trim() && email.trim() && password.trim() && rePassword.trim(); // Include rePassword
+
+  // const formIsValid = name && email && password && rePassword && Object.keys(errors).length === 0;
 
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [confirmPasswordVisibility, setConfirmPasswordVisibility] =
     useState(true);
+  // Before your return statement
+  const allFieldsFilled = name && email && password && rePassword; // Check if all fields are filled
+  const noErrors = Object.values(errors).every((error) => error === ""); // Check if there are no errors
 
-  const formIsValid = allFieldsFilled && Object.keys(errors).length === 0;
+  // Check if form is valid (all fields are filled and no errors)
+  const formIsValid = allFieldsFilled && noErrors;
+
+  // Button style based on form validity
+  const buttonStyle = formIsValid ? styles.buttonActive : styles.buttonDisabled;
+
   return (
-    <ImageBackground
-      source={require("../../assets/images/img1.jpg")}
-      style={styles.image}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <Image
-        source={require("../../assets/images/logo.png")}
-        style={styles.logo}
-      />
-
-      <View style={styles.container}>
-        <Text style={styles.title}>Sign Up</Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome name="user" style={styles.icon} />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            placeholderTextColor={COLORS.lightGray}
-            value={name}
-            onChangeText={(text) => {
-              setName(text);
-              // validateForm();
-            }}
-          />
-        </View>
-        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-
-        <View style={styles.inputContainer}>
-          <FontAwesome name="envelope" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor={COLORS.lightGray}
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              // validateForm();
-            }}
-          />
-        </View>
-        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-
-        <View style={styles.inputContainer}>
-          <FontAwesome name="lock" style={styles.icon} />
-          <TextInput
-            style={{ flex: 1, height: 50, padding: 10 }}
-            placeholder="Password"
-            placeholderTextColor={COLORS.lightGray}
-            secureTextEntry={passwordVisibility}
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TouchableOpacity
-            onPress={() => setPasswordVisibility(!passwordVisibility)}
-          >
-            <FontAwesome
-              name={passwordVisibility ? "eye-slash" : "eye"}
-              style={styles.icon}
-            />
-          </TouchableOpacity>
-        </View>
-        {errors.password && (
-          <Text style={styles.errorText}>{errors.password}</Text>
-        )}
-        <View style={styles.inputContainer}>
-          <FontAwesome name="lock" style={styles.icon} />
-          <TextInput
-            style={{ flex: 1, height: 50, padding: 10 }}
-            placeholder="Confirm Password"
-            placeholderTextColor={COLORS.lightGray}
-            secureTextEntry={confirmPasswordVisibility}
-            value={rePassword}
-            onChangeText={setRePassword}
-          />
-          <TouchableOpacity
-            onPress={() =>
-              setConfirmPasswordVisibility(!confirmPasswordVisibility)
-            }
-          >
-            <FontAwesome
-              name={confirmPasswordVisibility ? "eye-slash" : "eye"}
-              style={styles.icon}
-            />
-          </TouchableOpacity>
-        </View>
-        {errors.rePassword && (
-          <Text style={styles.errorText}>{errors.rePassword}</Text>
-        )}
-        <TouchableOpacity
-          style={formIsValid ? styles.buttonActive : styles.buttonDisabled}
-          onPress={handleSubmit}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ImageBackground
+          source={require("../../assets/images/img1.jpg")}
+          style={styles.image}
         >
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
-        {showSuccessMessage && (
-          <View style={styles.successMessageContainer}>
-            <Text style={styles.successMessageText}>
-              Registration Successful!
-            </Text>
+          <Image
+            source={require("../../assets/images/logo.png")}
+            style={styles.logo}
+          />
+
+          <View style={styles.container}>
+            <Text style={styles.title}>Sign Up</Text>
+
+            {/* Username Field */}
+            <View style={styles.inputContainer}>
+              <FontAwesome name="user" style={styles.icon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Username"
+                placeholderTextColor={COLORS.lightGray}
+                value={name}
+                onChangeText={(value) => handleChange("name", value)}
+              />
+            </View>
+            {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+
+            {/* Email Field */}
+            <View style={styles.inputContainer}>
+              <FontAwesome name="envelope" style={styles.icon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor={COLORS.lightGray}
+                value={email}
+                onChangeText={(value) => handleChange("email", value)}
+              />
+            </View>
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
+
+            {/* Password Field */}
+            <View style={styles.inputContainer}>
+              <FontAwesome name="lock" style={styles.icon} />
+              <TextInput
+                style={{ flex: 1, height: 50, padding: 10 }}
+                placeholder="Password"
+                placeholderTextColor={COLORS.lightGray}
+                secureTextEntry={passwordVisibility}
+                value={password}
+                onChangeText={(value) => handleChange("password", value)}
+              />
+              <TouchableOpacity
+                onPress={() => setPasswordVisibility(!passwordVisibility)}
+              >
+                <FontAwesome
+                  name={passwordVisibility ? "eye-slash" : "eye"}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+            </View>
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
+
+            {/* Confirm Password Field */}
+            <View style={styles.inputContainer}>
+              <FontAwesome name="lock" style={styles.icon} />
+              <TextInput
+                style={{ flex: 1, height: 50, padding: 10 }}
+                placeholder="Confirm Password"
+                placeholderTextColor={COLORS.lightGray}
+                secureTextEntry={confirmPasswordVisibility}
+                value={rePassword}
+                onChangeText={(value) => handleChange("rePassword", value)}
+              />
+              <TouchableOpacity
+                onPress={() =>
+                  setConfirmPasswordVisibility(!confirmPasswordVisibility)
+                }
+              >
+                <FontAwesome
+                  name={confirmPasswordVisibility ? "eye-slash" : "eye"}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+            </View>
+            {errors.rePassword && (
+              <Text style={styles.errorText}>{errors.rePassword}</Text>
+            )}
+
+            {/* Submit Button */}
+            {/* Submit Button */}
+            <TouchableOpacity
+              style={buttonStyle}
+              onPress={handleSubmit}
+              disabled={!formIsValid} // Disable the button if the form is not valid
+            >
+              <Text style={styles.buttonText}>Register</Text>
+            </TouchableOpacity>
           </View>
-        )}
-      </View>
-    </ImageBackground>
+        </ImageBackground>
+      </ScrollView>
+      <Toast></Toast>
+    </KeyboardAvoidingView>
   );
 };
-
 const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
