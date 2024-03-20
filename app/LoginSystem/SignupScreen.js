@@ -16,6 +16,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store"; // Assuming SecureStore is used.
 import Toast from "react-native-toast-message";
+import { urlPath } from "../lib";
 const SignupScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -135,7 +136,7 @@ const SignupScreen = ({ navigation }) => {
       console.log("Form has errors. Please correct them.");
       return;
     }
-    const url = urlPath + ":8443/auth/signup";
+    const url = urlPath + "/auth/signup";
     try {
       const response = await axios.post(url, {
         email,

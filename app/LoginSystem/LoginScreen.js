@@ -17,6 +17,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import * as LocalAuthentication from "expo-local-authentication";
 import { CommonActions } from "@react-navigation/native";
+import { urlPath } from "../lib";
 
 import Toast from "react-native-toast-message";
 import Tabs from "../tabs/Tabs";
@@ -144,7 +145,7 @@ const LoginScreen = ({ navigation }) => {
       return; // Stops the function if the form is not valid
     }
 
-    const url = urlPath + ":8443/auth/signin";
+    const url = urlPath + "/auth/signin";
     const data = {
       email: email,
       password: password,

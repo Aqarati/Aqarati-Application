@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  eureka-server:
+    hostname: eureka-server
+    image: ahmd66699/aqarati-service-discovery
+    ports:
+      - "8761:8761"
+    networks:
+      - aqarati-network
+  gateway:
+    hostname: gateway
+    image: ahmd66699/aqarati-gateway
+    ports:
+      - "8888:8888"
+    networks:
+      - aqarati-network
+  nginx-reverse-proxy:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - aqarati-network
+
+  auth-service:
+    image: ahmd66699/aqarati-auth-service
+    ports:
+      - "0:8443"
+    networks:
+      - aqarati-network
+
+  propery-service:
+    image: ahmd66699/aqarati-property-service
+    ports:
+      - "0:8666"
+    networks:
+      - aqarati-network
+networks:
+  aqarati-network:
+    driver: bridge
