@@ -6,19 +6,20 @@ import {
   Text,
   StyleSheet,
   ImageBackground,
-  Image,KeyboardAvoidingView
-  ,ScrollView,Platform
-  
+  Image,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import COLORS from "../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import * as LocalAuthentication from "expo-local-authentication";
-import { CommonActions } from '@react-navigation/native';
+import { CommonActions } from "@react-navigation/native";
 
-import Toast from 'react-native-toast-message';
-import Tabs  from "../tabs/Tabs";
+import Toast from "react-native-toast-message";
+import Tabs from "../tabs/Tabs";
 async function save(key, value) {
   await SecureStore.setItemAsync(key, value);
 }
@@ -88,11 +89,6 @@ const LoginScreen = ({ navigation }) => {
     authenticate();
   };
 
-
-
-
-
-
   const authenticate = async () => {
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: "Authenticate using Face ID",
@@ -103,84 +99,73 @@ const LoginScreen = ({ navigation }) => {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [
-            { name: 'Tabs' }, 
-          ],
+          routes: [{ name: "Tabs" }],
         })
       );
-     
+
       // Handle successful authentication
     } else {
       console.log("Authentication failed");
       // Handle authentication failure
     }
   };
-  
-  const SucessMessage = () =>{
-    
-    Toast.show({ 
-    type : 'success',
-    text1 : 'Login Message',
-    text2 : 'Login Successfully',
-    autoHide:false
-    ,
-    visibilityTime:3000,
-    position:'top'
-    
-    })
-    
-    }
 
-    const NonSuccessMessage = () =>{
-    
-      Toast.show({ 
-      type : 'error',
-      text1 : 'Warning Message',
-      text2 : 'Username or password incorrect!',
-      autoHide:true
-      ,
-      visibilityTime:3000,
-      position:'top'
-      
-      })
-      
-      }
+  const SucessMessage = () => {
+    Toast.show({
+      type: "success",
+      text1: "Login Message",
+      text2: "Login Successfully",
+      autoHide: false,
+      visibilityTime: 3000,
+      position: "top",
+    });
+  };
 
+  const NonSuccessMessage = () => {
+    Toast.show({
+      type: "error",
+      text1: "Warning Message",
+      text2: "Username or password incorrect!",
+      autoHide: true,
+      visibilityTime: 3000,
+      position: "top",
+    });
+  };
 
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   const handleSubmit = async () => {
     setHasTriedToSubmit(true); // Update the submission attempt state
     const isValid = validateForm();
-    
+
     if (!isValid) {
       return; // Stops the function if the form is not valid
     }
-  
-    const url = "http://192.168.100.37:8443/auth/signin";
+
+    const url = urlPath + ":8443/auth/signin";
     const data = {
       email: email,
       password: password,
     };
-  
+
     try {
       const response = await axios.post(url, data);
       console.log(response.data);
-  
+
       SucessMessage(); // Call the function to show the success message
       await sleep(3000);
       console.log(response.data.token);
       await save("token", response.data.token); // Make sure these saves are awaited
       await save("email", data.email);
       await save("password", data.password); // Fixed typo from "passwrod" to "password"
-  
+
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [
-            { name: 'Tabs' }, // Navigate to the main screen
+            { name: "Tabs" }, // Navigate to the main screen
           ],
         })
       );
@@ -190,90 +175,77 @@ const LoginScreen = ({ navigation }) => {
       // Handle the login error here, such as showing an error message
     }
   };
-  
-
-
-
 
   const showError = (errorKey) => hasTriedToSubmit && errors[errorKey];
-  const formIsValid =email.trim() && password.trim() && Object.keys(errors).length === 0;
+  const formIsValid =
+    email.trim() && password.trim() && Object.keys(errors).length === 0;
   const [passwordVisibility, setPasswordVisibility] = useState(true);
 
-
-
   return (
-    <KeyboardAvoidingView  
-    style={{ flex: 1 }} 
-    behavior={Platform.OS === "ios" ? "padding" : "height"} // Adjusting behavior based on platform 
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"} // Adjusting behavior based on platform
     >
-
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-  
-
-    <ImageBackground
-      source={require("../../assets/images/img1.jpg")}
-      style={styles.image}>
-
-
-
-      <Image
-        source={require("../../assets/images/logo.png")}
-        style={styles.logo}/>
-      
-      <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
-
-        <View style={styles.inputContainer}>
-          <FontAwesome name="envelope" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor={COLORS.lightGray}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-        </View>
-        {showError("email") && (
-          <Text style={styles.errorText}>{errors.email}</Text>
-        )}
-
-        <View style={styles.inputContainer}>
-          <FontAwesome name="lock" style={styles.icon} />
-          <TextInput
-            style={{ flex: 1, height: 50, padding: 10 }}
-            placeholder="Password"
-            placeholderTextColor={COLORS.lightGray}
-            secureTextEntry={passwordVisibility}
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TouchableOpacity
-            onPress={() => setPasswordVisibility(!passwordVisibility)}
-          >
-            <FontAwesome
-              name={passwordVisibility ? "eye-slash" : "eye"}
-              style={styles.icon}
-            />
-          </TouchableOpacity>
-        </View>
-        {showError("password") && (
-          <Text style={styles.errorText}>{errors.password}</Text>
-        )}
-        
-       
-        <TouchableOpacity
-          style={formIsValid ? styles.buttonActive : styles.buttonDisabled}
-          onPress={handleSubmit}
-          
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ImageBackground
+          source={require("../../assets/images/img1.jpg")}
+          style={styles.image}
         >
-           
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-      </View>
-      
-    </ImageBackground>
-    </ScrollView>
-    <Toast></Toast>
+          <Image
+            source={require("../../assets/images/logo.png")}
+            style={styles.logo}
+          />
+
+          <View style={styles.container}>
+            <Text style={styles.title}>Login</Text>
+
+            <View style={styles.inputContainer}>
+              <FontAwesome name="envelope" style={styles.icon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor={COLORS.lightGray}
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+              />
+            </View>
+            {showError("email") && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
+
+            <View style={styles.inputContainer}>
+              <FontAwesome name="lock" style={styles.icon} />
+              <TextInput
+                style={{ flex: 1, height: 50, padding: 10 }}
+                placeholder="Password"
+                placeholderTextColor={COLORS.lightGray}
+                secureTextEntry={passwordVisibility}
+                value={password}
+                onChangeText={setPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setPasswordVisibility(!passwordVisibility)}
+              >
+                <FontAwesome
+                  name={passwordVisibility ? "eye-slash" : "eye"}
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+            </View>
+            {showError("password") && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
+
+            <TouchableOpacity
+              style={formIsValid ? styles.buttonActive : styles.buttonDisabled}
+              onPress={handleSubmit}
+            >
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      </ScrollView>
+      <Toast></Toast>
     </KeyboardAvoidingView>
   );
 };

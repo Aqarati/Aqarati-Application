@@ -135,15 +135,12 @@ const SignupScreen = ({ navigation }) => {
       console.log("Form has errors. Please correct them.");
       return;
     }
-
+    const url = urlPath + ":8443/auth/signup";
     try {
-      const response = await axios.post(
-        "http://192.168.100.37:8443/auth/signup",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axios.post(url, {
+        email,
+        password,
+      });
       SucessMessage(name);
       await sleep(3000);
       console.log("Form submitted successfully!", response.data);
