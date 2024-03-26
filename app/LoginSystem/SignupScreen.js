@@ -137,10 +137,13 @@ const SignupScreen = ({ navigation }) => {
       return;
     }
     const url = urlPath + "/auth/signup";
+    const username = name;
+    console.log(url);
     try {
       const response = await axios.post(url, {
         email,
         password,
+        username,
       });
       SucessMessage(name);
       await sleep(3000);
