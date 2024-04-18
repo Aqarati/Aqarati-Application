@@ -30,7 +30,7 @@ const WelcomeScreen = ({ navigation }) => {
             investment.
           </Text>
         </View>
-        <Icon name="forward" />
+
         <TouchableOpacity
           onPress={() => navigation.navigate("Login")}
           style={styles.button}
