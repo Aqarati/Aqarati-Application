@@ -22,6 +22,7 @@ const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
@@ -31,6 +32,13 @@ const SignupScreen = ({ navigation }) => {
     // Name validation
     if (!name.trim()) {
       newErrors.name = "Username is required.";
+      isValid = false;
+    }
+    if (!phoneNumber.trim()) {
+      newErrors.phoneNumber = "Phone number is required.";
+      isValid = false;
+    } else if (!/^\d{10}$/.test(phoneNumber)) {
+      newErrors.phoneNumber = "Phone number is invalid.";
       isValid = false;
     }
 
@@ -68,6 +76,7 @@ const SignupScreen = ({ navigation }) => {
     if (field === "email") setEmail(value);
     if (field === "password") setPassword(value);
     if (field === "rePassword") setRePassword(value);
+    if (field === "phoneNumber") setPhoneNumber(value);
 
     // Perform validation immediately after state update
     validateField(field, value);
@@ -75,7 +84,13 @@ const SignupScreen = ({ navigation }) => {
 
   const validateField = (field, value) => {
     let newErrors = { ...errors }; // Copy existing errors
-
+    if (field === "phoneNumber") {
+      newErrors.phoneNumber = !value.trim()
+        ? "Phone number is required."
+        : !/^\d{10}$/.test(value)
+        ? "Phone number is invalid."
+        : "";
+    }
     switch (field) {
       case "name":
         newErrors.name = !value.trim() ? "Username is required." : "";
@@ -131,38 +146,43 @@ const SignupScreen = ({ navigation }) => {
   function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+
   const handleSubmit = async () => {
     if (!validateForm()) {
-      console.log("Form has errors. Please correct them.");
       return;
     }
-    const url = urlPath + "/auth/signup";
-    const username = name;
-    console.log(url);
+
+    const url = `http://192.168.100.13:32773/auth/signup`; // Use template literals for constructing the URL
+    const userData = {
+      // Consolidating user data into an object to simplify the axios call
+      email,
+      password,
+      username: name,
+      phoneNumber,
+    };
+
     try {
-      const response = await axios.post(url, {
-        email,
-        password,
-        username,
-      });
-      SucessMessage(name);
-      await sleep(3000);
+      const response = await axios.post(url, userData);
+      console.log(response);
+      SucessMessage(name); // Ensure this function is properly named and capitalized if it is a component
+      await sleep(3000); // Consider whether this sleep is necessary as it pauses execution without a UI benefit
       console.log("Form submitted successfully!", response.data);
       await SecureStore.setItemAsync("token", response.data.token);
       await SecureStore.setItemAsync("email", email);
-      await SecureStore.setItemAsync("password", password); // Consider security implications
+      await SecureStore.setItemAsync("password", password); // Consider security implications here
+      // Reset form fields
       setEmail("");
       setName("");
       setPassword("");
       setRePassword("");
+      setPhoneNumber("");
       navigation.navigate("Login");
     } catch (error) {
-      NonSucess();
+      NonSucess(); // Ensure this function captures and handles the actual error, possibly logging or displaying it
     }
   };
 
-  // const formIsValid = name && email && password && rePassword && Object.keys(errors).length === 0;
-
+  // const formIsValid = name && email && password && rePassword && Object.keys(errors).length === 0
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [confirmPasswordVisibility, setConfirmPasswordVisibility] =
     useState(true);
@@ -220,6 +240,20 @@ const SignupScreen = ({ navigation }) => {
             </View>
             {errors.email && (
               <Text style={styles.errorText}>{errors.email}</Text>
+            )}
+            <View style={styles.inputContainer}>
+              <FontAwesome name="phone" style={styles.icon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Phone Number"
+                placeholderTextColor={COLORS.lightGray}
+                value={phoneNumber}
+                onChangeText={(value) => handleChange("phoneNumber", value)}
+                keyboardType="numeric"
+              />
+            </View>
+            {errors.phoneNumber && (
+              <Text style={styles.errorText}>{errors.phoneNumber}</Text>
             )}
 
             {/* Password Field */}

@@ -145,7 +145,7 @@ const LoginScreen = ({ navigation }) => {
       return; // Stops the function if the form is not valid
     }
 
-    const url = urlPath + "/auth/signin";
+    const url = "http://192.168.100.13:32773/auth/signin";
     const data = {
       email: email,
       password: password,
@@ -154,9 +154,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       const response = await axios.post(url, data);
       console.log(response.data);
-
       SucessMessage(); // Call the function to show the success message
-      await sleep(3000);
       console.log(response.data.token);
       await save("token", response.data.token); // Make sure these saves are awaited
       await save("email", data.email);
@@ -243,6 +241,16 @@ const LoginScreen = ({ navigation }) => {
             >
               <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Signup");
+              }}
+            >
+              <Text style={styles.formFooter}>
+                Don't have an account?{" "}
+                <Text style={{ textDecorationLine: "underline" }}>Sign up</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
         </ImageBackground>
       </ScrollView>
@@ -252,6 +260,14 @@ const LoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  formFooter: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#222",
+    textAlign: "center",
+    letterSpacing: 0.15,
+    marginTop: 10,
+  },
   inputContainer: {
     flexDirection: "row",
     borderWidth: 1,

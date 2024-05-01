@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import FeatherIcon from "react-native-vector-icons/Feather";
+import { Styles } from "./Styles";
 import {
   StyleSheet,
   SafeAreaView,
@@ -16,11 +17,12 @@ import {
   TextInput,
   FlatList,
 } from "react-native";
+
 import { Feather } from "@expo/vector-icons";
 import { COLORS } from "../../assets/theme";
 import { useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
+
 const Tab = createBottomTabNavigator();
 const SettingsStack = createNativeStackNavigator();
 
@@ -312,8 +314,7 @@ const styles2 = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
-    marginBottom: 4,
-    marginBottom: 16,
+    marginBottom: 10,
   },
   bottomButtonText: {
     color: "#fff",
@@ -342,14 +343,212 @@ const styles2 = StyleSheet.create({
   // Add more styles as needed
 });
 
-function DetailsScreen3() {
+const SettingItem = ({ text }) => {
   return (
-    <View>
-      <Text>hello</Text>
+    <View style={styles3.settingItem}>
+      <Text style={styles3.settingText}>{text}</Text>
+      <AntDesign
+        name="checkcircleo"
+        size={24}
+        color={COLORS.primary}
+        style={styles3.icon}
+      />
+    </View>
+  );
+};
+
+function DetailsScreen3({ navigation }) {
+  const addReel = () => {
+    console.log("Add reel logic triggered");
+  };
+
+  return (
+    <View style={styles3.container}>
+      <Text style={styles3.title}>Add reel</Text>
+      <SettingItem text="A video of up to 30 seconds can be added" />
+      <SettingItem text="For Android users, pressing faster will speed up and secure" />
+      <SettingItem text="Improving the quality of filming, they are programmed longitudinally" />
+      <TouchableOpacity style={styles3.addReelBox} onPress={addReel}>
+        <AntDesign name="pluscircleo" size={50} color={COLORS.primary2} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles3.button}
+        onPress={() => navigation.navigate("Details4")} // Replace 'NextScreenName' with the actual name of your screen
+      >
+        <Text style={styles3.buttonText}>Next</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
+const styles3 = StyleSheet.create({
+  title: {
+    marginLeft: 30,
+    fontSize: 30,
+    fontWeight: "bold",
+    marginBottom: 10,
+
+    color: COLORS.primary,
+    marginTop: 30,
+  },
+  container: {
+    padding: 10,
+    flex: 1,
+    backgroundColor: COLORS.white,
+    justifyContent: "center", // Centers everything vertically
+  },
+  addReelBox: {
+    width: 300,
+    height: 250,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    marginVertical: 20,
+    alignSelf: "center",
+    borderWidth: 3,
+    borderRadius: 5,
+    backgroundColor: COLORS.white,
+    borderColor: "grey",
+    marginBottom: -5,
+  },
+  settingItem: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  settingText: {
+    fontSize: 16,
+    fontWeight: "bold",
+
+    marginLeft: 20,
+    flex: 1,
+  },
+  icon: {
+    // Additional styling for the icon if necessary
+  },
+  boldText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center", // Ensures text is centered horizontally
+    color: COLORS.primary,
+    marginBottom: 20, // Space between the title and the first setting item
+  },
+  button: {
+    backgroundColor: COLORS.primary,
+    padding: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    marginVertical: 20,
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontSize: 18,
+  },
+});
+
+const DATA = [
+  "Irbid",
+  "Ajloun",
+  "Jerash",
+  "Mafraq",
+  "Balqa",
+  "Amman",
+  "Zarqa",
+  "Madaba",
+  "Karak",
+  "Tafilah",
+  "Ma'an",
+  "Aqaba",
+];
+const ListItem = ({ title, onPress }) => (
+  <TouchableOpacity onPress={onPress} style={styles4.item}>
+    <AntDesign name="arrowright" size={20} color="black" style={styles4.icon} />
+    <Text style={styles4.title}>{title}</Text>
+  </TouchableOpacity>
+);
+const DetailsScreen4 = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const renderItem = ({ item }) => (
+    <ListItem
+      title={item}
+      onPress={() => console.log(`Pressed on ${item}`)} // Replace with your actual onPress action
+    />
+  );
+
+  return (
+    <View style={styles4.container}>
+      <View style={styles4.searchSection}>
+        <TextInput
+          style={styles4.input}
+          placeholder="Search for the area"
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+        />
+      </View>
+
+      <FlatList
+        data={DATA.filter((item) =>
+          item.toLowerCase().includes(searchQuery.toLowerCase())
+        )}
+        renderItem={renderItem}
+        keyExtractor={(item) => item}
+      />
+    </View>
+  );
+};
+const styles4 = StyleSheet.create({
+  item: {
+    backgroundColor: "#fff",
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    flexDirection: "row-reverse",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderWidth: 2,
+    borderRadius: 5,
+    borderColor: "grey",
+    marginBottom: 20,
+  },
+  icon: {
+    // Styles for the icon if necessary
+  },
+  title: {
+    fontSize: 16,
+    // Any additional text styles
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff", // This ensures the background of the container is white
+    // Remove marginTop and marginBottom if not needed to avoid unwanted spacing
+  },
+  searchSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff", // Ensure search section also has a white background
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  searchIcon: {
+    // If you have a search icon, adjust its styles here
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    textAlign: "center",
+    // Ensure input background is also white if necessary
+    backgroundColor: "#fff",
+  },
+});
 export default function App() {
   return (
     <NavigationContainer independent={true}>
@@ -375,6 +574,11 @@ export default function App() {
               <SettingsStack.Screen
                 name="Detail3"
                 component={DetailsScreen3}
+                options={{ headerShown: true }}
+              />
+              <SettingsStack.Screen
+                name="Details4"
+                component={DetailsScreen4}
                 options={{ headerShown: true }}
               />
             </SettingsStack.Navigator>
