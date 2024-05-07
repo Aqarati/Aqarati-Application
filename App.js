@@ -17,7 +17,7 @@ import OwnLand from "./app/CategoryScreens/OwnLand";
 import RentApartment from "./app/CategoryScreens/RentApartment";
 import RentHome from "./app/CategoryScreens/RentHome";
 import Invest from "./app/CategoryScreens/Invest";
-
+import Toast from "react-native-toast-message";
 const Stack = createNativeStackNavigator();
 
 function App() {
@@ -44,7 +44,7 @@ function App() {
         <Stack.Screen
           name="profilescreen"
           component={ProfileScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Details"
@@ -74,7 +74,7 @@ function App() {
         <Stack.Screen
           name="editprofile"
           component={EditProfile}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="ownhome"

@@ -17,10 +17,9 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import * as LocalAuthentication from "expo-local-authentication";
 import { CommonActions } from "@react-navigation/native";
-import { urlPath } from "../lib";
 
 import Toast from "react-native-toast-message";
-import Tabs from "../tabs/Tabs";
+
 async function save(key, value) {
   await SecureStore.setItemAsync(key, value);
 }

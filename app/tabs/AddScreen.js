@@ -1,10 +1,9 @@
 import * as React from "react";
-
+import { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import FeatherIcon from "react-native-vector-icons/Feather";
-import { Styles } from "./Styles";
+
 import {
   StyleSheet,
   SafeAreaView,
@@ -20,14 +19,16 @@ import {
   Keyboard,
   Switch,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
-import { COLORS } from "../../assets/theme";
-import { useState } from "react";
-import { AntDesign } from "@expo/vector-icons";
 
+import { COLORS } from "../../assets/theme";
+
+import { AntDesign } from "@expo/vector-icons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 const Tab = createBottomTabNavigator();
 const SettingsStack = createNativeStackNavigator();
-
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Octicons from "react-native-vector-icons/Octicons";
+import * as ImagePicker from "expo-image-picker";
 const items = [
   {
     img: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80",
@@ -217,20 +218,54 @@ function DetailsScreen2({ navigation }) {
   const initialPhotos = new Array(12).fill(null);
   const [photos, setPhotos] = useState(initialPhotos);
 
-  // Function to handle adding photos
-  const addPhoto = (index) => {
-    // This function would be replaced by your image picker logic
-    // and would update the photos state with the new image.
-    console.log(`Add photo at position ${index}`);
+  useEffect(() => {
+    // Request permission to access the camera and photo library
+    (async () => {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Required",
+          "Sorry, we need camera roll permissions to make this work!"
+        );
+      }
+    })();
+  }, []);
+
+  const handleImagePress = async (index) => {
+    // Open the device's photo library
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      selectionLimit: 12,
+      allowsMultipleSelection: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    console.log("ImagePicker result:", result); // Log the result object to see its structure and check for the URI
+
+    if (!result.cancelled) {
+      // If image is selected, update photoUri and keep changePhotoMode true
+      const newPhotos = [...photos];
+      newPhotos[index] = result.uri;
+      setPhotos(newPhotos);
+
+      // Log the updated newPhotos array to verify the saved image URI
+      console.log("Updated newPhotos:", newPhotos);
+    }
   };
 
   const renderItem = ({ item, index }) => (
     <TouchableOpacity
       style={index === 0 ? styles2.firstPhotoBox : styles2.photoBox}
-      onPress={() => addPhoto(index)}
+      onPress={() => handleImagePress(index)}
     >
       {item ? (
-        <Image source={{ uri: item }} style={styles2.photo} />
+        <Image
+          source={{ uri: item }}
+          style={[styles2.photo, { resizeMode: "cover" }]}
+        />
       ) : (
         <View
           style={index === 0 ? styles2.firstAddIconBox : styles2.addIconBox}
@@ -246,14 +281,16 @@ function DetailsScreen2({ navigation }) {
       <Text style={styles2.title}>Add pictures to the advertise</Text>
       <View style={styles2.dashedBox}>
         <Text style={styles2.dashedBoxText}>
-          • Up to 12 photos can be added
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Up to 12
+          photos can be added
         </Text>
         <Text style={styles2.dashedBoxText}>
-          • Pictures increase the number of views
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Pictures
+          increase the number of views
         </Text>
         <Text style={styles2.dashedBoxText}>
-          • Hint: You can rearrange photos by dragging them from one place to
-          another
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Hint:
+          You can rearrange photos by dragging them from one place to another
         </Text>
       </View>
 
@@ -480,7 +517,7 @@ const DATA = [
     name: "Irbid",
     areas: ["Irbid City", "Ar Ramtha", "Bani Kinana"],
     rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4", "5"],
+    bathrooms: ["1", "2", "3", "4", "5", "6+"],
     roomstate: ["Furnished", "Unfurnished", "Partially Furnished", "d"],
     floor: [
       "Ground Floor",
@@ -1116,6 +1153,12 @@ const NumberOfRoomsScreen = ({ navigation, route }) => {
       onPress={() => handleRoomSelection(room)}
       style={RoomStyle.item}
     >
+      <MaterialIcons
+        name="bedroom-child"
+        size={20}
+        color={COLORS.primary}
+        style={RoomStyle.icon}
+      />
       <Text style={RoomStyle.itemText}>{room} Room</Text>
       <AntDesign name="arrowright" size={20} color="black" />
     </TouchableOpacity>
@@ -1133,6 +1176,9 @@ const NumberOfRoomsScreen = ({ navigation, route }) => {
   );
 };
 const RoomStyle = StyleSheet.create({
+  icon: {
+    marginLeft: 1, // Adjust spacing between the icon and the text as needed
+  },
   container: {
     flex: 1,
     padding: 10,
@@ -1163,6 +1209,7 @@ const RoomStyle = StyleSheet.create({
   itemText: {
     fontSize: 16,
     color: "black",
+    marginLeft: -170, // to make the icons lefto of the text
   },
   searchSection: {
     flexDirection: "row",
@@ -1198,6 +1245,12 @@ const NumberOfBathroomsScreen = ({ navigation, route }) => {
       onPress={() => handleBathroomSelection(bathroom)}
       style={bathRoomStyle.item}
     >
+      <FontAwesome
+        name="bathtub"
+        size={20}
+        color={COLORS.primary}
+        style={RoomStyle.icon}
+      />
       <Text style={bathRoomStyle.itemText}>{bathroom} Bathroom</Text>
       <AntDesign name="arrowright" size={20} color="black" />
     </TouchableOpacity>
@@ -1245,6 +1298,7 @@ const bathRoomStyle = StyleSheet.create({
   itemText: {
     fontSize: 16,
     color: "black",
+    marginLeft: -130, // to make the icons lefto of the text
   },
   searchSection: {
     flexDirection: "row",

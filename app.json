@@ -18,6 +18,7 @@
         "NSFaceIDUsageDescription": "Here we will explain why we use it i thing for auth"
       }
     },
+
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
