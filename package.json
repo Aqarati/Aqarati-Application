@@ -20,7 +20,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@tailwindcss/forms": "^0.5.7",
     "axios": "^1.6.7",
-    "expo": "~50.0.11",
+    "expo": "^51.0.2",
     "expo-image-picker": "^14.7.1",
     "expo-local-authentication": "~13.8.0",
     "expo-secure-store": "~12.8.1",
