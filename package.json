@@ -47,7 +47,8 @@
     "tailwindcss": "^3.4.1",
     "twrnc": "^4.1.0",
     "typescript": "^5.3.0",
-    "undefined": "@/components/icon"
+    "undefined": "@/components/icon",
+    "react-native-reanimated": "~3.10.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
