@@ -18,6 +18,8 @@ import RentApartment from "./app/CategoryScreens/RentApartment";
 import RentHome from "./app/CategoryScreens/RentHome";
 import Invest from "./app/CategoryScreens/Invest";
 import Toast from "react-native-toast-message";
+import "react-native-reanimated";
+
 const Stack = createNativeStackNavigator();
 
 function App() {
