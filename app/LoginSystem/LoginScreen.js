@@ -14,7 +14,6 @@ import {
 import COLORS from "../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
-import * as SecureStore from "expo-secure-store";
 import * as LocalAuthentication from "expo-local-authentication";
 import { CommonActions } from "@react-navigation/native";
 import { urlPath, save, getValueFor } from "../lib";
@@ -57,7 +56,8 @@ const LoginScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    checkForBiometrics();
+    // here is the biometric login
+    // checkForBiometrics();
   }, []);
 
   const checkForBiometrics = async () => {
@@ -147,7 +147,7 @@ const LoginScreen = ({ navigation }) => {
       await save("token", response.data.token);
       await save("email", data.email);
       await save("password", data.password);
-      console.log(getValueFor("token"));
+
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
@@ -155,6 +155,7 @@ const LoginScreen = ({ navigation }) => {
         })
       );
     } catch (error) {
+      console.log("faild Authentication");
       NonSuccessMessage();
     }
   };
