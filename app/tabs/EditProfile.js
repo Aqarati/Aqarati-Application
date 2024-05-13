@@ -15,11 +15,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 // Sample data
 const DATA = [
   {
-    Fullname: "alex deman",
-    Username: "alex",
-    Email: "alex@gmail.com",
-    Phone: "0790543919",
-    Password: "*******",
+    firstName: "alex deman",
+    LastName: "alex deman",
   },
 ];
 
