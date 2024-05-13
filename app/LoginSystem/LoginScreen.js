@@ -17,21 +17,8 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import * as LocalAuthentication from "expo-local-authentication";
 import { CommonActions } from "@react-navigation/native";
-
+import { urlPath, save, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
-
-async function save(key, value) {
-  await SecureStore.setItemAsync(key, value);
-}
-
-async function getValueFor(key) {
-  let result = await SecureStore.getItemAsync(key);
-  if (result) {
-    alert("🔐 Here's your value 🔐 \n" + result);
-  } else {
-    alert("No values stored under that key.");
-  }
-}
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -144,33 +131,31 @@ const LoginScreen = ({ navigation }) => {
       return; // Stops the function if the form is not valid
     }
 
-    const url = "http://192.168.100.13:32773/auth/signin";
+    const url = urlPath + "/auth/signin";
     const data = {
       email: email,
       password: password,
     };
+    var token = "Bearer " + getValueFor("token");
 
     try {
       const response = await axios.post(url, data);
       console.log(response.data);
-      SucessMessage(); // Call the function to show the success message
+      console.log(url);
+      SucessMessage();
       console.log(response.data.token);
-      await save("token", response.data.token); // Make sure these saves are awaited
+      await save("token", response.data.token);
       await save("email", data.email);
-      await save("password", data.password); // Fixed typo from "passwrod" to "password"
-
+      await save("password", data.password);
+      console.log(getValueFor("token"));
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [
-            { name: "Tabs" }, // Navigate to the main screen
-          ],
+          routes: [{ name: "Tabs" }],
         })
       );
     } catch (error) {
       NonSuccessMessage();
-      // console.error("Login Error:", error);
-      // Handle the login error here, such as showing an error message
     }
   };
 
