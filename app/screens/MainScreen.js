@@ -179,7 +179,10 @@ export default function MainScreen({ navigation }) {
                 onPress={() => navigation.navigate("profilescreen")}
               >
                 <Image
-                  source={{ uri: userData ? `${userData.imageUrl}` : "" }}
+                  source={{
+                    uri:
+                      userData && userData.imageUrl ? userData.imageUrl : "s",
+                  }}
                   style={profilestyle.avatar}
                 />
               </TouchableOpacity>

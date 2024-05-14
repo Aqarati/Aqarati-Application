@@ -64,7 +64,9 @@ export default function ProfileScreen({ navigation }) {
             <View style={styles.profileHeader}>
               <Image
                 alt=""
-                source={{ uri: userData ? `${userData.imageUrl}` : "" }}
+                source={{
+                  uri: userData && userData.imageUrl ? userData.imageUrl : "s",
+                }}
                 style={styles.profileAvatar}
               />
 
