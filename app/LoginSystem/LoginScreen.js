@@ -19,23 +19,48 @@ import { CommonActions } from "@react-navigation/native";
 import { urlPath, save, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
 
+const SucessMessage = () => {
+  Toast.show({
+    type: "success",
+    text1: "Login Message",
+    text2: "Login Successfully",
+    autoHide: false,
+    visibilityTime: 3000,
+    position: "top",
+  });
+};
+
+const NonSuccessMessage = (text) => {
+  Toast.show({
+    type: "error",
+    text1: "Warning Message",
+    text2: text,
+    autoHide: true,
+    visibilityTime: 3000,
+    position: "top",
+  });
+};
+
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [isFormValid, setIsFormValid] = useState(false);
   const [hasTriedToSubmit, setHasTriedToSubmit] = useState(false); // New state to track submission attempts
+  const [passwordVisibility, setPasswordVisibility] = useState(true);
+
+  useEffect(() => {
+    // here is the biometric login
+    // checkForBiometrics();
+  }, []);
 
   useEffect(() => {
     const isValid = validateForm();
-    setIsFormValid(isValid);
     if (hasTriedToSubmit) {
       validateForm();
     }
   }, [email, password, hasTriedToSubmit]);
 
   const validateForm = () => {
-    // this function will check the field if empty or the email is valid
     let newErrors = {};
     let isValid = true;
 
@@ -54,11 +79,6 @@ const LoginScreen = ({ navigation }) => {
     setErrors(newErrors);
     return isValid;
   };
-
-  useEffect(() => {
-    // here is the biometric login
-    // checkForBiometrics();
-  }, []);
 
   const checkForBiometrics = async () => {
     const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -89,46 +109,17 @@ const LoginScreen = ({ navigation }) => {
           routes: [{ name: "Tabs" }],
         })
       );
-
-      // Handle successful authentication
     } else {
       console.log("Authentication failed");
-      // Handle authentication failure
     }
   };
 
-  const SucessMessage = () => {
-    Toast.show({
-      type: "success",
-      text1: "Login Message",
-      text2: "Login Successfully",
-      autoHide: false,
-      visibilityTime: 3000,
-      position: "top",
-    });
-  };
-
-  const NonSuccessMessage = () => {
-    Toast.show({
-      type: "error",
-      text1: "Warning Message",
-      text2: "Username or password incorrect!",
-      autoHide: true,
-      visibilityTime: 3000,
-      position: "top",
-    });
-  };
-
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   const handleSubmit = async () => {
-    setHasTriedToSubmit(true); // Update the submission attempt state
+    setHasTriedToSubmit(true);
     const isValid = validateForm();
 
     if (!isValid) {
-      return; // Stops the function if the form is not valid
+      return;
     }
 
     const url = urlPath + "/auth/signin";
@@ -136,34 +127,45 @@ const LoginScreen = ({ navigation }) => {
       email: email,
       password: password,
     };
-    var token = "Bearer " + getValueFor("token");
 
-    try {
-      const response = await axios.post(url, data);
-      console.log(response.data);
-      console.log(url);
-      SucessMessage();
-      console.log(response.data.token);
-      await save("token", response.data.token);
-      await save("email", data.email);
-      await save("password", data.password);
-
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: "Tabs" }],
-        })
-      );
-    } catch (error) {
-      console.log("faild Authentication");
-      NonSuccessMessage();
-    }
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+    await axios
+      .request(config)
+      .then((response) => {
+        save("token", response.data.token);
+        save("email", data.email);
+        save("password", data.password);
+        SucessMessage();
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Tabs" }],
+          })
+        );
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          console.log("Unauthorized: Authentication failed");
+          NonSuccessMessage("Username or password incorrect!");
+        } else {
+          console.log("error: " + error);
+          NonSuccessMessage("There is an error could be network error!");
+        }
+        console.log("Success");
+      });
   };
 
   const showError = (errorKey) => hasTriedToSubmit && errors[errorKey];
   const formIsValid =
     email.trim() && password.trim() && Object.keys(errors).length === 0;
-  const [passwordVisibility, setPasswordVisibility] = useState(true);
 
   return (
     <KeyboardAvoidingView
