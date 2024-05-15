@@ -14,42 +14,53 @@ import {
 import COLORS from "../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
-import * as SecureStore from "expo-secure-store";
 import * as LocalAuthentication from "expo-local-authentication";
 import { CommonActions } from "@react-navigation/native";
-
+import { urlPath, save, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
 
-async function save(key, value) {
-  await SecureStore.setItemAsync(key, value);
-}
+const SucessMessage = () => {
+  Toast.show({
+    type: "success",
+    text1: "Login Message",
+    text2: "Login Successfully",
+    autoHide: false,
+    visibilityTime: 3000,
+    position: "top",
+  });
+};
 
-async function getValueFor(key) {
-  let result = await SecureStore.getItemAsync(key);
-  if (result) {
-    alert("🔐 Here's your value 🔐 \n" + result);
-  } else {
-    alert("No values stored under that key.");
-  }
-}
+const NonSuccessMessage = (text) => {
+  Toast.show({
+    type: "error",
+    text1: "Warning Message",
+    text2: text,
+    autoHide: true,
+    visibilityTime: 3000,
+    position: "top",
+  });
+};
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [isFormValid, setIsFormValid] = useState(false);
   const [hasTriedToSubmit, setHasTriedToSubmit] = useState(false); // New state to track submission attempts
+  const [passwordVisibility, setPasswordVisibility] = useState(true);
+
+  useEffect(() => {
+    // here is the biometric login
+    // checkForBiometrics();
+  }, []);
 
   useEffect(() => {
     const isValid = validateForm();
-    setIsFormValid(isValid);
     if (hasTriedToSubmit) {
       validateForm();
     }
   }, [email, password, hasTriedToSubmit]);
 
   const validateForm = () => {
-    // this function will check the field if empty or the email is valid
     let newErrors = {};
     let isValid = true;
 
@@ -68,10 +79,6 @@ const LoginScreen = ({ navigation }) => {
     setErrors(newErrors);
     return isValid;
   };
-
-  useEffect(() => {
-    checkForBiometrics();
-  }, []);
 
   const checkForBiometrics = async () => {
     const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -102,82 +109,63 @@ const LoginScreen = ({ navigation }) => {
           routes: [{ name: "Tabs" }],
         })
       );
-
-      // Handle successful authentication
     } else {
       console.log("Authentication failed");
-      // Handle authentication failure
     }
   };
 
-  const SucessMessage = () => {
-    Toast.show({
-      type: "success",
-      text1: "Login Message",
-      text2: "Login Successfully",
-      autoHide: false,
-      visibilityTime: 3000,
-      position: "top",
-    });
-  };
-
-  const NonSuccessMessage = () => {
-    Toast.show({
-      type: "error",
-      text1: "Warning Message",
-      text2: "Username or password incorrect!",
-      autoHide: true,
-      visibilityTime: 3000,
-      position: "top",
-    });
-  };
-
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   const handleSubmit = async () => {
-    setHasTriedToSubmit(true); // Update the submission attempt state
+    setHasTriedToSubmit(true);
     const isValid = validateForm();
 
     if (!isValid) {
-      return; // Stops the function if the form is not valid
+      return;
     }
 
-    const url = "http://192.168.100.13:32773/auth/signin";
+    const url = urlPath + "/auth/signin";
     const data = {
       email: email,
       password: password,
     };
 
-    try {
-      const response = await axios.post(url, data);
-      console.log(response.data);
-      SucessMessage(); // Call the function to show the success message
-      console.log(response.data.token);
-      await save("token", response.data.token); // Make sure these saves are awaited
-      await save("email", data.email);
-      await save("password", data.password); // Fixed typo from "passwrod" to "password"
-
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [
-            { name: "Tabs" }, // Navigate to the main screen
-          ],
-        })
-      );
-    } catch (error) {
-      NonSuccessMessage();
-      // console.error("Login Error:", error);
-      // Handle the login error here, such as showing an error message
-    }
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: data,
+    };
+    await axios
+      .request(config)
+      .then((response) => {
+        save("token", response.data.token);
+        save("email", data.email);
+        save("password", data.password);
+        SucessMessage();
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Tabs" }],
+          })
+        );
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          console.log("Unauthorized: Authentication failed");
+          NonSuccessMessage("Username or password incorrect!");
+        } else {
+          console.log("error: " + error);
+          NonSuccessMessage("There is an error could be network error!");
+        }
+        console.log("Success");
+      });
   };
 
   const showError = (errorKey) => hasTriedToSubmit && errors[errorKey];
   const formIsValid =
     email.trim() && password.trim() && Object.keys(errors).length === 0;
-  const [passwordVisibility, setPasswordVisibility] = useState(true);
 
   return (
     <KeyboardAvoidingView

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -10,8 +10,11 @@ import {
   Image,
   Linking,
 } from "react-native";
+import axios from "axios";
+
 import FeatherIcon from "react-native-vector-icons/Feather";
 import COLORS from "../../assets/Colors/colors";
+import { urlPath, getValueFor } from "../lib";
 
 export default function ProfileScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -19,30 +22,37 @@ export default function ProfileScreen({ navigation }) {
     emailNotifications: true,
     pushNotifications: false,
   });
-  const instahandlePress = () => {
-    // Your Instagram username
-    const username = "aqaratiofficial";
-    // Construct the Instagram URL
-    const instagramUrl = `https://www.instagram.com/${username}/`;
-
-    // Open the Instagram profile in the browser
-    Linking.openURL(instagramUrl)
-      .then(() => console.log("Instagram profile opened"))
-      .catch((error) =>
-        console.error("Error opening Instagram profile:", error)
-      );
+  const [userData, setUserData] = useState(null); // Add this line to initialize user data state
+  const fetchData = async () => {
+    console.log("fetch data for profile");
+    const url = urlPath + "/user/profile";
+    console.log("url : " + url);
+    const token = await getValueFor("token");
+    const config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: url,
+      headers: {
+        Authorization: "Bearer  " + token,
+      },
+    };
+    console.log(config);
+    await axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+        setUserData(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-  const xhandlePress = () => {
-    // Your Instagram username
-    const username = "Aqaratiofficial";
-    // Construct the Instagram URL
-    const xUrl = `https://twitter.com/${username}/`;
 
-    // Open the Instagram profile in the browser
-    Linking.openURL(xUrl)
-      .then(() => console.log("X profile opened"))
-      .catch((error) => console.error("Error opening X profile:", error));
-  };
+  useEffect(() => {
+    console.log("profile use effect called");
+    fetchData();
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <View style={styles.container}>
@@ -55,14 +65,22 @@ export default function ProfileScreen({ navigation }) {
             <View style={styles.profileHeader}>
               <Image
                 alt=""
-                source={require("../../assets/images/moh.jpg")}
+                source={{
+                  uri: userData && userData.imageUrl ? userData.imageUrl : "s",
+                }}
                 style={styles.profileAvatar}
               />
 
               <View>
-                <Text style={styles.profileName}>Mohammed Ahmed</Text>
+                <Text style={styles.profileName}>
+                  {userData
+                    ? `${userData.firstName} ${userData.lastName}`
+                    : " "}
+                </Text>
 
-                <Text style={styles.profileHandle}>@f4.g</Text>
+                <Text style={styles.profileHandle}>
+                  {userData ? `@${userData.uname}` : ""}
+                </Text>
               </View>
             </View>
 

@@ -16,7 +16,8 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store"; // Assuming SecureStore is used.
 import Toast from "react-native-toast-message";
-import { urlPath } from "../lib";
+import { urlPath, save, getValueFor } from "../lib";
+
 const SignupScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -152,7 +153,8 @@ const SignupScreen = ({ navigation }) => {
       return;
     }
 
-    const url = `http://192.168.100.13:32773/auth/signup`; // Use template literals for constructing the URL
+    const url = urlPath + "/auth/signup";
+
     const userData = {
       // Consolidating user data into an object to simplify the axios call
       email,

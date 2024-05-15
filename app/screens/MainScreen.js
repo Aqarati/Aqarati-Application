@@ -9,8 +9,10 @@ import {
   Image,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome5";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
+import { urlPath, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
 const initialItems = [
   {
@@ -112,6 +114,36 @@ const categories = [
 ];
 
 export default function MainScreen({ navigation }) {
+  const [userData, setUserData] = useState(null); // Add this line to initialize user data state
+  const fetchData = async () => {
+    console.log("fetch data for profile");
+    const url = urlPath + "/user/profile";
+    console.log("url : " + url);
+    const token = await getValueFor("token");
+    const config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: url,
+      headers: {
+        Authorization: "Bearer  " + token,
+      },
+    };
+    console.log(config);
+    await axios
+      .request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+        setUserData(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  useEffect(() => {
+    console.log("Main screen use effect called");
+    fetchData();
+  }, []);
+
   const handleCardPress = (itemDetails) => {
     navigation.navigate("Details", { itemDetails });
   };
@@ -147,7 +179,10 @@ export default function MainScreen({ navigation }) {
                 onPress={() => navigation.navigate("profilescreen")}
               >
                 <Image
-                  source={require("../../assets/images/moh.jpg")}
+                  source={{
+                    uri:
+                      userData && userData.imageUrl ? userData.imageUrl : "s",
+                  }}
                   style={profilestyle.avatar}
                 />
               </TouchableOpacity>
