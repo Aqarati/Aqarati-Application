@@ -53,6 +53,31 @@ export default function ProfileScreen({ navigation }) {
     fetchData();
   }, []);
 
+  const instahandlePress = () => {
+    // Your Instagram username
+    const username = "aqaratiofficial";
+    // Construct the Instagram URL
+    const instagramUrl = "https://www.instagram.com/${username}/";
+
+    // Open the Instagram profile in the browser
+    Linking.openURL(instagramUrl)
+      .then(() => console.log("Instagram profile opened"))
+      .catch((error) =>
+        console.error("Error opening Instagram profile:", error)
+      );
+  };
+  const xhandlePress = () => {
+    // Your Instagram username
+    const username = "Aqaratiofficial";
+    // Construct the Instagram URL
+    const xUrl = "https://twitter.com/${username}/";
+
+    // Open the Instagram profile in the browser
+    Linking.openURL(xUrl)
+      .then(() => console.log("X profile opened"))
+      .catch((error) => console.error("Error opening X profile:", error));
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <View style={styles.container}>
