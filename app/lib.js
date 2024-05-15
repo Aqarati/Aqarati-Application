@@ -7,8 +7,8 @@ export async function save(key, value) {
   // console.log("saved  " + key + ":" + value);
 }
 
-export async function delete_token(key) {
-  await SecureStore.deleteItemAsync(key);
+export async function delete_token() {
+  await SecureStore.deleteItemAsync("token");
 }
 
 export async function getValueFor(key) {

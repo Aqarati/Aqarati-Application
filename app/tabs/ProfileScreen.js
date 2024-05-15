@@ -11,10 +11,29 @@ import {
   Linking,
 } from "react-native";
 import axios from "axios";
-
+import { delete_token } from "../lib";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import COLORS from "../../assets/Colors/colors";
+import Toast from "react-native-toast-message";
+
 import { urlPath, getValueFor } from "../lib";
+
+const SucessMessage = () => {
+  Toast.show({
+    type: "success",
+    text1: "Logout Message",
+    text2: "Logout Successfully",
+    autoHide: false,
+    visibilityTime: 3000,
+    position: "top",
+  });
+};
+const resetToFirstScreen = (navigation) => {
+  navigation.reset({
+    index: 0,
+    routes: [{ name: "Home" }], // Replace 'Details' with the name of your first screen
+  });
+};
 
 export default function ProfileScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -348,7 +367,9 @@ export default function ProfileScreen({ navigation }) {
 
             <TouchableOpacity
               onPress={() => {
-                // handle onPress
+                SucessMessage();
+                delete_token();
+                resetToFirstScreen(navigation);
               }}
               style={styles.row}
             >
@@ -368,6 +389,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </ScrollView>
       </View>
+      <Toast></Toast>
     </SafeAreaView>
   );
 }
