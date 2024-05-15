@@ -18,6 +18,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Switch,
+  Alert,
 } from "react-native";
 
 import { COLORS } from "../../assets/theme";
@@ -29,92 +30,122 @@ const SettingsStack = createNativeStackNavigator();
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Octicons from "react-native-vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
+
 const items = [
   {
-    img: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80",
+    img: "https://images.pexels.com/photos/425343/pexels-photo-425343.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     address: "Apartments for Rent",
   },
   {
-    img: "https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
+    img: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     address: "Houses for Rent",
   },
 ];
-function DetailsScreen({ navigation }) {
+const selectedDATA = [
+  {
+    adtype: [],
+    adsubtype: [],
+    photos: [],
+    rel: [],
+    city: [],
+    areas: [],
+    rooms: [],
+    bathrooms: [],
+    roomstate: [],
+    buildingarea: [],
+    buildingfloor: [],
+    buildingage: [],
+    buildingrentperiod: [],
+    buildingkeyFeatures: [],
+    buildingadditionalBenefits: [],
+    buildingnearbyLocations: [],
+    buildingorientations: [],
+    adtitle: [],
+    addescription: [],
+    adprice: [],
+  },
+];
+
+const DetailsScreen = ({ navigation }) => {
+  const handlePress = (address) => {
+    navigation.push("Detail1", { adtype: address });
+  };
+
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <SafeAreaView style={{ backgroundColor: "#fff" }}>
-        <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <Text style={styles.title}>What would you like to advertise?</Text>
           <Text style={styles.subtitle}>
             Choose the appropriate section to add the advertisement
           </Text>
-          {items.map(({ img, address }, index) => {
-            return (
-              <View
-                key={index}
-                style={[styles.card, index === 0 && { borderTopWidth: 0 }]}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.push("Detail1");
-                  }}
-                >
-                  <Image
-                    alt=""
-                    resizeMode="cover"
-                    source={{ uri: img }}
-                    style={styles.cardImg}
-                  />
-
-                  <View style={styles.cardBody}>
-                    <Text style={styles.cardTitle}>{address}</Text>
-                  </View>
-                </TouchableOpacity>
+          {items.map(({ img, address }, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[styles.card, index === 0 && { borderTopWidth: 2 }]}
+              onPress={() => handlePress(address)}
+            >
+              <Image
+                source={{ uri: img }}
+                style={styles.cardImg}
+                resizeMode="cover"
+              />
+              <View style={styles.cardContent}>
+                <Text style={styles.cardTitle}>{address}</Text>
               </View>
-            );
-          })}
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </SafeAreaView>
     </View>
   );
-}
+};
+
 const styles = StyleSheet.create({
   container: {
-    padding: 26,
+    flex: 1,
+    backgroundColor: COLORS.white,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    padding: 15,
   },
   title: {
-    fontSize: 30,
-    fontWeight: "700",
-    color: "#1d1d1d",
-    marginBottom: 12,
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: COLORS.primary,
+    marginTop: 30,
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#1d1d1d",
-    marginBottom: 15,
+    fontSize: 18,
+    marginBottom: 30,
+    color: COLORS.grey,
+    textAlign: "center",
   },
-  /** Card */
   card: {
-    borderColor: "#e3e3e3",
-    marginBottom: 18,
+    borderRadius: 12,
+    borderColor: COLORS.grey,
+    borderWidth: 1,
+    marginBottom: 20,
+    marginTop: 5,
   },
   cardImg: {
     width: "100%",
     height: 180,
-    borderRadius: 12,
-    marginRight: 16,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
-  cardBody: {
-    paddingVertical: 15,
+  cardContent: {
+    padding: 15,
   },
   cardTitle: {
-    fontSize: 21,
-    lineHeight: 28,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "bold",
     color: COLORS.primary,
-    marginBottom: 8,
-    justifyContent: "center",
     textAlign: "center",
   },
 });
@@ -137,19 +168,22 @@ const lessons = [
   },
 ];
 
-const ListItems = ({ title, navigation }) => (
-  <TouchableOpacity
-    onPress={() => navigation.navigate("Detail2")}
-    style={styles1.item}
-  >
+const ListItems = ({ title, onPress }) => (
+  <TouchableOpacity onPress={onPress} style={styles1.item}>
     <AntDesign name="arrowright" size={20} color="black" />
     <Text style={styles1.title}>{title}</Text>
   </TouchableOpacity>
 );
 
 const DetailsScreen1 = ({ navigation }) => {
+  const handlePress = (item) => {
+    selectedDATA[0].adsubtype = item.name;
+    console.log(selectedDATA[0].adsubtype);
+    navigation.navigate("Detail2", { selectedItem: item });
+  };
+
   const renderItem = ({ item }) => (
-    <ListItems title={item.name} navigation={navigation} />
+    <ListItems title={item.name} onPress={() => handlePress(item)} />
   );
 
   return (
@@ -252,7 +286,9 @@ function DetailsScreen2({ navigation }) {
       setPhotos(newPhotos);
 
       // Log the updated newPhotos array to verify the saved image URI
-      console.log("Updated newPhotos:", newPhotos);
+
+      selectedDATA[0].photos = newPhotos;
+      console.log(selectedDATA[0].photos);
     }
   };
 
@@ -436,7 +472,8 @@ function DetailsScreen3({ navigation }) {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles3.button}
-        onPress={() => navigation.navigate("Details4")} // Replace 'NextScreenName' with the actual name of your screen
+        onPress={() => navigation.navigate("Details4")}
+        // Replace 'NextScreenName' with the actual name of your screen
       >
         <Text style={styles3.buttonText}>Next</Text>
       </TouchableOpacity>
@@ -928,33 +965,27 @@ const DATA = [
   },
 ];
 
-const ListItem = ({
-  title,
-  areas,
-  rooms,
-  bathrooms,
-  roomstate,
-  navigation,
-}) => (
-  <TouchableOpacity
-    onPress={() =>
-      navigation.navigate("AreaDetailsScreen", {
-        areas,
-        rooms,
-        bathrooms,
-        title,
-        roomstate,
-      })
-    }
-    style={styles4.item}
-  >
-    <AntDesign name="arrowright" size={20} color="black" />
-    <Text style={styles4.title}>{title}</Text>
-  </TouchableOpacity>
-);
-
 const DetailsScreen4 = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleAreaPress = ({
+    navigation,
+    name,
+    areas,
+    rooms,
+    bathrooms,
+    roomstate,
+  }) => {
+    navigation.navigate("AreaDetailsScreen", {
+      areas,
+      rooms,
+      bathrooms,
+      title: name,
+      roomstate,
+    });
+    selectedDATA[0].city = name;
+    console.log(selectedDATA[0].city);
+  };
 
   const renderItem = ({ item }) => (
     <ListItem
@@ -963,8 +994,17 @@ const DetailsScreen4 = ({ navigation }) => {
       rooms={item.rooms}
       bathrooms={item.bathrooms}
       roomstate={item.roomstate}
-      floor={item.floor}
       navigation={navigation}
+      onSelect={(name, areas, rooms, bathrooms, roomstate) =>
+        handleAreaPress({
+          navigation,
+          name,
+          areas,
+          rooms,
+          bathrooms,
+          roomstate,
+        })
+      }
     />
   );
 
@@ -989,6 +1029,24 @@ const DetailsScreen4 = ({ navigation }) => {
     </View>
   );
 };
+
+const ListItem = ({
+  title,
+  areas,
+  rooms,
+  bathrooms,
+  roomstate,
+  navigation,
+  onSelect,
+}) => (
+  <TouchableOpacity
+    onPress={() => onSelect(title, areas, rooms, bathrooms, roomstate)}
+    style={styles4.item}
+  >
+    <AntDesign name="arrowright" size={20} color="black" />
+    <Text style={styles4.title}>{title}</Text>
+  </TouchableOpacity>
+);
 const styles4 = StyleSheet.create({
   container: {
     flex: 1,
@@ -1040,17 +1098,19 @@ const styles4 = StyleSheet.create({
 });
 
 const AreaDetailsScreen = ({ route, navigation }) => {
-  const { areas, rooms, bathrooms, roomstate } = route.params; // Removed bathrooms from route params
+  const { areas, rooms, bathrooms, roomstate } = route.params;
 
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleAreaPress = (area) => {
+    selectedDATA[0].areas = area;
+    console.log(selectedDATA[0].areas);
     navigation.navigate("NumberOfRoomsScreen", {
       area,
       rooms,
       roomstate,
       bathrooms,
-    }); // Pass bathrooms here
+    });
   };
 
   const renderItem = ({ item }) => (
@@ -1139,6 +1199,8 @@ const NumberOfRoomsScreen = ({ navigation, route }) => {
   const { rooms, bathrooms, roomstate } = route.params;
 
   const handleRoomSelection = (numberOfRooms) => {
+    selectedDATA[0].rooms = numberOfRooms;
+    console.log(selectedDATA[0].rooms);
     navigation.navigate("NumberOfBathroomsScreen", {
       bathrooms,
 
@@ -1236,6 +1298,8 @@ const NumberOfBathroomsScreen = ({ navigation, route }) => {
 
   const handleBathroomSelection = (numberOfBathrooms) => {
     // Handle bathroom selection logic here
+    selectedDATA[0].bathrooms = numberOfBathrooms;
+    console.log(selectedDATA[0].bathrooms);
     navigation.navigate("RoomState", { roomstate, bathrooms });
   };
 
@@ -1323,11 +1387,18 @@ const bathRoomStyle = StyleSheet.create({
 const RoomState = ({ navigation, route }) => {
   const { roomstate } = route.params;
 
+  // Function to handle navigation to "BuildingArea" screen with updated roomstate
+  const handleNavigation = (state) => {
+    selectedDATA[0].roomstate = state; // Update roomstate in selectedDATA
+    console.log(selectedDATA[0].roomstate); // Log updated selectedDATA for debugging
+    navigation.navigate("BuildingArea"); // Navigate with updated roomstate
+  };
+
   const renderRoomStateCard = (state) => (
     <TouchableOpacity
       key={state}
       style={roomStateStyles.stateItem}
-      onPress={() => navigation.navigate("BuildingArea")}
+      onPress={() => handleNavigation(state)}
     >
       <Text style={roomStateStyles.stateText}>{state}</Text>
       <AntDesign name="arrowright" size={20} color="black" />
@@ -1380,8 +1451,10 @@ const roomStateStyles = StyleSheet.create({
 
 const BuildingArea = ({ navigation, route }) => {
   const [area, setArea] = useState("");
+
   const navigateToNextPage = () => {
-    // Optionally process the area or just navigate
+    selectedDATA[0].buildingarea = area;
+    console.log(selectedDATA[0].buildingarea);
     navigation.navigate("ApartmentFloor");
   };
 
@@ -1408,7 +1481,6 @@ const BuildingArea = ({ navigation, route }) => {
     </TouchableWithoutFeedback>
   );
 };
-
 const buildingAreaStyle = StyleSheet.create({
   container: {
     flex: 1,
@@ -1457,7 +1529,8 @@ const ApartmentFloor = ({ navigation }) => {
   const floors = DATA[0].floor; // Accessing the floor array from the first entry of DATA
   const [searchQuery, setSearchQuery] = useState("");
   const handleFloorSelection = (selectedFloor) => {
-    // Navigate to another screen and pass the selected floor
+    selectedDATA[0].buildingfloor = selectedFloor;
+    console.log(selectedDATA[0].buildingfloor);
     navigation.navigate("BuildingAge", { selectedFloor });
   };
   const filteredFloors = floors.filter((floor) =>
@@ -1552,6 +1625,8 @@ const BuildingAge = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleAgeSelection = (selectedAge) => {
+    selectedDATA[0].buildingage = selectedAge;
+    console.log(selectedDATA[0].buildingage);
     navigation.navigate("Rent_period", { selectedAge });
   };
 
@@ -1647,6 +1722,8 @@ const Rent_period = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handlePeriodSelection = (selectedPeriod) => {
+    selectedDATA[0].buildingrentperiod = selectedPeriod;
+    console.log(selectedDATA[0].buildingrentperiod);
     navigation.navigate("KeyFeaturesScreen ", { selectedPeriod }); // Change 'Rent_period' to an appropriate screen name
   };
 
@@ -1758,7 +1835,8 @@ const KeyFeaturesScreen = ({ navigation }) => {
       .filter((feature) => feature.selected)
       .map((feature) => feature.name);
     navigation.navigate("AdditionalBenefitsScreen", { selectedFeatures });
-    console.log(selectedFeatures);
+    selectedDATA[0].buildingkeyFeatures = selectedFeatures;
+    console.log(selectedDATA[0].buildingkeyFeatures);
   };
 
   const renderFeature = ({ item, index }) => (
@@ -1888,7 +1966,8 @@ const AdditionalBenefitsScreen = ({ navigation }) => {
       .filter((benefit) => benefit.selected)
       .map((benefit) => benefit.name);
     navigation.navigate("NearbyLocationsScreen", { selectedBenefits });
-    console.log(selectedBenefits);
+    selectedDATA[0].buildingadditionalBenefits = selectedBenefits;
+    console.log(selectedDATA[0].buildingadditionalBenefits);
   };
 
   const renderBenefit = ({ item, index }) => (
@@ -2019,6 +2098,8 @@ const NearbyLocationsScreen = ({ navigation }) => {
       .filter((location) => location.selected)
       .map((location) => location.name);
     navigation.navigate("ApartmentOrientationScreen", { selectedLocations });
+    selectedDATA[0].buildingnearbyLocations = selectedLocations;
+    console.log(selectedDATA[0].buildingnearbyLocations);
   };
 
   const renderLocation = ({ item, index }) => (
@@ -2085,6 +2166,8 @@ const ApartmentOrientationScreen = ({ navigation }) => {
       .filter((orientation) => orientation.selected)
       .map((orientation) => orientation.name);
     navigation.navigate("AdvertisementDetailsScreen", { selectedOrientations });
+    selectedDATA[0].buildingorientations = selectedOrientations;
+    console.log(selectedDATA[0].buildingorientations);
   };
 
   const renderOrientation = ({ item, index }) => (
@@ -2132,8 +2215,11 @@ const AdvertisementDetailsScreen = ({ navigation }) => {
 
   const navigateToNext = () => {
     navigation.navigate("WhatPriceScreen", { title, description });
-    console.log("title : ", title);
-    console.log("description : ", description);
+    selectedDATA[0].adtitle = title;
+    selectedDATA[0].addescription = description;
+    console.log(selectedDATA[0].adtitle);
+    console.log(selectedDATA[0].addescription);
+    console.log(selectedDATA);
   };
 
   return (
@@ -2234,12 +2320,56 @@ const styles11 = {
     fontSize: 18,
   },
 };
+const makeitEmpty = (selectedDATA) => {
+  selectedDATA.forEach((item) => {
+    Object.keys(item).forEach((key) => {
+      item[key] = [];
+    });
+  });
 
+  return selectedDATA;
+};
+const resetToFirstScreen = (navigation) => {
+  navigation.reset({
+    index: 0,
+    routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
+  });
+};
 const WhatPriceScreen = ({ navigation }) => {
-  const [price, setPrice] = React.useState("");
+  const [price, setPrice] = useState("");
 
   const navigateToNext = () => {
-    // Navigate to the next screen or perform any other action
+    // Display a confirmation modal to the user
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to share the post?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            // Handle the case when the user confirms to share the post
+            selectedDATA[0].adprice = price;
+            console.log(selectedDATA[0].adprice);
+            console.log(selectedDATA);
+
+            // Perform the action to share the post into the database
+            // Navigate to the next screen or perform any other action
+          },
+        },
+        {
+          text: "No",
+          onPress: () => {
+            makeitEmpty(selectedDATA);
+            resetToFirstScreen(navigation);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -2292,11 +2422,12 @@ const WhatPriceScreen = ({ navigation }) => {
           value={price}
         />
 
+        {/* Post button */}
         <TouchableOpacity
           style={styles12.bottomButton}
           onPress={navigateToNext}
         >
-          <Text style={styles12.bottomButtonText}>Next</Text>
+          <Text style={styles12.bottomButtonText}>Post</Text>
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>

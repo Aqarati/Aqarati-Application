@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Switch,
   Image,
+  Linking,
 } from "react-native";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import COLORS from "../../assets/Colors/colors";
@@ -18,7 +19,30 @@ export default function ProfileScreen({ navigation }) {
     emailNotifications: true,
     pushNotifications: false,
   });
+  const instahandlePress = () => {
+    // Your Instagram username
+    const username = "aqaratiofficial";
+    // Construct the Instagram URL
+    const instagramUrl = `https://www.instagram.com/${username}/`;
 
+    // Open the Instagram profile in the browser
+    Linking.openURL(instagramUrl)
+      .then(() => console.log("Instagram profile opened"))
+      .catch((error) =>
+        console.error("Error opening Instagram profile:", error)
+      );
+  };
+  const xhandlePress = () => {
+    // Your Instagram username
+    const username = "Aqaratiofficial";
+    // Construct the Instagram URL
+    const xUrl = `https://twitter.com/${username}/`;
+
+    // Open the Instagram profile in the browser
+    Linking.openURL(xUrl)
+      .then(() => console.log("X profile opened"))
+      .catch((error) => console.error("Error opening X profile:", error));
+  };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <View style={styles.container}>
@@ -212,6 +236,84 @@ export default function ProfileScreen({ navigation }) {
 
               <Text style={styles.rowLabel}>Rate in App Store</Text>
 
+              <View style={styles.rowSpacer} />
+
+              <FeatherIcon
+                color={COLORS.primary}
+                name="chevron-right"
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Social media</Text>
+
+            <TouchableOpacity onPress={instahandlePress} style={styles.row}>
+              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+                <FeatherIcon
+                  color={COLORS.primary}
+                  name="instagram"
+                  size={20}
+                />
+              </View>
+
+              <Text style={styles.rowLabel}>instagram</Text>
+              <View style={styles.rowSpacer} />
+
+              <FeatherIcon
+                color={COLORS.primary}
+                name="chevron-right"
+                size={20}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                // handle onPress
+              }}
+              style={styles.row}
+            >
+              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+                <FeatherIcon color={COLORS.primary} name="facebook" size={20} />
+              </View>
+
+              <Text style={styles.rowLabel}>Facebook</Text>
+              <View style={styles.rowSpacer} />
+
+              <FeatherIcon
+                color={COLORS.primary}
+                name="chevron-right"
+                size={20}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={xhandlePress} style={styles.row}>
+              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+                <FeatherIcon color={COLORS.primary} name="x" size={20} />
+              </View>
+
+              <Text style={styles.rowLabel}>X</Text>
+              <View style={styles.rowSpacer} />
+
+              <FeatherIcon
+                color={COLORS.primary}
+                name="chevron-right"
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Account</Text>
+
+            <TouchableOpacity
+              onPress={() => {
+                // handle onPress
+              }}
+              style={styles.row}
+            >
+              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+                <FeatherIcon color={COLORS.primary} name="log-out" size={20} />
+              </View>
+
+              <Text style={styles.rowLabel}>Account Log out</Text>
               <View style={styles.rowSpacer} />
 
               <FeatherIcon
