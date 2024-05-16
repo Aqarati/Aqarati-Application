@@ -12,20 +12,45 @@ const SearchScreen = () => {
     console.log(search);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (search.trim()) {
-      axios
-        .post(`${urlPath}/search`, { query: search })
+      const url1 = urlPath + "/property/search/?keyword=dreamHome";
+      const url2 = urlPath + "/property";
+      let config1 = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: url1,
+        headers: {},
+      };
+
+      await axios
+        .request(config1)
         .then((response) => {
-          console.log("Search results:", response.data);
-          // Handle the search results here
+          const ids = response.data.map((item) => item.id);
+          console.log(response);
+          console.log(ids);
+          console.log(JSON.stringify(response.data));
+
+          let data = JSON.stringify(ids);
+
+          let config2 = {
+            method: "get",
+            maxBodyLength: Infinity,
+            url: url2,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            data: data,
+          };
+          console.log(config2);
+          return axios.get(url2);
+        })
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
         })
         .catch((error) => {
-          console.error("Error during search:", error);
-          // Handle the error here
+          console.log(error);
         });
-    } else {
-      console.log("Please enter a search query");
     }
   };
 
@@ -40,6 +65,7 @@ const SearchScreen = () => {
         inputStyle={styles.input}
         leftIconContainerStyle={styles.leftIcon}
         rightIconContainerStyle={styles.rightIcon}
+        lightTheme
       />
       <TouchableOpacity style={styles.searchButton} onPress={handleSubmit}>
         <Icon name="search" size={24} color="#000" />
@@ -50,12 +76,14 @@ const SearchScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#fff",
     paddingTop: 60, // Adjust for status bar height
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
   },
   searchContainer: {
     flex: 1,
