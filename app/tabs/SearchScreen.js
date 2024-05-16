@@ -1,49 +1,100 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, ActivityIndicator } from 'react-native';
-import axios from 'axios';
+import React, { useState } from "react";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { SearchBar, Icon } from "react-native-elements";
+import axios from "axios";
+import { urlPath } from "../lib";
 
 const SearchScreen = () => {
-  const [query, setQuery] = useState('');  // The search query entered by the user
-  const [loading, setLoading] = useState(false);  // State to manage loading indicator
-  const [properties, setProperties] = useState([]);  // State to store the properties fetched from the API
-  const [errorMessage, setErrorMessage] = useState('');  // State to store any error messages
+  const [search, setSearch] = useState("");
 
-  const handleSearch = async () => {
-    if (!query) return;  // If the query is empty, do nothing
-    setLoading(true);
-    try {
-      // Making a GET request to http://localhost/property with a query parameter
-      const response = await axios.get('http://localhost/property', { params: { name: query } });
-      setProperties(response.data);  // Assuming the API returns an array of properties
-    } catch (error) {
-      console.error(error);
-      setErrorMessage('Failed to fetch properties');
+  const updateSearch = (search) => {
+    setSearch(search);
+    console.log(search);
+  };
+
+  const handleSubmit = () => {
+    if (search.trim()) {
+      axios
+        .post(`${urlPath}/search`, { query: search })
+        .then((response) => {
+          console.log("Search results:", response.data);
+          // Handle the search results here
+        })
+        .catch((error) => {
+          console.error("Error during search:", error);
+          // Handle the error here
+        });
+    } else {
+      console.log("Please enter a search query");
     }
-    setLoading(false);
   };
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>Search Properties</Text>
-      <TextInput
-        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 20, padding: 10 }}
-        onChangeText={text => setQuery(text)}
-        value={query}
-        placeholder="Enter a keyword..."
+    <View style={styles.container}>
+      <SearchBar
+        placeholder="Search here..."
+        onChangeText={updateSearch}
+        value={search}
+        containerStyle={styles.searchContainer}
+        inputContainerStyle={styles.inputContainer}
+        inputStyle={styles.input}
+        leftIconContainerStyle={styles.leftIcon}
+        rightIconContainerStyle={styles.rightIcon}
       />
-      <Button title="Search" onPress={handleSearch} disabled={loading} />
-      {loading && <ActivityIndicator size="large" color="#0000ff" />}
-      {errorMessage ? <Text>{errorMessage}</Text> : null}
-      <FlatList
-        data={properties}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => (
-          <Text style={{ padding: 10, fontSize: 18 }}>{item.name}</Text>  // Customize this based on your actual property object structure
-        )}
-      />
+      <TouchableOpacity style={styles.searchButton} onPress={handleSubmit}>
+        <Icon name="search" size={24} color="#000" />
+      </TouchableOpacity>
     </View>
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 60, // Adjust for status bar height
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+  },
+  searchContainer: {
+    flex: 1,
+    backgroundColor: "#f0f0f0",
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  inputContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+  },
+  input: {
+    color: "#000",
+  },
+  leftIcon: {
+    marginLeft: 10,
+  },
+  rightIcon: {
+    marginRight: 10,
+  },
+  searchButton: {
+    marginLeft: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+});
+
 export default SearchScreen;
-23
