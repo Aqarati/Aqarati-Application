@@ -6,14 +6,26 @@ import { useNavigation } from "@react-navigation/native";
 const PropertyCard = ({ property }) => {
   const navigation = useNavigation();
 
-  const imageUrl = property.image
-    ? property.image
-    : "https://aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
+  // Default image URL
+  let imageUrl =
+    "https://aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
+
+  // Check if propertyImages array exists and has at least one image
+  if (property.propertyImages && property.propertyImages.length > 0) {
+    // Loop through propertyImages array to find the first non-VR image
+    for (let i = 0; i < property.propertyImages.length; i++) {
+      if (!property.propertyImages[i].vr) {
+        imageUrl = property.propertyImages[i].imgUrl;
+        break;
+      }
+    }
+  }
 
   const handleCardPress = () => {
     // Navigate to the details screen, passing the property object as a parameter
     navigation.navigate("PropertyDetails", { property });
   };
+
   return (
     <TouchableOpacity onPress={handleCardPress}>
       <View style={styles.card}>
