@@ -6,6 +6,7 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import ImageView from "react-native-image-viewing";
 
@@ -16,9 +17,24 @@ const PropertyDetails = ({ route }) => {
 
   const renderImageItem = ({ item, index }) => (
     <TouchableOpacity onPress={() => handleImagePress(index)}>
-      <Image source={{ uri: item.imgUrl }} style={styles.image} />
+      <View>
+        <Image source={{ uri: item.imgUrl }} style={styles.image} />
+        {item.vr && (
+          <TouchableOpacity
+            style={styles.vrButton}
+            onPress={() => handleVRPress(item.vr_url)}
+          >
+            <Text style={styles.vrButtonText}>View VR</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </TouchableOpacity>
   );
+  const handleVRPress = (vrUrl) => {
+    if (vrUrl) {
+      Linking.openURL(vrUrl);
+    }
+  };
 
   const handleImagePress = (index) => {
     setCurrentIndex(index);
@@ -88,6 +104,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000",
     marginBottom: 10,
+  },
+  vrButton: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 10,
+    borderRadius: 5,
+  },
+  vrButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 
