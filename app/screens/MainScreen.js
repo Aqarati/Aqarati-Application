@@ -14,6 +14,7 @@ import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
 import { urlPath, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
+import PropertyCard from "../components/PropertyCard";
 const initialItems = [
   {
     img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
@@ -115,7 +116,8 @@ const categories = [
 
 export default function MainScreen({ navigation }) {
   const [userData, setUserData] = useState(null); // Add this line to initialize user data state
-  const fetchData = async () => {
+  const [properties, setProperties] = useState([]);
+  const fetchUserProfileData = async () => {
     console.log("fetch data for profile");
     const url = urlPath + "/user/profile";
     console.log("url : " + url);
@@ -139,9 +141,35 @@ export default function MainScreen({ navigation }) {
         console.log(error);
       });
   };
+  const fetchUserPropertyData = async () => {
+    console.log("fetch data for Property");
+    const url = urlPath + "/property";
+    console.log("url : " + url);
+    const token = await getValueFor("token");
+
+    let config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: url,
+      headers: {},
+    };
+
+    console.log(config);
+    await axios
+      .request(config)
+      .then((response) => {
+        setProperties(response.data);
+        console.log("\n \n");
+        console.log(properties);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   useEffect(() => {
     console.log("Main screen use effect called");
-    fetchData();
+    fetchUserProfileData();
+    fetchUserPropertyData();
   }, []);
 
   const handleCardPress = (itemDetails) => {
@@ -218,7 +246,12 @@ export default function MainScreen({ navigation }) {
             </ScrollView>
           </View>
         </View>
-        {items.map(({ img, name, price, stars, reviews, saved }, index) => {
+        <ScrollView>
+          {properties.map((property) => (
+            <PropertyCard key={property.id} property={property} />
+          ))}
+        </ScrollView>
+        {/* {items.map(({ img, name, price, stars, reviews, saved }, index) => {
           return (
             <TouchableOpacity
               key={index}
@@ -278,7 +311,7 @@ export default function MainScreen({ navigation }) {
               </View>
             </TouchableOpacity>
           );
-        })}
+        })} */}
       </ScrollView>
       <Toast></Toast>
     </SafeAreaView>

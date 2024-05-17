@@ -1,11 +1,20 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+} from "react-native";
 import { SearchBar, Icon } from "react-native-elements";
 import axios from "axios";
+import { Divider } from "@rneui/themed";
+import PropertyCard from "../components/PropertyCard";
 import { urlPath } from "../lib";
 
 const SearchScreen = () => {
   const [search, setSearch] = useState("");
+  const [properties, setProperties] = useState([]);
 
   const updateSearch = (search) => {
     setSearch(search);
@@ -14,7 +23,7 @@ const SearchScreen = () => {
 
   const handleSubmit = async () => {
     if (search.trim()) {
-      const url1 = urlPath + "/property/search/?keyword=dreamHome";
+      const url1 = urlPath + "/property/search/?keyword=" + search;
       const url2 = urlPath + "/property";
       let config1 = {
         method: "get",
@@ -30,6 +39,7 @@ const SearchScreen = () => {
           console.log(response);
           console.log(ids);
           console.log(JSON.stringify(response.data));
+          setProperties(response.data);
 
           let data = JSON.stringify(ids);
 
@@ -55,22 +65,31 @@ const SearchScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <SearchBar
-        placeholder="Search here..."
-        onChangeText={updateSearch}
-        value={search}
-        containerStyle={styles.searchContainer}
-        inputContainerStyle={styles.inputContainer}
-        inputStyle={styles.input}
-        leftIconContainerStyle={styles.leftIcon}
-        rightIconContainerStyle={styles.rightIcon}
-        lightTheme
-      />
-      <TouchableOpacity style={styles.searchButton} onPress={handleSubmit}>
-        <Icon name="search" size={24} color="#000" />
-      </TouchableOpacity>
-    </View>
+    <>
+      <View style={styles.container}>
+        <SearchBar
+          placeholder="Search here..."
+          onChangeText={updateSearch}
+          value={search}
+          containerStyle={styles.searchContainer}
+          inputContainerStyle={styles.inputContainer}
+          inputStyle={styles.input}
+          leftIconContainerStyle={styles.leftIcon}
+          rightIconContainerStyle={styles.rightIcon}
+          lightTheme
+        />
+        <TouchableOpacity style={styles.searchButton} onPress={handleSubmit}>
+          <Icon name="search" size={24} color="#000" />
+        </TouchableOpacity>
+      </View>
+      <View>
+        <ScrollView>
+          {properties.map((property) => (
+            <PropertyCard key={property.id} property={property} />
+          ))}
+        </ScrollView>
+      </View>
+    </>
   );
 };
 
