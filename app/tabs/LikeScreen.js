@@ -6,6 +6,7 @@ import React from "react";
 
 const LikeScreen = () => {
   const [likedPropertyIdData, setLikedPropertyIdData] = useState([]);
+  const [likedProperty, setLikedProperty] = useState([]);
   const fetchFavouriteIdData = async () => {
     console.log("fetch fav id for Like Screen");
     const url = urlPath + "/user/favourite";
@@ -23,7 +24,7 @@ const LikeScreen = () => {
     await axios
       .request(config)
       .then((response) => {
-        setLikedPropertyIdData(response.data);
+        setLikedPropertyIdData(JSON.stringify(response.data));
         console.log(likedPropertyIdData);
       })
       .catch((error) => {
@@ -33,10 +34,15 @@ const LikeScreen = () => {
 
   useEffect(() => {
     console.log("Like screen use effect called");
+    console.log("Like property id", likedPropertyIdData);
     fetchFavouriteIdData();
   }, []);
 
-  return <Text>like</Text>;
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>{likedPropertyIdData}</Text>
+    </View>
+  );
 };
 
 export default LikeScreen;
