@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-export const urlPath = `http://192.168.100.37:81`;
+export const urlPath = `http://192.168.100.37:8081`;
 
 export async function save(key, value) {
   await SecureStore.setItemAsync(key, value);

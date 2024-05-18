@@ -12,12 +12,12 @@ import {
   Alert,
 } from "react-native";
 import axios from "axios";
-import { delete_token } from "../lib";
+
 import FeatherIcon from "react-native-vector-icons/Feather";
 import COLORS from "../../assets/Colors/colors";
 import Toast from "react-native-toast-message";
 
-import { urlPath, getValueFor } from "../lib";
+import { urlPath, getValueFor, delete_token } from "../lib";
 
 const SucessMessage = () => {
   Toast.show({
