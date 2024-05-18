@@ -195,9 +195,12 @@ export default function MainScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: "#fff" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView
-        contentContainerStyle={[styles.container, { paddingBottom: 30 }]}
+        contentContainerStyle={[
+          styles.container,
+          { paddingBottom: 0, backgroundColor: "#fff" },
+        ]}
       >
         <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
           <View style={profilestyle.container}>
@@ -209,8 +212,10 @@ export default function MainScreen({ navigation }) {
                 <Image
                   source={{
                     uri:
-                      userData && userData.imageUrl ? userData.imageUrl : "s",
-                  }}
+                      userData && userData.imageUrl
+                        ? userData.imageUrl
+                        : "default_image_url",
+                  }} // Replace with actual default image URL
                   style={profilestyle.avatar}
                 />
               </TouchableOpacity>
@@ -226,12 +231,7 @@ export default function MainScreen({ navigation }) {
               showsHorizontalScrollIndicator={false}
             >
               {categories.map(({ img, label, color, screen }, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => {
-                    Message();
-                  }}
-                >
+                <TouchableOpacity key={index} onPress={Message}>
                   <View
                     style={[Categories_styles.card, { backgroundColor: color }]}
                   >
@@ -246,22 +246,25 @@ export default function MainScreen({ navigation }) {
             </ScrollView>
           </View>
         </View>
-        <ScrollView>
-          {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
+        <ScrollView style={{ backgroundColor: "#fff" }}>
+          {Array.isArray(properties) &&
+            properties.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))}
         </ScrollView>
       </ScrollView>
-      <Toast></Toast>
+      <Toast />
     </SafeAreaView>
   );
 }
+
 const Categories_styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
     paddingHorizontal: 0,
     flexGrow: 1,
     flexShrink: 1,
+    backgroundColor: "#fff",
   },
   title: {
     paddingHorizontal: 24,
@@ -270,7 +273,6 @@ const Categories_styles = StyleSheet.create({
     color: "#1d1d1d",
     marginBottom: 12,
   },
-  /** List */
   list: {
     marginBottom: 0,
   },
@@ -302,7 +304,6 @@ const Categories_styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 18,
   },
-  /** Card */
   card: {
     width: 80,
     paddingVertical: 16,
@@ -328,16 +329,15 @@ const Categories_styles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     padding: 15,
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 33,
     fontWeight: "700",
     color: "#1d1d1d",
-
     marginEnd: 70,
     color: COLORS.primary,
   },
-  /** Card */
   card: {
     position: "relative",
     borderRadius: 8,
@@ -420,6 +420,7 @@ const profilestyle = StyleSheet.create({
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: 0,
+    backgroundColor: "#fff",
   },
   header: {
     flexDirection: "row",

@@ -22,7 +22,7 @@ import {
 } from "react-native";
 
 import { COLORS } from "../../assets/theme";
-
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 const Tab = createBottomTabNavigator();
@@ -30,17 +30,6 @@ const SettingsStack = createNativeStackNavigator();
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Octicons from "react-native-vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
-
-const items = [
-  {
-    img: "https://images.pexels.com/photos/425343/pexels-photo-425343.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    address: "Apartments for Rent",
-  },
-  {
-    img: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    address: "Houses for Rent",
-  },
-];
 const selectedDATA = [
   {
     adtype: [],
@@ -65,10 +54,20 @@ const selectedDATA = [
     adprice: [],
   },
 ];
+const items = [
+  {
+    img: "https://images.pexels.com/photos/425343/pexels-photo-425343.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    address: "Apartments for Rent",
+  },
+  {
+    img: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    address: "Houses for Rent",
+  },
+];
 
 const DetailsScreen = ({ navigation }) => {
   const handlePress = (address) => {
-    navigation.push("Detail1", { adtype: address });
+    navigation.push("Detail1", { address: address }); // Pass the address as a parameter
   };
 
   return (
@@ -153,18 +152,23 @@ const styles = StyleSheet.create({
 const lessons = [
   {
     name: "Apartments for Rent",
+    name2: "Home for rent",
   },
   {
     name: "Apartments for sale",
+    name2: "Home for sale",
   },
   {
     name: "Hotel apartments and suites",
+    name2: "Home suitable for rent",
   },
   {
     name: "Student apartments",
+    name2: "Student Home for rent",
   },
   {
     name: "Apartments for sale",
+    name2: "Home suitable for sale",
   },
 ];
 
@@ -175,15 +179,24 @@ const ListItems = ({ title, onPress }) => (
   </TouchableOpacity>
 );
 
-const DetailsScreen1 = ({ navigation }) => {
+const DetailsScreen1 = () => {
+  const navigation = useNavigation(); // Get navigation object using useNavigation hook
+  const route = useRoute(); // Get route object using useRoute hook
+  const { address } = route.params; // Extract address from route params
+
   const handlePress = (item) => {
-    selectedDATA[0].adsubtype = item.name;
+    const selectedName =
+      address === "Apartments for Rent" ? item.name : item.name2;
+    selectedDATA[0].adsubtype = selectedName;
     console.log(selectedDATA[0].adsubtype);
-    navigation.navigate("Detail2", { selectedItem: item });
+    navigation.navigate("AdvertisementDetailsScreen", { selectedItem: item });
   };
 
   const renderItem = ({ item }) => (
-    <ListItems title={item.name} onPress={() => handlePress(item)} />
+    <ListItems
+      title={address === "Apartments for Rent" ? item.name : item.name2}
+      onPress={() => handlePress(item)}
+    />
   );
 
   return (
@@ -197,7 +210,6 @@ const DetailsScreen1 = ({ navigation }) => {
     </View>
   );
 };
-
 const styles1 = StyleSheet.create({
   container: {
     flex: 1,

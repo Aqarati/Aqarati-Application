@@ -9,6 +9,7 @@ import {
   Switch,
   Image,
   Linking,
+  Alert,
 } from "react-native";
 import axios from "axios";
 import { delete_token } from "../lib";
@@ -71,12 +72,18 @@ export default function ProfileScreen({ navigation }) {
     console.log("profile use effect called");
     fetchData();
   }, []);
+  const bugreport = () => {
+    const formurl = "https://forms.gle/QZLQoRXa3G9RKzKE6";
 
+    Linking.openURL(formurl)
+      .then(() => console.log("Form URL: " + formurl))
+      .catch((error) => console.error("Error opening Form:", error));
+  };
   const instahandlePress = () => {
     // Your Instagram username
     const username = "aqaratiofficial";
-    // Construct the Instagram URL
-    const instagramUrl = "https://www.instagram.com/${username}/";
+    // Construct the Instagram URL using string interpolation
+    const instagramUrl = `https://www.instagram.com/${username}/`;
 
     // Open the Instagram profile in the browser
     Linking.openURL(instagramUrl)
@@ -86,15 +93,38 @@ export default function ProfileScreen({ navigation }) {
       );
   };
   const xhandlePress = () => {
-    // Your Instagram username
+    // Your Twitter username
     const username = "Aqaratiofficial";
-    // Construct the Instagram URL
-    const xUrl = "https://twitter.com/${username}/";
+    // Construct the Twitter URL using string interpolation
+    const xUrl = `https://twitter.com/${username}/`;
 
-    // Open the Instagram profile in the browser
+    // Open the Twitter profile in the browser
     Linking.openURL(xUrl)
       .then(() => console.log("X profile opened"))
       .catch((error) => console.error("Error opening X profile:", error));
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Logout",
+          onPress: () => {
+            // Perform logout actions here
+            SucessMessage();
+            delete_token();
+            resetToFirstScreen(navigation);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -138,6 +168,28 @@ export default function ProfileScreen({ navigation }) {
 
                 <FeatherIcon color={COLORS.white} name="edit-3" size={16} />
               </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Management</Text>
+
+            <TouchableOpacity onPress={() => {}} style={styles.row}>
+              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+                <FeatherIcon
+                  color={COLORS.primary}
+                  name="book-open"
+                  size={20}
+                />
+              </View>
+
+              <Text style={styles.rowLabel}>Dashboard</Text>
+              <View style={styles.rowSpacer} />
+
+              <FeatherIcon
+                color={COLORS.primary}
+                name="chevron-right"
+                size={20}
+              />
             </TouchableOpacity>
           </View>
           <View style={styles.section}>
@@ -244,12 +296,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Resources</Text>
 
-            <TouchableOpacity
-              onPress={() => {
-                // handle onPress
-              }}
-              style={styles.row}
-            >
+            <TouchableOpacity onPress={bugreport} style={styles.row}>
               <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
                 <FeatherIcon color={COLORS.primary} name="flag" size={20} />
               </View>
@@ -265,12 +312,7 @@ export default function ProfileScreen({ navigation }) {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => {
-                // handle onPress
-              }}
-              style={styles.row}
-            >
+            <TouchableOpacity onPress={instahandlePress} style={styles.row}>
               <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
                 <FeatherIcon color={COLORS.primary} name="mail" size={20} />
               </View>
@@ -365,14 +407,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account</Text>
 
-            <TouchableOpacity
-              onPress={() => {
-                SucessMessage();
-                delete_token();
-                resetToFirstScreen(navigation);
-              }}
-              style={styles.row}
-            >
+            <TouchableOpacity onPress={handleLogout} style={styles.row}>
               <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
                 <FeatherIcon color={COLORS.primary} name="log-out" size={20} />
               </View>
