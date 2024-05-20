@@ -1,13 +1,20 @@
-import { View, Text, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  RefreshControl,
+} from "react-native";
 import axios from "axios";
-import { StyleSheet } from "react-native";
-import { useEffect, useState } from "react";
 import { urlPath, getValueFor } from "../lib";
-import React from "react";
 import PropertyCard from "../components/PropertyCard";
+
 const LikeScreen = () => {
   const [likedPropertyIdData, setLikedPropertyIdData] = useState("");
   const [likedProperty, setLikedProperty] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
   const fetchFavouriteIdData = async () => {
     console.log("fetch fav id for Like Screen");
     const url = urlPath + "/user/favourite";
@@ -34,6 +41,7 @@ const LikeScreen = () => {
         console.log(error);
       });
   };
+
   const fetchFavouriteData = async (id) => {
     const url = urlPath + "/property/properties?PropertiesIDs=" + id;
     console.log("url:" + url);
@@ -55,6 +63,11 @@ const LikeScreen = () => {
       });
   };
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchFavouriteIdData().then(() => setRefreshing(false));
+  }, []);
+
   useEffect(() => {
     console.log("Like screen use effect called");
     fetchFavouriteIdData();
@@ -64,7 +77,12 @@ const LikeScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Liked Properties:</Text>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {likedProperty.map((property) => (
           <PropertyCard key={property.id} property={property} />
         ))}
@@ -89,4 +107,5 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 });
+
 export default LikeScreen;
