@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   View,
   Image,
+  ActivityIndicator,
 } from "react-native";
-import { useState, useEffect } from "react";
 import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
 import { urlPath, getValueFor } from "../lib";
@@ -49,8 +49,10 @@ const categories = [
 ];
 
 export default function MainScreen({ navigation }) {
-  const [userData, setUserData] = useState(null); // Add this line to initialize user data state
+  const [userData, setUserData] = useState(null);
   const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
+
   const fetchUserProfileData = async () => {
     console.log("fetch data for profile");
     const url = urlPath + "/user/profile";
@@ -75,6 +77,7 @@ export default function MainScreen({ navigation }) {
         console.log(error);
       });
   };
+
   const fetchUserPropertyData = async () => {
     console.log("fetch data for Property");
     const url = urlPath + "/property";
@@ -85,7 +88,9 @@ export default function MainScreen({ navigation }) {
       method: "get",
       maxBodyLength: Infinity,
       url: url,
-      headers: {},
+      headers: {
+        Authorization: "Bearer  " + token,
+      },
     };
 
     console.log(config);
@@ -98,8 +103,10 @@ export default function MainScreen({ navigation }) {
       })
       .catch((error) => {
         console.log(error);
-      });
+      })
+      .finally(() => setLoading(false)); // Set loading to false when data is fetched
   };
+
   useEffect(() => {
     console.log("Main screen use effect called");
     fetchUserProfileData();
@@ -109,6 +116,7 @@ export default function MainScreen({ navigation }) {
   const handleCardPress = (itemDetails) => {
     navigation.navigate("Details", { itemDetails });
   };
+
   const Message = () => {
     Toast.show({
       type: "success",
@@ -179,10 +187,16 @@ export default function MainScreen({ navigation }) {
           </View>
         </View>
         <ScrollView style={{ backgroundColor: "#fff" }}>
-          {Array.isArray(properties) &&
+          {loading ? ( // Show loading indicator while data is being fetched
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+          ) : (
+            Array.isArray(properties) &&
             properties.map((property) => (
               <PropertyCard key={property.id} property={property} />
-            ))}
+            ))
+          )}
         </ScrollView>
       </ScrollView>
       <Toast />
@@ -266,9 +280,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 33,
     fontWeight: "700",
-    color: "#1d1d1d",
     marginEnd: 70,
     color: COLORS.primary,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
   },
 });
 
@@ -282,7 +301,7 @@ const profilestyle = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "flex-end", // Aligns children (the avatar) to the right
+    justifyContent: "flex-end",
   },
   avatar: {
     width: 48,
