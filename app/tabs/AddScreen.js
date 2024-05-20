@@ -30,6 +30,7 @@ const SettingsStack = createNativeStackNavigator();
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Octicons from "react-native-vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
+import axios from 'axios';
 const selectedDATA = [
   {
     adtype: [],
@@ -267,12 +268,11 @@ function DetailsScreen2({ navigation }) {
   useEffect(() => {
     // Request permission to access the camera and photo library
     (async () => {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
         Alert.alert(
-          "Permission Required",
-          "Sorry, we need camera roll permissions to make this work!"
+          'Permission Required',
+          'Sorry, we need camera roll permissions to make this work!'
         );
       }
     })();
@@ -289,7 +289,7 @@ function DetailsScreen2({ navigation }) {
       quality: 1,
     });
 
-    console.log("ImagePicker result:", result); // Log the result object to see its structure and check for the URI
+    console.log('ImagePicker result:', result); // Log the result object to see its structure and check for the URI
 
     if (!result.cancelled) {
       // If image is selected, update photoUri and keep changePhotoMode true
@@ -298,9 +298,32 @@ function DetailsScreen2({ navigation }) {
       setPhotos(newPhotos);
 
       // Log the updated newPhotos array to verify the saved image URI
-
       selectedDATA[0].photos = newPhotos;
       console.log(selectedDATA[0].photos);
+
+      // Upload the image to the server
+      try {
+        const formData = new FormData();
+        formData.append('images', {
+          uri: result.uri,
+          type: 'image/jpeg',
+          name: `photo_${index}.jpg`,
+        });
+
+        const config = {
+          method: 'put',
+          url: 'http://localhost:8888/property/image/356',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          data: formData,
+        };
+
+        const response = await axios.request(config);
+        console.log(JSON.stringify(response.data));
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -312,12 +335,10 @@ function DetailsScreen2({ navigation }) {
       {item ? (
         <Image
           source={{ uri: item }}
-          style={[styles2.photo, { resizeMode: "cover" }]}
+          style={[styles2.photo, { resizeMode: 'cover' }]}
         />
       ) : (
-        <View
-          style={index === 0 ? styles2.firstAddIconBox : styles2.addIconBox}
-        >
+        <View style={index === 0 ? styles2.firstAddIconBox : styles2.addIconBox}>
           <AntDesign name="pluscircleo" size={24} color={COLORS.primary2} />
         </View>
       )}
@@ -329,16 +350,13 @@ function DetailsScreen2({ navigation }) {
       <Text style={styles2.title}>Add pictures to the advertise</Text>
       <View style={styles2.dashedBox}>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Up to 12
-          photos can be added
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Up to 12 photos can be added
         </Text>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Pictures
-          increase the number of views
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Pictures increase the number of views
         </Text>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Hint:
-          You can rearrange photos by dragging them from one place to another
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Hint: You can rearrange photos by dragging them from one place to another
         </Text>
       </View>
 
@@ -353,7 +371,7 @@ function DetailsScreen2({ navigation }) {
       <TouchableOpacity
         style={styles2.bottomButton}
         onPress={() => {
-          navigation.push("Detail3");
+          navigation.push('WhatPriceScreen');
         }}
       >
         <Text style={styles2.bottomButtonText}>Next</Text>
@@ -361,7 +379,6 @@ function DetailsScreen2({ navigation }) {
     </View>
   );
 }
-
 const styles2 = StyleSheet.create({
   container: {
     flex: 1,
@@ -2226,7 +2243,7 @@ const AdvertisementDetailsScreen = ({ navigation }) => {
   const [description, setDescription] = useState("");
 
   const navigateToNext = () => {
-    navigation.navigate("WhatPriceScreen", { title, description });
+    navigation.navigate("Detail2", { title, description });
     selectedDATA[0].adtitle = title;
     selectedDATA[0].addescription = description;
     console.log(selectedDATA[0].adtitle);

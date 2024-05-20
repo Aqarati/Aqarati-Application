@@ -20,6 +20,7 @@ import Invest from "./app/CategoryScreens/Invest";
 import Toast from "react-native-toast-message";
 import "react-native-reanimated";
 import PropertyDetails from "./app/screens/PropertyDetails";
+import dashboard from "./app/screens/dashboard";
 
 const Stack = createNativeStackNavigator();
 
@@ -109,6 +110,12 @@ function App() {
           component={PropertyDetails}
           options={{ headerShown: true }}
         />
+        <Stack.Screen
+        name="dashboard"
+        component={dashboard}
+        options={{headerShown:false}}>
+
+        </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -173,7 +173,7 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Management</Text>
 
-            <TouchableOpacity onPress={() => {}} style={styles.row}>
+            <TouchableOpacity onPress={() => {navigation.navigate("dashboard")}} style={styles.row}>
               <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
                 <FeatherIcon
                   color={COLORS.primary}
@@ -197,7 +197,7 @@ export default function ProfileScreen({ navigation }) {
 
             <TouchableOpacity
               onPress={() => {
-                // handle onPress
+              
               }}
               style={styles.row}
             >
