@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback  } from "react";
 import {
   View,
   Text,
@@ -11,12 +11,12 @@ import axios from "axios";
 import { urlPath, getValueFor } from "../lib";
 import PropertyCard from "../components/PropertyCard";
 import COLORS from "../../assets/Colors/colors";
-
+import Toast from "react-native-toast-message";
 const LikeScreen = () => {
   const [likedPropertyIdData, setLikedPropertyIdData] = useState("");
   const [likedProperty, setLikedProperty] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [loading, setLoading] = useState(true); // Added loading state
+  const [loading, setLoading] = useState(true);
 
   const fetchFavouriteIdData = async () => {
     console.log("fetch fav id for Like Screen");
@@ -42,14 +42,14 @@ const LikeScreen = () => {
       })
       .catch((error) => {
         console.log(error);
-        setLoading(false); // Stop loading in case of error
+        setLoading(false);
       });
   };
 
   const fetchFavouriteData = async (id) => {
     const url = urlPath + "/property/properties?PropertiesIDs=" + id;
     console.log("url:" + url);
-    console.log("GeT property Data");
+    console.log("Get property Data");
     let config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -61,15 +61,22 @@ const LikeScreen = () => {
       .request(config)
       .then((response) => {
         setLikedProperty(response.data);
-        setLoading(false); // Stop loading after data is fetched
+        setLoading(false);
+        if (response.data.length === 0) {
+          Toast.show({
+            type: 'info',
+            text1: 'No Liked Properties',
+            text2: 'You have no liked properties.',
+          });
+        }
       })
       .catch((error) => {
         console.log(error);
-        setLoading(false); // Stop loading in case of error
+        setLoading(false);
       });
   };
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchFavouriteIdData().then(() => setRefreshing(false));
   }, []);
@@ -84,7 +91,7 @@ const LikeScreen = () => {
     <View style={styles.container}>
       <Text style={styles.header}>Liked Properties</Text>
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" /> // Loading indicator
+        <ActivityIndicator size="large" color={COLORS.primary} />
       ) : likedProperty.length === 0 ? (
         <ScrollView
           style={styles.scrollView}
@@ -92,8 +99,8 @@ const LikeScreen = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <Text style={styles.noPropertyText}>No liked properties</Text>
-        </ScrollView> // No properties message
+         
+        </ScrollView>
       ) : (
         <ScrollView
           style={styles.scrollView}
@@ -106,10 +113,10 @@ const LikeScreen = () => {
           ))}
         </ScrollView>
       )}
+      <Toast />
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -127,11 +134,7 @@ const styles = StyleSheet.create({
   scrollView: {
     marginBottom: 20,
   },
-  noPropertyText: {
-    fontSize: 18,
-    textAlign: "center",
-    marginTop: 20,
-  },
+
 });
 
 export default LikeScreen;
