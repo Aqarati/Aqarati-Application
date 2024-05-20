@@ -8,7 +8,6 @@ import {
   View,
   Image,
 } from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome5";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
@@ -337,80 +336,6 @@ const styles = StyleSheet.create({
     color: "#1d1d1d",
     marginEnd: 70,
     color: COLORS.primary,
-  },
-  card: {
-    position: "relative",
-    borderRadius: 8,
-    backgroundColor: "#fff",
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  cardLikeWrapper: {
-    position: "absolute",
-    zIndex: 1,
-    top: 12,
-    right: 12,
-  },
-  cardLike: {
-    width: 48,
-    height: 48,
-    borderRadius: 9999,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cardTop: {
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  cardImg: {
-    width: "100%",
-    height: 160,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  cardBody: {
-    padding: 10,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: "500",
-    color: "#232425",
-  },
-  cardPrice: {
-    fontSize: 15,
-    fontWeight: "400",
-    color: "#232425",
-  },
-  cardFooter: {
-    marginTop: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  cardStars: {
-    marginLeft: 2,
-    marginRight: 6,
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#232425",
-  },
-  cardReviews: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: "#595a63",
   },
 });
 

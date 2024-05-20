@@ -7,8 +7,10 @@ import {
   FlatList,
   TouchableOpacity,
   Linking,
+  ScrollView,
 } from "react-native";
 import ImageView from "react-native-image-viewing";
+import LikeSection from "./components/likeSection";
 
 const PropertyDetails = ({ route }) => {
   const { property } = route.params;
@@ -30,6 +32,7 @@ const PropertyDetails = ({ route }) => {
       </View>
     </TouchableOpacity>
   );
+
   const handleVRPress = (vrUrl) => {
     if (vrUrl) {
       Linking.openURL(vrUrl);
@@ -43,29 +46,34 @@ const PropertyDetails = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{property.name}</Text>
-      <View style={styles.imageContainer}>
-        <FlatList
-          data={property.propertyImages}
-          renderItem={renderImageItem}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>{property.name}</Text>
+        <View style={styles.imageContainer}>
+          <FlatList
+            data={property.propertyImages}
+            renderItem={renderImageItem}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+        <View style={styles.detailsContainer}>
+          <Text style={styles.description}>{property.description}</Text>
+          <Text style={styles.price}>Price: {property.price}</Text>
+          {/* Add more details here */}
+        </View>
+        <ImageView
+          images={property.propertyImages.map((image) => ({
+            uri: image.imgUrl,
+          }))}
+          imageIndex={currentIndex}
+          visible={visible}
+          onRequestClose={() => setVisible(false)}
         />
+      </ScrollView>
+      <View style={styles.likeSectionContainer}>
+        <LikeSection p={property} />
       </View>
-      <View style={styles.detailsContainer}>
-        <Text style={styles.description}>{property.description}</Text>
-
-        <Text style={styles.price}>Price: {property.price}</Text>
-
-        {/* Add more details here */}
-      </View>
-      <ImageView
-        images={property.propertyImages.map((image) => ({ uri: image.imgUrl }))}
-        imageIndex={currentIndex}
-        visible={visible}
-        onRequestClose={() => setVisible(false)}
-      />
     </View>
   );
 };
@@ -74,6 +82,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  scrollContent: {
+    paddingBottom: 100, // Ensure there's enough space for the footer
   },
   title: {
     fontSize: 28,
@@ -116,6 +127,14 @@ const styles = StyleSheet.create({
   vrButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  likeSectionContainer: {
+    position: "absolute",
+    bottom: 20,
+    width: "100%",
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
   },
 });
 
