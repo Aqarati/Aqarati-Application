@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, SafeAreaView, ScrollView, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
 import axios from 'axios';
 import { getValueFor } from '../lib';// Adjust this import according to your method of retrieving the token
-import PropertyCard from '../components/PropertyCard'; // Adjust this import according to your component
+import PropertyCardDashboard from '../components/PropertyCardDashboard'; // Adjust this import according to your component
 import Toast from 'react-native-toast-message';
 import COLORS from '../../assets/Colors/colors';
 import { urlPath } from '../lib';
+
+
 export default function MainScreen({ navigation }) {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +70,7 @@ export default function MainScreen({ navigation }) {
         ) : (
           Array.isArray(properties) &&
           properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCardDashboard key={property.id} property={property} />
           ))
         )}
       </ScrollView>

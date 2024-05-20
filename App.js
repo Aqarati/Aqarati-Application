@@ -17,11 +17,11 @@ import OwnLand from "./app/CategoryScreens/OwnLand";
 import RentApartment from "./app/CategoryScreens/RentApartment";
 import RentHome from "./app/CategoryScreens/RentHome";
 import Invest from "./app/CategoryScreens/Invest";
-import Toast from "react-native-toast-message";
+import PropertyCardDashboard from "./app/components/PropertyCardDashboard";
 import "react-native-reanimated";
 import PropertyDetails from "./app/screens/PropertyDetails";
 import dashboard from "./app/screens/dashboard";
-
+import PropertyDetailsDashboard from "./app/screens/PropertyDetailsDashboard";
 const Stack = createNativeStackNavigator();
 
 function App() {
@@ -108,6 +108,16 @@ function App() {
         <Stack.Screen
           name="PropertyDetails"
           component={PropertyDetails}
+          options={{ headerShown: true }}
+        />
+          <Stack.Screen
+          name="PropertyCardDashboard"
+          component={PropertyCardDashboard}
+          options={{ headerShown: true }}
+        />
+          <Stack.Screen
+          name="PropertyDetailsDashboard"
+          component={PropertyDetailsDashboard}
           options={{ headerShown: true }}
         />
         <Stack.Screen
