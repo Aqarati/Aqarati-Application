@@ -84,6 +84,15 @@ const LikeScreen = () => {
       <Text style={styles.header}>Liked Properties:</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" /> // Loading indicator
+      ) : likedProperty.length === 0 ? (
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <Text style={styles.noPropertyText}>No liked properties</Text>
+        </ScrollView> // No properties message
       ) : (
         <ScrollView
           style={styles.scrollView}
@@ -114,6 +123,11 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     marginBottom: 20,
+  },
+  noPropertyText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: 20,
   },
 });
 
