@@ -2,7 +2,8 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Divider } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import FontAwesome from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import COLORS from "../../assets/Colors/colors";
 
 const PropertyCard = ({ property }) => {
   const navigation = useNavigation();
@@ -35,7 +36,7 @@ const PropertyCard = ({ property }) => {
         <View style={styles.cardLikeWrapper}>
           <TouchableOpacity onPress={handleCardPress}>
             <View style={styles.cardLike}>
-              <FontAwesome color={"#0043de"} name="certificate" size={22} />
+              <MaterialIcons color={COLORS.primary } name="verified" size={22} />
             </View>
           </TouchableOpacity>
         </View>
