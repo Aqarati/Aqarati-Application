@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Divider } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
+import FontAwesome from "react-native-vector-icons/FontAwesome5";
 
 const PropertyCard = ({ property }) => {
   const navigation = useNavigation();
@@ -29,17 +30,42 @@ const PropertyCard = ({ property }) => {
   return (
     <TouchableOpacity onPress={handleCardPress}>
       <View style={styles.card}>
-        <Image source={{ uri: imageUrl }} style={styles.image} />
-        <Divider style={styles.divider} />
-        <Text style={styles.title}>{property.name}</Text>
-        <Text style={styles.description}>{property.description}</Text>
-        <Text style={styles.price}>Price: {property.price}</Text>
+        <View style={styles.cardLikeWrapper}>
+          <TouchableOpacity onPress={handleCardPress}>
+            <View style={styles.cardLike}>
+              <FontAwesome color={"#0043de"} name="certificate" size={22} />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.cardTop}>
+          <Image
+            alt=""
+            resizeMode="cover"
+            style={styles.cardImg}
+            source={{ uri: imageUrl }}
+          />
+        </View>
+
+        <View style={styles.cardBody}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>{property.name}</Text>
+
+            <Text style={styles.cardPrice}>
+              <Text style={{ fontWeight: "600" }}>{property.price} JD</Text>
+            </Text>
+          </View>
+
+          <View style={styles.cardFooter}>
+            <Text style={style.description}>{property.description}</Text>
+          </View>
+        </View>
       </View>
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
+const style = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -75,4 +101,84 @@ const styles = StyleSheet.create({
   },
 });
 
+const styles = StyleSheet.create({
+  container: {
+    padding: 15,
+    backgroundColor: "#fff",
+  },
+  card: {
+    position: "relative",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  cardLikeWrapper: {
+    position: "absolute",
+    zIndex: 1,
+    top: 12,
+    right: 12,
+  },
+  cardLike: {
+    width: 32,
+    height: 32,
+    borderRadius: 9999,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardTop: {
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  cardImg: {
+    width: "100%",
+    height: 160,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  cardBody: {
+    padding: 10,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: "500",
+    color: "#232425",
+  },
+  cardPrice: {
+    fontSize: 15,
+    fontWeight: "400",
+    color: "#232425",
+  },
+  cardFooter: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  cardStars: {
+    marginLeft: 2,
+    marginRight: 6,
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#232425",
+  },
+  cardReviews: {
+    fontSize: 14,
+    fontWeight: "400",
+    color: "#595a63",
+  },
+});
 export default PropertyCard;
