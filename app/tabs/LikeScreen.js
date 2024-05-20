@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import { urlPath, getValueFor } from "../lib";
 import PropertyCard from "../components/PropertyCard";
+import COLORS from "../../assets/Colors/colors";
 
 const LikeScreen = () => {
   const [likedPropertyIdData, setLikedPropertyIdData] = useState("");
@@ -81,7 +82,7 @@ const LikeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Liked Properties:</Text>
+      <Text style={styles.header}>Liked Properties</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" /> // Loading indicator
       ) : likedProperty.length === 0 ? (
@@ -116,10 +117,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff", // Background color of the container
   },
   header: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: "bold",
-    marginBottom: 10,
-    marginTop: 45,
+    marginBottom: 20,
+    marginTop: 60,
+    textAlign: "center",
+    color:COLORS.primary
   },
   scrollView: {
     marginBottom: 20,

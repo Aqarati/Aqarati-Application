@@ -91,7 +91,7 @@ const SearchScreen = () => {
           <Icon name="search" size={24} color="#000" />
         </TouchableOpacity>
       </View>
-      <View>
+      <View style={{marginTop:10}} >
         {loading ? (
           <ActivityIndicator
             size="50"
@@ -99,7 +99,7 @@ const SearchScreen = () => {
 "
           />
         ) : (
-          <ScrollView>
+          <ScrollView style={{marginTop:10}}>
             {noResults ? (
               <Text style={styles.noResultsText}>No results found</Text>
             ) : (
@@ -117,7 +117,7 @@ const SearchScreen = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    paddingTop: 60, // Adjust for status bar height
+    paddingTop: 70, // Adjust for status bar height
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,

@@ -200,7 +200,7 @@ export default function MainScreen({ navigation }) {
             </ScrollView>
           </View>
         </View>
-        <ScrollView style={{ backgroundColor: "#fff" }}>
+        <ScrollView style={{ backgroundColor: "#fff" , marginBottom:50}}>
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.primary} />
