@@ -14,72 +14,7 @@ import COLORS from "../../assets/Colors/colors";
 import { urlPath, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
 import PropertyCard from "../components/PropertyCard";
-const initialItems = [
-  {
-    img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
-    name: "Marbella, Spain",
-    price: 200,
-    stars: 4.45,
-    reviews: 124,
-    saved: false,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
-    name: "Baveno, Italy",
-    price: 320,
-    stars: 4.81,
-    reviews: 409,
-    saved: false,
-  },
-  {
-    img: "https://cio.com/wp-content/uploads/2023/07/shutterstock_676661263.jpg?resize=1024%2C683&quality=50&strip=all",
-    name: "Marbella, Spain",
-    price: 2000,
-    stars: 4.45,
-    reviews: 124,
-    saved: false,
-  },
-  {
-    img: "https://i2.au.reastatic.net/1000x750-format=webp/4d352958ceb83faf067d03131d84b91ae959420f5fa892202186a0c809631646/main.jpg",
-    name: "Tucson, Arizona",
-    price: 695,
-    stars: 4.3,
-    reviews: 72,
-    saved: false,
-  },
-  {
-    img: "https://i2.au.reastatic.net/1000x750-format=webp/fbf8d820df00160986236a098a4f7b845ed154ab6deea187e5b7e93c9ded2592/image.jpg",
-    name: "Marbella, Spain",
-    price: 200,
-    stars: 4.45,
-    reviews: 124,
-    saved: false,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
-    name: "Baveno, Italy",
-    price: 320,
-    stars: 4.81,
-    reviews: 409,
-    saved: false,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80",
-    name: "Tucson, Arizona",
-    price: 695,
-    stars: 4.3,
-    reviews: 72,
-    saved: false,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80",
-    name: "Marbella, Spain",
-    price: 200,
-    stars: 4.45,
-    reviews: 124,
-    saved: false,
-  },
-];
+
 const categories = [
   {
     img: "https://img.icons8.com/?size=256&id=J3w76cMS9cUS&format=png",
@@ -184,8 +119,6 @@ export default function MainScreen({ navigation }) {
       position: "top",
     });
   };
-  const [items, setItems] = useState(initialItems);
-  // State to track the opened card
 
   const handleLikePress = (index) => {
     const newItems = [...items];
