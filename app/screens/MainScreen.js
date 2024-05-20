@@ -8,6 +8,7 @@ import {
   View,
   Image,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
@@ -51,7 +52,8 @@ const categories = [
 export default function MainScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
   const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // Add refreshing state
 
   const fetchUserProfileData = async () => {
     console.log("fetch data for profile");
@@ -104,7 +106,10 @@ export default function MainScreen({ navigation }) {
       .catch((error) => {
         console.log(error);
       })
-      .finally(() => setLoading(false)); // Set loading to false when data is fetched
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false); // Set refreshing to false when data is fetched
+      });
   };
 
   useEffect(() => {
@@ -112,6 +117,12 @@ export default function MainScreen({ navigation }) {
     fetchUserProfileData();
     fetchUserPropertyData();
   }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchUserProfileData();
+    fetchUserPropertyData();
+  };
 
   const handleCardPress = (itemDetails) => {
     navigation.navigate("Details", { itemDetails });
@@ -141,6 +152,9 @@ export default function MainScreen({ navigation }) {
           styles.container,
           { paddingBottom: 0, backgroundColor: "#fff" },
         ]}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
           <View style={profilestyle.container}>
@@ -187,7 +201,7 @@ export default function MainScreen({ navigation }) {
           </View>
         </View>
         <ScrollView style={{ backgroundColor: "#fff" }}>
-          {loading ? ( // Show loading indicator while data is being fetched
+          {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
