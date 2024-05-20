@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 import { urlPath, getValueFor } from "../lib";
@@ -14,6 +15,7 @@ const LikeScreen = () => {
   const [likedPropertyIdData, setLikedPropertyIdData] = useState("");
   const [likedProperty, setLikedProperty] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true); // Added loading state
 
   const fetchFavouriteIdData = async () => {
     console.log("fetch fav id for Like Screen");
@@ -25,7 +27,7 @@ const LikeScreen = () => {
       maxBodyLength: Infinity,
       url: url,
       headers: {
-        Authorization: "Bearer  " + token,
+        Authorization: "Bearer " + token,
       },
     };
     console.log(config);
@@ -39,6 +41,7 @@ const LikeScreen = () => {
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false); // Stop loading in case of error
       });
   };
 
@@ -57,9 +60,11 @@ const LikeScreen = () => {
       .request(config)
       .then((response) => {
         setLikedProperty(response.data);
+        setLoading(false); // Stop loading after data is fetched
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false); // Stop loading in case of error
       });
   };
 
@@ -77,16 +82,20 @@ const LikeScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Liked Properties:</Text>
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {likedProperty.map((property) => (
-          <PropertyCard key={property.id} property={property} />
-        ))}
-      </ScrollView>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" /> // Loading indicator
+      ) : (
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {likedProperty.map((property) => (
+            <PropertyCard key={property.id} property={property} />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
