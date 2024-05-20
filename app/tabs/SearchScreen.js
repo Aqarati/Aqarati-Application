@@ -5,16 +5,18 @@ import {
   TouchableOpacity,
   Text,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { SearchBar, Icon } from "react-native-elements";
 import axios from "axios";
-import { Divider } from "@rneui/themed";
 import PropertyCard from "../components/PropertyCard";
 import { urlPath } from "../lib";
 
 const SearchScreen = () => {
   const [search, setSearch] = useState("");
   const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [noResults, setNoResults] = useState(false);
 
   const updateSearch = (search) => {
     setSearch(search);
@@ -23,6 +25,10 @@ const SearchScreen = () => {
 
   const handleSubmit = async () => {
     if (search.trim()) {
+      setLoading(true);
+      setNoResults(false);
+      setProperties([]);
+
       const url1 = urlPath + "/property/search/?keyword=" + search;
       const url2 = urlPath + "/property";
       let config1 = {
@@ -32,35 +38,38 @@ const SearchScreen = () => {
         headers: {},
       };
 
-      await axios
-        .request(config1)
-        .then((response) => {
-          const ids = response.data.map((item) => item.id);
-          console.log(response);
-          console.log(ids);
-          console.log(JSON.stringify(response.data));
-          setProperties(response.data);
+      try {
+        const response1 = await axios.request(config1);
+        const ids = response1.data.map((item) => item.id);
+        console.log(response1);
+        console.log(ids);
+        console.log(JSON.stringify(response1.data));
 
-          let data = JSON.stringify(ids);
+        if (response1.data.length === 0) {
+          setNoResults(true);
+        } else {
+          setProperties(response1.data);
+        }
 
-          let config2 = {
-            method: "get",
-            maxBodyLength: Infinity,
-            url: url2,
-            headers: {
-              "Content-Type": "application/json",
-            },
-            data: data,
-          };
-          console.log(config2);
-          return axios.get(url2);
-        })
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        let data = JSON.stringify(ids);
+
+        let config2 = {
+          method: "get",
+          maxBodyLength: Infinity,
+          url: url2,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: data,
+        };
+        console.log(config2);
+        const response2 = await axios.get(url2);
+        console.log(JSON.stringify(response2.data));
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -83,11 +92,23 @@ const SearchScreen = () => {
         </TouchableOpacity>
       </View>
       <View>
-        <ScrollView>
-          {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
-        </ScrollView>
+        {loading ? (
+          <ActivityIndicator
+            size="50"
+            color="##808080
+"
+          />
+        ) : (
+          <ScrollView>
+            {noResults ? (
+              <Text style={styles.noResultsText}>No results found</Text>
+            ) : (
+              properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))
+            )}
+          </ScrollView>
+        )}
       </View>
     </>
   );
@@ -141,6 +162,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 5,
+  },
+  noResultsText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#999",
   },
 });
 
