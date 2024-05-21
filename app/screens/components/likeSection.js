@@ -11,7 +11,8 @@ import { Linking } from "react-native";
 import { urlPath } from "../../lib";
 import { getValueFor } from "../../lib";
 import axios from "axios";
-
+import COLORS from "../../../assets/Colors/colors";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const LikeSection = ({ p }) => {
   const [liked, setLiked] = useState(null);
   const [loading, setLoading] = useState(false); // New state for loading indicator
@@ -93,9 +94,11 @@ const LikeSection = ({ p }) => {
       </TouchableOpacity>
       <View style={styles.buttonWrapper}>
         {loading ? (
-          <ActivityIndicator size="small" color="#007bff" />
+          <ActivityIndicator size="small" color={COLORS.primary} />
         ) : (
-          <Button title={liked ? "Unlike" : "Like"} onPress={handleLikePress} />
+          <TouchableOpacity onPress={handleLikePress}style={styles.icons}>
+            <FontAwesome name="heart" size={30} color={liked ? '#CD1818' : 'white'} />
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -103,26 +106,39 @@ const LikeSection = ({ p }) => {
 };
 
 const styles = StyleSheet.create({
+  icons:{
+    backgroundColor: COLORS.primary,
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft:20
+  },
   container: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 10,
+    padding: 15,
   },
   button: {
-    backgroundColor: "#007bff",
+    backgroundColor: COLORS.primary,
     padding: 15,
     paddingHorizontal: 80,
     margin: 5,
     borderRadius: 5,
+    borderRadius:40,
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     textAlign: "center",
+    fontWeight: "bold",
+   
   },
   buttonWrapper: {
     marginRight: 20,
+    
   },
 });
 
