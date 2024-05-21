@@ -58,10 +58,10 @@ const PropertyDetailsDashboard = ({ route }) => {
             throw new Error("Token not found");
         }
 
-        const propertyId = 52; // Assuming propertyId is fixed
+        const propertyId = property.id; // Assuming propertyId is fixed
         const propertyName = name;
         const propertyDescription = description;
-        const propertyPrice = parseFloat(price);
+        const propertyPrice =parseInt(price);
 
         // Construct the data object using the variables
         const data = {
@@ -71,7 +71,7 @@ const PropertyDetailsDashboard = ({ route }) => {
             price: propertyPrice
         };
 
-        const url = urlPath + "/property";
+        const url = urlPath + "/property/";
 
         // Make the request with the token included in the headers
         const response = await axios.put(url, data, {
@@ -90,157 +90,103 @@ const PropertyDetailsDashboard = ({ route }) => {
 };
   
 
-  return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Edit Property Details</Text>
-        <View style={styles.inputContainer}>
-  <TextInput
-    style={styles.input}
-    value={name}
-    onChangeText={setName}
-    placeholder="Property Name"
-  />
-  <TextInput
-    style={[styles.input, { height: 100 }]} // Increase height for multiline input
-    value={description}
-    onChangeText={setDescription}
-    placeholder="Description"
-    multiline
-  />
-  <TextInput
-    style={styles.input}
-    value={price}
-    onChangeText={setPrice}
-    placeholder="Price"
-    keyboardType="numeric"
-  />
-  <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-    <Text style={styles.saveButtonText}>Save Changes</Text>
-  </TouchableOpacity>
-</View>
-        <View style={styles.imageContainer}>
-          <FlatList
-            data={property.propertyImages}
-            renderItem={renderImageItem}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
-        <View style={styles.detailsContainer}>
-          <Text style={styles.description}>{description}</Text>
-          <Text style={styles.price}>Price: {price}</Text>
-        </View>
-        <ImageView
-          images={property.propertyImages.map((image) => ({
-            uri: image.imgUrl,
-          }))}
-          imageIndex={currentIndex}
-          visible={visible}
-          onRequestClose={() => setVisible(false)}
+return (
+  <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+      <Text style={styles.title}>Edit Property Details</Text>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>Property Title</Text>
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholder="Enter property name"
         />
-      </ScrollView>
-      <View style={styles.likeSectionContainer}>
-        <LikeSection p={property} />
       </View>
-    </View>
-  );
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>Property Description</Text>
+        <TextInput
+          style={[styles.input, styles.multilineInput]}
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Enter description"
+          multiline
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>Property Price</Text>
+        <TextInput
+          style={styles.input}
+          value={price}
+          onChangeText={setPrice}
+          placeholder="Enter price"
+          keyboardType="numeric"
+        />
+      </View>
+
+      <TouchableOpacity style={styles.saveButton}
+
+
+      onPress={handleSave}>
+        <Text style={styles.saveButtonText}>Save</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
-    inputContainer: {
-        padding: 20,
-        paddingBottom: 0,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-      },
-      input: {
-        marginBottom: 10,
-        padding: 10,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-      },
-      saveButton: {
-        backgroundColor:COLORS.primary,
-        padding: 10,
-        borderRadius: 5,
-        marginTop: 20,
-      },
-      saveButtonText: {
-        color: 'white',
-        textAlign: 'center',
-        fontWeight: 'bold',
-      },
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 15,
-    marginTop: 15,
-    paddingHorizontal: 20,
-  },
-  inputContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 18,
-    color: "#666",
-    marginBottom: 10,
-  },
-  imageContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
-  image: {
-    width: 300,
-    height: 200,
-    resizeMode: "cover",
-    marginRight: 10,
-  },
-  detailsContainer: {
-    padding: 20,
-  },
-  price: {
-    fontSize: 20,
-    color: "#000",
-    marginBottom: 10,
-  },
-  vrButton: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    padding: 10,
-    borderRadius: 5,
-  },
-  vrButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  likeSectionContainer: {
-    position: "absolute",
-    bottom: 20,
-    width: "100%",
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderTopColor: "#ddd",
-  },
-});
+container: {
+  flex: 1,
+  backgroundColor: "#fff",
+},
+scrollContent: {
+  paddingBottom: 100,
+},
+title: {
+  fontSize: 28,
+  fontWeight: "bold",
+  marginBottom: 15,
+  marginTop: 70,
+  paddingHorizontal: 20,
+  textAlign: "center",
+  color: COLORS.primary, // Example primary color
+},
+inputContainer: {
+  
+  paddingHorizontal: 20,
+  marginBottom: 10,
+},
+inputLabel: {
+  fontSize: 25,
+  color: COLORS.primary, // Example primary color
 
+  marginBottom: 5,
+},
+input: {
+  borderWidth: 1,
+  borderColor: "#ccc",
+  padding: 10,
+  borderRadius: 5,
+  marginBottom: 15,
+},
+multilineInput: {
+  height: 100,
+},
+saveButton: {
+  backgroundColor: COLORS.primary, // Example primary color
+  padding: 10,
+  borderRadius: 5,
+  marginTop: 20,
+  marginHorizontal: 20,
+},
+saveButtonText: {
+  color: 'white',
+  textAlign: 'center',
+  fontWeight: 'bold',
+},
+});
 export default PropertyDetailsDashboard;

@@ -118,7 +118,7 @@ function App() {
           <Stack.Screen
           name="PropertyDetailsDashboard"
           component={PropertyDetailsDashboard}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
         name="dashboard"
