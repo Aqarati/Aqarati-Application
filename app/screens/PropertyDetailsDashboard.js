@@ -3,52 +3,26 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
-  FlatList,
-  TouchableOpacity,
   TextInput,
-  Button,
-  Linking,
+  TouchableOpacity,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import ImageView from "react-native-image-viewing";
-import LikeSection from "./components/likeSection";
-import { urlPath } from "../lib";
-import { Alert } from "react-native";
-
+import { useNavigation } from "@react-navigation/native";
+import { urlPath, getValueFor } from "../lib";
 import COLORS from "../../assets/Colors/colors";
-import { getValueFor } from "../lib";
+
 const PropertyDetailsDashboard = ({ route }) => {
+  const navigation = useNavigation();
+
   const { property } = route.params;
-  const [visible, setVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   const [name, setName] = useState(property.name);
   const [description, setDescription] = useState(property.description);
   const [price, setPrice] = useState(property.price.toString());
-
-  const renderImageItem = ({ item, index }) => (
-    <TouchableOpacity onPress={() => handleImagePress(index)}>
-      <View>
-        <Image source={{ uri: item.imgUrl }} style={styles.image} />
-        {item.vr && (
-          <TouchableOpacity
-            style={styles.vrButton}
-            onPress={() => handleVRPress(item.vr_url)}
-          >
-            <Text style={styles.vrButtonText}>View VR</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-
-  const handleVRPress = (vrUrl) => {
-    if (vrUrl) {
-      Linking.openURL(vrUrl);
-    }
-  };
+  const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
     try {
@@ -103,6 +77,7 @@ const PropertyDetailsDashboard = ({ route }) => {
         {
           text: "OK",
           onPress: async () => {
+            setLoading(true); // Start loading
             try {
               // Retrieve token asynchronously
               const token = await getValueFor("token");
@@ -114,7 +89,7 @@ const PropertyDetailsDashboard = ({ route }) => {
 
               const propertyId = property.id; // Assuming propertyId is fixed
 
-              const url = urlPath + "/property/" + propertyId;
+              const url = `${urlPath}/property/${propertyId}`;
 
               // Make the request with the token included in the headers
               const response = await axios.delete(url, {
@@ -126,9 +101,12 @@ const PropertyDetailsDashboard = ({ route }) => {
 
               console.log(JSON.stringify(response.data));
               // Handle successful response
+              navigation.goBack();
             } catch (error) {
               console.log(error);
               // Handle error
+            } finally {
+              setLoading(false); // Stop loading
             }
           },
         },
@@ -139,6 +117,11 @@ const PropertyDetailsDashboard = ({ route }) => {
 
   return (
     <View style={styles.container}>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      )}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Edit Property Details</Text>
 
@@ -210,7 +193,6 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 25,
     color: COLORS.primary, // Example primary color
-
     marginBottom: 5,
   },
   input: {
@@ -242,5 +224,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontWeight: "bold",
   },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+  },
 });
+
 export default PropertyDetailsDashboard;
