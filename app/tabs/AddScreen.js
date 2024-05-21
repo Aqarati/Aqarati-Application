@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
+import { getValueFor, urlPath } from "../lib";
 import {
   StyleSheet,
   SafeAreaView,
@@ -30,7 +30,7 @@ const SettingsStack = createNativeStackNavigator();
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Octicons from "react-native-vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
-import axios from 'axios';
+import axios from "axios";
 const selectedDATA = [
   {
     adtype: [],
@@ -261,18 +261,19 @@ const styles1 = StyleSheet.create({
   },
 });
 
-function DetailsScreen2({ navigation }) {
+const DetailsScreen2 = ({ navigation }) => {
   const initialPhotos = new Array(12).fill(null);
   const [photos, setPhotos] = useState(initialPhotos);
 
   useEffect(() => {
     // Request permission to access the camera and photo library
     (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
         Alert.alert(
-          'Permission Required',
-          'Sorry, we need camera roll permissions to make this work!'
+          "Permission Required",
+          "Sorry, we need camera roll permissions to make this work!"
         );
       }
     })();
@@ -283,16 +284,12 @@ function DetailsScreen2({ navigation }) {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
-      selectionLimit: 12,
-      allowsMultipleSelection: true,
+      allowsMultipleSelection: false,
       aspect: [1, 1],
       quality: 1,
     });
 
-    console.log('ImagePicker result:', result); // Log the result object to see its structure and check for the URI
-
     if (!result.cancelled) {
-      // If image is selected, update photoUri and keep changePhotoMode true
       const newPhotos = [...photos];
       newPhotos[index] = result.uri;
       setPhotos(newPhotos);
@@ -304,25 +301,28 @@ function DetailsScreen2({ navigation }) {
       // Upload the image to the server
       try {
         const formData = new FormData();
-        formData.append('images', {
+        formData.append("file", {
           uri: result.uri,
-          type: 'image/jpeg',
           name: `photo_${index}.jpg`,
+          type: "image/jpeg",
         });
 
-        const config = {
-          method: 'put',
-          url: 'http://localhost:8888/property/image/356',
+        const response = await fetch("YOUR_UPLOAD_URL_HERE", {
+          method: "POST",
+          body: formData,
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
-          data: formData,
-        };
+        });
 
-        const response = await axios.request(config);
-        console.log(JSON.stringify(response.data));
+        if (!response.ok) {
+          throw new Error("Failed to upload image");
+        }
+
+        console.log("Image uploaded successfully");
       } catch (error) {
         console.log(error);
+        Alert.alert("Upload Error", "There was an error uploading the image.");
       }
     }
   };
@@ -335,10 +335,12 @@ function DetailsScreen2({ navigation }) {
       {item ? (
         <Image
           source={{ uri: item }}
-          style={[styles2.photo, { resizeMode: 'cover' }]}
+          style={[styles2.photo, { resizeMode: "cover" }]}
         />
       ) : (
-        <View style={index === 0 ? styles2.firstAddIconBox : styles2.addIconBox}>
+        <View
+          style={index === 0 ? styles2.firstAddIconBox : styles2.addIconBox}
+        >
           <AntDesign name="pluscircleo" size={24} color={COLORS.primary2} />
         </View>
       )}
@@ -350,13 +352,16 @@ function DetailsScreen2({ navigation }) {
       <Text style={styles2.title}>Add pictures to the advertise</Text>
       <View style={styles2.dashedBox}>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Up to 12 photos can be added
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Up to 12
+          photos can be added
         </Text>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Pictures increase the number of views
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Pictures
+          increase the number of views
         </Text>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Hint: You can rearrange photos by dragging them from one place to another
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Hint:
+          You can rearrange photos by dragging them from one place to another
         </Text>
       </View>
 
@@ -371,14 +376,15 @@ function DetailsScreen2({ navigation }) {
       <TouchableOpacity
         style={styles2.bottomButton}
         onPress={() => {
-          navigation.push('WhatPriceScreen');
+          navigation.push("WhatPriceScreen");
         }}
       >
         <Text style={styles2.bottomButtonText}>Next</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
+
 const styles2 = StyleSheet.create({
   container: {
     flex: 1,
@@ -2242,7 +2248,7 @@ const AdvertisementDetailsScreen = ({ navigation }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const navigateToNext = () => {
+  const navigateToNext = async () => {
     navigation.navigate("Detail2", { title, description });
     selectedDATA[0].adtitle = title;
     selectedDATA[0].addescription = description;
@@ -2368,6 +2374,21 @@ const WhatPriceScreen = ({ navigation }) => {
   const [price, setPrice] = useState("");
 
   const navigateToNext = () => {
+    const makeitEmpty = (selectedDATA) => {
+      selectedDATA.forEach((item) => {
+        Object.keys(item).forEach((key) => {
+          item[key] = [];
+        });
+      });
+
+      return selectedDATA;
+    };
+    const resetToFirstScreen = (navigation) => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
+      });
+    };
     // Display a confirmation modal to the user
     Alert.alert(
       "Confirm",
@@ -2379,14 +2400,85 @@ const WhatPriceScreen = ({ navigation }) => {
         },
         {
           text: "Yes",
-          onPress: () => {
+          onPress: async () => {
             // Handle the case when the user confirms to share the post
             selectedDATA[0].adprice = price;
             console.log(selectedDATA[0].adprice);
             console.log(selectedDATA);
+            const handleSavePost = async () => {
+              const url = urlPath + "/property";
+              const token = await getValueFor("token");
+              let data = JSON.stringify({
+                name: selectedDATA[0].adtitle,
+                description: selectedDATA[0].addescription,
+                price: selectedDATA[0].adprice,
+              });
+
+              let config = {
+                method: "post",
+                maxBodyLength: Infinity,
+                url: url,
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + token,
+                },
+                data: data,
+              };
+              console.log("saving Post");
+              console.log(config);
+              await axios
+                .request(config)
+                .then((response) => {
+                  console.log(JSON.stringify(response.data));
+                  console.log(JSON.stringify("ID For Property"));
+                  console.log(JSON.stringify(response.data.id));
+                  handleAddImageToPost(response.data.id);
+                  makeitEmpty(selectedDATA);
+                  resetToFirstScreen(navigation);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            };
 
             // Perform the action to share the post into the database
             // Navigate to the next screen or perform any other action
+            const handleAddImageToPost = async (pId) => {
+              const url = urlPath + "/property";
+              const token = await getValueFor("token");
+              let data = new FormData();
+              // data.append(
+              //   "images",
+              //   fs.createReadStream(
+              //     "/C:/Users/ahmd6/Desktop/photo_2024-05-19_19-28-04.jpg"
+              //   )
+              // );
+
+              let config = {
+                method: "put",
+                maxBodyLength: Infinity,
+                url: "http://localhost:8888/property/image/" + pId,
+                headers: {
+                  Authorization: "Bearer " + token,
+                  // ...data.getHeaders(),
+                },
+                data: data,
+              };
+              console.log("saving Post");
+              console.log(config);
+              await axios
+                .request(config)
+                .then((response) => {
+                  console.log(JSON.stringify(response.data));
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            };
+
+            console.log("Handling Save Post");
+
+            await handleSavePost();
           },
         },
         {
