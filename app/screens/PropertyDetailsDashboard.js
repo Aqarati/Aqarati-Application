@@ -7,13 +7,15 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Image,
+  FlatList,
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { urlPath, getValueFor } from "../lib";
 import COLORS from "../../assets/Colors/colors";
-
+import * as ImagePicker from "expo-image-picker";
 const PropertyDetailsDashboard = ({ route }) => {
   const navigation = useNavigation();
 
@@ -22,48 +24,81 @@ const PropertyDetailsDashboard = ({ route }) => {
   const [name, setName] = useState(property.name);
   const [description, setDescription] = useState(property.description);
   const [price, setPrice] = useState(property.price.toString());
+  const [propertyImages, setPropertyImages] = useState(property.propertyImages);
   const [loading, setLoading] = useState(false);
+  const [images, setImages] = useState([]);
+
 
   const handleSave = async () => {
     try {
-      // Retrieve token asynchronously
       const token = await getValueFor("token");
 
-      // Check if token is available
       if (!token) {
         throw new Error("Token not found");
       }
-
-      const propertyId = property.id; // Assuming propertyId is fixed
+  
+      const propertyId = property.id;
       const propertyName = name;
       const propertyDescription = description;
       const propertyPrice = parseInt(price);
-
-      // Construct the data object using the variables
+  
       const data = {
         id: propertyId,
         name: propertyName,
         description: propertyDescription,
         price: propertyPrice,
+       
       };
-
+  
       const url = urlPath + "/property/";
-
-      // Make the request with the token included in the headers
-      const response = await axios.put(url, data, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log(JSON.stringify(response.data));
-      // Handle successful response
+  
+      Alert.alert(
+        "Confirm Save",
+        "Are you sure you want to save this item?",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Save canceled"),
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: async () => {
+              setLoading(true);
+  
+              try {
+                const response = await axios.put(url, data, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                  },
+                });
+  
+                console.log(JSON.stringify(response.data));
+                // Reload the screen
+                navigation.navigate("PropertyDetailsDashboard", {
+                  property: {
+                    ...property,
+                    name: propertyName,
+                    description: propertyDescription,
+                    price: propertyPrice,
+                  },
+                });
+              } catch (error) {
+                console.log(error);
+              } finally {
+                setLoading(false);
+              }
+            },
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
       console.log(error);
-      // Handle error
     }
   };
+
   const handleDelete = async () => {
     Alert.alert(
       "Confirm Deletion",
@@ -77,36 +112,30 @@ const PropertyDetailsDashboard = ({ route }) => {
         {
           text: "OK",
           onPress: async () => {
-            setLoading(true); // Start loading
+            setLoading(true);
             try {
-              // Retrieve token asynchronously
               const token = await getValueFor("token");
 
-              // Check if token is available
               if (!token) {
                 throw new Error("Token not found");
               }
 
-              const propertyId = property.id; // Assuming propertyId is fixed
-
+              const propertyId = property.id;
               const url = `${urlPath}/property/${propertyId}`;
 
-              // Make the request with the token included in the headers
               const response = await axios.delete(url, {
                 headers: {
-                  Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+                  Authorization: `Bearer ${token}`,
                   "Content-Type": "application/json",
                 },
               });
 
               console.log(JSON.stringify(response.data));
-              // Handle successful response
               navigation.goBack();
             } catch (error) {
               console.log(error);
-              // Handle error
             } finally {
-              setLoading(false); // Stop loading
+              setLoading(false);
             }
           },
         },
@@ -114,6 +143,64 @@ const PropertyDetailsDashboard = ({ route }) => {
       { cancelable: false }
     );
   };
+
+    // Open the camera or photo library
+    const handleImagePress = async (index) => {
+      // Open the device's photo library
+      const FormData = require('form-data');
+        let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsMultipleSelection: true,
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    console.log(result);
+    const url = urlPath;
+    console.log(url);
+    let data = new FormData();
+    console.log(result.assets[0].uri);
+    console.log(property.id);
+    data.append('image', result.assets[0].uri);
+    data.append('property-id', property.id);
+    
+    
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: url+'/document/',
+      headers: { 
+        'Authorization': '{{Authorization}}', 
+        ...data.getHeaders()
+      },
+      data : data
+    };
+    
+    axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    
+  };
+
+
+  const renderImageItem = ({ item, index }) => (
+    <View style={styles.imageWrapper}>
+      <Image source={{ uri: item.imgUrl }} style={styles.image} />
+   
+      {item.vr && (
+        <TouchableOpacity
+          style={styles.vrButton}
+          onPress={() => handleVRPress(item.vr_url)}
+        >
+          <Text style={styles.vrButtonText}>View VR</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -124,6 +211,15 @@ const PropertyDetailsDashboard = ({ route }) => {
       )}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Edit Property Details</Text>
+        <View style={styles.imageContainer}>
+          <FlatList
+            data={property.propertyImages}
+            renderItem={renderImageItem}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
 
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Property Title</Text>
@@ -164,6 +260,9 @@ const PropertyDetailsDashboard = ({ route }) => {
         <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Text style={styles.saveButtonText}>Delete</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.docButton} onPress={handleImagePress}>
+          <Text style={styles.saveButtonText}>Upload Document</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -184,15 +283,40 @@ const styles = StyleSheet.create({
     marginTop: 70,
     paddingHorizontal: 20,
     textAlign: "center",
-    color: COLORS.primary, // Example primary color
+    color: COLORS.primary,
+  },
+  imageContainer: {
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  imageWrapper: {
+    position: "relative",
+    marginRight: 10,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+  },
+  
+  vrButton: {
+    position: "absolute",
+    bottom: 5,
+    left: 5,
+    backgroundColor: "blue",
+    borderRadius: 5,
+    padding: 5,
+  },
+  vrButtonText: {
+    color: "white",
   },
   inputContainer: {
     paddingHorizontal: 20,
     marginBottom: 10,
   },
   inputLabel: {
-    fontSize: 25,
-    color: COLORS.primary, // Example primary color
+    fontSize: 20,
+    color: COLORS.primary,
     marginBottom: 5,
   },
   input: {
@@ -200,23 +324,29 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     padding: 10,
     borderRadius: 5,
-    marginBottom: 15,
   },
   multilineInput: {
     height: 100,
   },
   saveButton: {
-    backgroundColor: COLORS.primary, // Example primary color
+    backgroundColor: COLORS.primary,
     padding: 10,
     borderRadius: 5,
     marginTop: 20,
     marginHorizontal: 20,
   },
   deleteButton: {
-    backgroundColor: COLORS.darkGray, // Example primary color
+    backgroundColor: COLORS.darkGray,
     padding: 10,
     borderRadius: 5,
-    marginTop: 20,
+    marginTop: 10,
+    marginHorizontal: 20,
+  },
+  docButton: {
+    backgroundColor: COLORS.primary,
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
     marginHorizontal: 20,
   },
   saveButtonText: {
@@ -236,5 +366,4 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
 });
-
 export default PropertyDetailsDashboard;

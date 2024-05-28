@@ -22,6 +22,7 @@ import "react-native-reanimated";
 import PropertyDetails from "./app/screens/PropertyDetails";
 import dashboard from "./app/screens/dashboard";
 import PropertyDetailsDashboard from "./app/screens/PropertyDetailsDashboard";
+
 const Stack = createNativeStackNavigator();
 
 function App() {

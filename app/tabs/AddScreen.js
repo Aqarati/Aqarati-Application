@@ -658,45 +658,46 @@ const WhatPriceScreen = ({ navigation,route }) => {
                 });
             };
 
-            const handleAddImageToPost = async (pId) => {
-              const url = urlPath + "property/image/" + pId;
+            const handleAddImageToPost = async (propertyId) => {
               const token = await getValueFor("token");
-            
-              try {
-                let data = new FormData();
-                  console.log("photos" , photos)
-                // Iterate over the photos array and append each image to FormData
-                photos.forEach((photoUri, index) => {
-                  if (photoUri) {
-                    const fileName = photoUri.split('/').pop();
-                    const fileType = fileName.split('.').pop();
-                    data.append("images", {
-                      uri: photoUri,
-                      name: `photo_${index}.${fileType}`,
-                      type: `image/${fileType}`,
-                    });
-                  }
-                });
-            
-                let config = {
-                  method: "put",
-                  maxBodyLength: Infinity,
-                  url: url,
-                  headers: {
-                    Authorization: "Bearer " + token,
-                    'Content-Type': 'multipart/form-data',
-                  },
-                  data: data,
-                };
-            
-                console.log("Saving Post");
-                console.log(config);
-            
-                const response = await axios.request(config);
-                console.log("Server response:", response.data);
-              } catch (error) {
-                console.log("Error uploading images:", error.response ? error.response.data : error.message);
-              }
+              const  url = urlPath +"/property/image/"+propertyId;
+              const filteredPhotos = photos.filter(photo => photo !== null);
+              console.log(filteredPhotos)
+              let formData = new FormData();
+              filteredPhotos.forEach((uri, index) => {
+                console.log(uri)
+      formData.append("images", {
+        uri: uri,
+        name: `image${index}.png`,
+        type: "image/png",
+      });
+    });
+
+    let config = {
+      method: "put",
+      url: url,
+      headers: {
+        Authorization:
+          "Bearer " +token,
+        "Content-Type": "multipart/form-data",
+      },
+      data: formData,
+    }
+    console.log("config",config);
+    try {
+     
+
+      let response = await axios(config);
+      console.log("config");
+      console.log(config);
+
+      console.log("\n \nFinist");
+      console.log(response.data);
+      Alert.alert("Success", "Images uploaded successfully");
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Image upload failed");
+    }
             };
             
 
