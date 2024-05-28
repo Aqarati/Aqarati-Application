@@ -20,7 +20,7 @@ import {
   Switch,
   Alert,
 } from "react-native";
-
+import * as FileSystem from 'expo-file-system';
 import { COLORS } from "../../assets/theme";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
@@ -31,6 +31,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Octicons from "react-native-vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
 import axios from 'axios';
+import { getValueFor, urlPath } from "../lib";
 const selectedDATA = [
   {
     adtype: [],
@@ -53,6 +54,7 @@ const selectedDATA = [
     adtitle: [],
     addescription: [],
     adprice: [],
+    images:[],
   },
 ];
 const items = [
@@ -261,7 +263,7 @@ const styles1 = StyleSheet.create({
   },
 });
 
-function DetailsScreen2({ navigation }) {
+const DetailsScreen2 = ({ navigation }) => {
   const initialPhotos = new Array(12).fill(null);
   const [photos, setPhotos] = useState(initialPhotos);
 
@@ -283,47 +285,29 @@ function DetailsScreen2({ navigation }) {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
-      selectionLimit: 12,
       allowsMultipleSelection: true,
       aspect: [1, 1],
       quality: 1,
     });
 
-    console.log('ImagePicker result:', result); // Log the result object to see its structure and check for the URI
+    console.log('ImagePicker result:', result);
 
-    if (!result.cancelled) {
-      // If image is selected, update photoUri and keep changePhotoMode true
+    if (!result.canceled) {
+      // If images are selected, update the photo array
       const newPhotos = [...photos];
-      newPhotos[index] = result.uri;
+      const selectedUris = result.assets.slice(0, 12).map(asset => asset.uri);
+      selectedUris.forEach((uri, idx) => {
+        if (index + idx < 12) {
+          newPhotos[index + idx] = uri;
+        }
+      });
       setPhotos(newPhotos);
 
-      // Log the updated newPhotos array to verify the saved image URI
-      selectedDATA[0].photos = newPhotos;
-      console.log(selectedDATA[0].photos);
+      // Update selectedDATA with the selected image URIs
+      selectedDATA[0].images = selectedUris;
 
-      // Upload the image to the server
-      try {
-        const formData = new FormData();
-        formData.append('images', {
-          uri: result.uri,
-          type: 'image/jpeg',
-          name: `photo_${index}.jpg`,
-        });
-
-        const config = {
-          method: 'put',
-          url: 'http://localhost:8888/property/image/356',
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          data: formData,
-        };
-
-        const response = await axios.request(config);
-        console.log(JSON.stringify(response.data));
-      } catch (error) {
-        console.log(error);
-      }
+      console.log('Updated photos:', newPhotos);
+      console.log('selectedDATA:', selectedDATA);
     }
   };
 
@@ -371,7 +355,7 @@ function DetailsScreen2({ navigation }) {
       <TouchableOpacity
         style={styles2.bottomButton}
         onPress={() => {
-          navigation.push('WhatPriceScreen');
+          navigation.push('WhatPriceScreen',{ photos: photos });
         }}
       >
         <Text style={styles2.bottomButtonText}>Next</Text>
@@ -379,6 +363,7 @@ function DetailsScreen2({ navigation }) {
     </View>
   );
 }
+
 const styles2 = StyleSheet.create({
   container: {
     flex: 1,
@@ -390,8 +375,8 @@ const styles2 = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     marginBottom: 10,
-    color: COLORS.primary, // Set the title color to primary
-    textAlign: "center", // Center align the title for better aesthetics
+    color: COLORS.primary,
+    textAlign: "center",
   },
   dashedBox: {
     borderWidth: 1,
@@ -402,20 +387,19 @@ const styles2 = StyleSheet.create({
     marginBottom: 30,
     marginTop: 30,
     marginLeft: 6,
-    width: "95%", // Reduce width to 95% of its container to make it narrower
+    width: "95%",
   },
   dashedBoxText: {
     color: "grey",
     textAlign: "left",
-    fontSize: 16, // Increased font size for better readability
-    paddingLeft: 5, // Add padding to allow space for the bullet
+    fontSize: 16,
+    paddingLeft: 5,
   },
-
   photoBox: {
-    width: "25%", // Reduced width to decrease box area, ensuring four boxes per line
-    height: 80, // Reduced height
+    width: "25%",
+    height: 80,
     borderColor: "grey",
-    borderWidth: 3,
+    borderWidth: 1,
     borderRadius: 5,
     margin: 5,
     justifyContent: "center",
@@ -423,16 +407,8 @@ const styles2 = StyleSheet.create({
     backgroundColor: "#fff",
   },
   addIconBox: {
-    width: 50,
-    height: 50,
-    backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 25,
-  },
-  addIconText: {
-    color: COLORS.white,
-    fontSize: 18,
   },
   row: {
     flexDirection: "row",
@@ -452,22 +428,23 @@ const styles2 = StyleSheet.create({
     fontSize: 18,
   },
   firstPhotoBox: {
-    width: "25%", // Consistent with other photo boxes
-    height: 80, // Consistent with other photo boxes
+    width: "25%",
+    height: 80,
     borderColor: "grey",
-    borderWidth: 3,
+    borderWidth: 1,
     borderRadius: 5,
     margin: 5,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: COLORS.primary, // Use primary color for distinct appearance
+    backgroundColor: "#fff",
   },
   firstAddIconBox: {
-    width: 25,
-    height: 25,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 25,
+  },
+  photo: {
+    width: '100%',
+    height: '100%',
   },
 });
 
@@ -2364,10 +2341,25 @@ const resetToFirstScreen = (navigation) => {
     routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
   });
 };
-const WhatPriceScreen = ({ navigation }) => {
+const WhatPriceScreen = ({ navigation,route }) => {
   const [price, setPrice] = useState("");
-
+  const { photos } = route.params;
   const navigateToNext = () => {
+    const makeitEmpty = (selectedDATA) => {
+      selectedDATA.forEach((item) => {
+        Object.keys(item).forEach((key) => {
+          item[key] = [];
+        });
+      });
+
+      return selectedDATA;
+    };
+    const resetToFirstScreen = (navigation) => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
+      });
+    };
     // Display a confirmation modal to the user
     Alert.alert(
       "Confirm",
@@ -2379,14 +2371,95 @@ const WhatPriceScreen = ({ navigation }) => {
         },
         {
           text: "Yes",
-          onPress: () => {
+          onPress: async () => {
             // Handle the case when the user confirms to share the post
             selectedDATA[0].adprice = price;
             console.log(selectedDATA[0].adprice);
             console.log(selectedDATA);
+            const handleSavePost = async () => {
+              const url = urlPath + "/property";
+              const token = await getValueFor("token");
+              let data = JSON.stringify({
+                name: selectedDATA[0].adtitle,
+                description: selectedDATA[0].addescription,
+                price: selectedDATA[0].adprice,
+              });
+
+              let config = {
+                method: "post",
+                maxBodyLength: Infinity,
+                url: url,
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + token,
+                },
+                data: data,
+              };
+              console.log("saving Post");
+              console.log(config);
+              await axios
+                .request(config)
+                .then((response) => {
+                  console.log(JSON.stringify(response.data));
+                  console.log(JSON.stringify("ID For Property"));
+                  console.log(JSON.stringify(response.data.id));
+                  handleAddImageToPost(response.data.id);
+                  makeitEmpty(selectedDATA);
+                  resetToFirstScreen(navigation);
+                })
+                .catch((error) => {
+                  console.log(error);
+                 
+                });
+            };
 
             // Perform the action to share the post into the database
             // Navigate to the next screen or perform any other action
+            const handleAddImageToPost = async (pId) => {
+              const url = urlPath + "property/image/" + pId;
+              const token = await getValueFor("token");
+            
+              try {
+                let data = new FormData();
+            
+                // Iterate over the photos array and append each image to FormData
+                photos.forEach((photoUri, index) => {
+                  if (photoUri) {
+                    const fileName = photoUri.split('/').pop();
+                    const fileType = fileName.split('.').pop();
+                    data.append("images", {
+                      uri: photoUri,
+                      name: `photo_${index}.${fileType}`,
+                      type: `image/${fileType}`,
+                    });
+                  }
+                });
+            
+                let config = {
+                  method: "put",
+                  maxBodyLength: Infinity,
+                  url: url,
+                  headers: {
+                    Authorization: "Bearer " + token,
+                    'Content-Type': 'multipart/form-data',
+                  },
+                  data: data,
+                };
+            
+                console.log("Saving Post");
+                console.log(config);
+            
+                const response = await axios.request(config);
+                console.log("Server response:", response.data);
+              } catch (error) {
+                console.log("Error uploading images:", error.response ? error.response.data : error.message);
+              }
+            };
+            
+
+            console.log("Handling Save Post");
+
+            await handleSavePost();
           },
         },
         {
