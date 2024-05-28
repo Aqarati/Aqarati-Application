@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { getValueFor, urlPath } from "../lib";
+import { DATA } from "./data";
 import {
   StyleSheet,
   SafeAreaView,
@@ -20,7 +21,7 @@ import {
   Switch,
   Alert,
 } from "react-native";
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from "expo-file-system";
 import { COLORS } from "../../assets/theme";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
@@ -30,7 +31,7 @@ const SettingsStack = createNativeStackNavigator();
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Octicons from "react-native-vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
-import axios from 'axios';
+import axios from "axios";
 const selectedDATA = [
   {
     adtype: [],
@@ -53,7 +54,7 @@ const selectedDATA = [
     adtitle: [],
     addescription: [],
     adprice: [],
-    images:[],
+    images: [],
   },
 ];
 const items = [
@@ -291,12 +292,12 @@ const DetailsScreen2 = ({ navigation }) => {
       quality: 1,
     });
 
-    console.log('ImagePicker result:', result); // Log the result object to see its structure and check for the URI
+    console.log("ImagePicker result:", result); // Log the result object to see its structure and check for the URI
 
     if (!result.cancelled) {
       // If image is selected, update photoUri and keep changePhotoMode true
       const newPhotos = [...photos];
-      const selectedUris = result.assets.slice(0, 12).map(asset => asset.uri);
+      const selectedUris = result.assets.slice(0, 12).map((asset) => asset.uri);
       selectedUris.forEach((uri, idx) => {
         if (index + idx < 12) {
           newPhotos[index + idx] = uri;
@@ -311,17 +312,17 @@ const DetailsScreen2 = ({ navigation }) => {
       // Upload the image to the server
       try {
         const formData = new FormData();
-        formData.append('images', {
+        formData.append("images", {
           uri: result.uri,
-          type: 'image/jpeg',
+          type: "image/jpeg",
           name: `photo_${index}.jpg`,
         });
 
         const config = {
-          method: 'put',
-          url: 'http://localhost:8888/property/image/356',
+          method: "put",
+          url: "http://localhost:8888/property/image/356",
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
           data: formData,
         };
@@ -383,14 +384,14 @@ const DetailsScreen2 = ({ navigation }) => {
       <TouchableOpacity
         style={styles2.bottomButton}
         onPress={() => {
-          navigation.push('WhatPriceScreen');
+          navigation.push("WhatPriceScreen");
         }}
       >
         <Text style={styles2.bottomButtonText}>Next</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
 const styles2 = StyleSheet.create({
   container: {
     flex: 1,
@@ -470,8 +471,8 @@ const styles2 = StyleSheet.create({
     alignItems: "center",
   },
   photo: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 });
 
@@ -581,422 +582,6 @@ const styles3 = StyleSheet.create({
     fontSize: 18,
   },
 });
-
-const DATA = [
-  {
-    name: "Irbid",
-    areas: ["Irbid City", "Ar Ramtha", "Bani Kinana"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4", "5", "6+"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished", "d"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-    buildingages: [
-      "0 - 11 months",
-      "1 - 5 Years",
-      "6 -9 Years",
-      "10 - 19 Years",
-      "20+ Years",
-    ],
-    Rent_period: ["Daily", "Weekly", "Monthly", "Yearly"],
-    keyFeatures: [
-      "Balcony",
-      "Pool",
-      "Gym",
-      "Parking",
-      "Security",
-      "Pet Friendly",
-      "Elevator",
-      "Garden",
-      "Rooftop Access",
-      "High-Speed Internet",
-      "Modern Appliances",
-      "Air Conditioning",
-      "Furnished",
-      "Waterfront View",
-      "Near Public Transport",
-    ],
-    additionalBenefits: [
-      "Elevator",
-      "Garden",
-
-      "Staircase",
-      "24/7 Security",
-      "Children's Play Area",
-      "Fire Safety",
-      "Spa Facilities",
-      "Sports Facilities",
-      "Guest Parking",
-      "CCTV Surveillance",
-      "Backup Generator",
-      "Laundry Room",
-      "Storage Space",
-      "Waste Disposal System",
-    ],
-    nearbyLocations: [
-      "Restaurants",
-      "Schools",
-      "Supermarkets",
-      "Malls",
-      "Hospitals",
-      "Parks",
-      "Gyms",
-      "Banks",
-      "Pharmacies",
-      "Cinemas",
-      "Public Transport Stations",
-      "Libraries",
-      "Post Offices",
-      "Police Stations",
-      "Universities",
-    ],
-    orientations: [
-      "North",
-      "South",
-      "East",
-      "West",
-      "Northeast",
-      "Northwest",
-      "Southeast",
-      "Southwest",
-    ],
-  },
-  {
-    name: "Ajloun",
-    areas: ["Ajloun City", "Kufranjah", "Anjara"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-  {
-    name: "Jerash",
-    areas: ["Jerash City", "Souf", "Musha"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-  {
-    name: "Mafraq",
-    areas: ["Mafraq City", "Al-Sareeh", "Umm el-Jimal"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-  {
-    name: "Balqa",
-    areas: ["Salt City", "Ain Al Basha", "Fuheis"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-  },
-  {
-    name: "Amman",
-    areas: ["Amman City", "Wadi As-Seer", "Al-Jubaiha"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-  {
-    name: "Zarqa",
-    areas: ["Zarqa City", "Russeifa", "Azraq"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-  {
-    name: "Madaba",
-    areas: ["Madaba City", "Ma'in", "Libb"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-  {
-    name: "Karak",
-    areas: ["Al-Karak City", "Al-Mazar", "ahmed", "Mohammed"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-  {
-    name: "Tafilah",
-    areas: ["Tafilah City", "Busaira", "Qadisiyah"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-  {
-    name: "Ma'an",
-    areas: ["Ma'an City", "Shobak", "Petra"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-    buildingages: [
-      "0 - 11 months",
-      "1 - 5 Years",
-      "6 -9 Years",
-      "10 - 19 Years",
-      "20+ Years",
-    ],
-  },
-  {
-    name: "Aqaba",
-    areas: ["Aqaba City", "Al-Quwairah", "Wadi Rum"],
-    rooms: ["1", "2", "3", "4", "5", "6+"],
-    bathrooms: ["1", "2", "3", "4"],
-    roomstate: ["Furnished", "Unfurnished", "Partially Furnished"],
-    floor: [
-      "Ground Floor",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "11",
-      "12",
-      "13",
-      "14",
-      "15",
-      "16",
-      "17",
-      "18",
-      "19",
-      "20",
-    ],
-  },
-];
 
 const DetailsScreen4 = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -2368,9 +1953,10 @@ const resetToFirstScreen = (navigation) => {
     routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
   });
 };
-const WhatPriceScreen = ({ navigation,route }) => {
+const WhatPriceScreen = ({ navigation, route }) => {
   const [price, setPrice] = useState("");
   const { photos } = route.params;
+
   const navigateToNext = () => {
     const makeitEmpty = (selectedDATA) => {
       selectedDATA.forEach((item) => {
