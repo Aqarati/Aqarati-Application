@@ -51,7 +51,7 @@ const selectedDATA = [
     adtitle: [],
     addescription: [],
     adprice: [],
-    images:[],
+    images: [],
   },
 ];
 const items = [
@@ -292,7 +292,7 @@ const DetailsScreen2 = ({ navigation }) => {
     if (!result.canceled) {
       // If images are selected, update the photo array
       const newPhotos = [...photos];
-      const selectedUris = result.assets.slice(0, 12).map(asset => asset.uri);
+      const selectedUris = result.assets.slice(0, 12).map((asset) => asset.uri);
       selectedUris.forEach((uri, idx) => {
         if (index + idx < 12) {
           newPhotos[index + idx] = uri;
@@ -440,8 +440,8 @@ const styles2 = StyleSheet.create({
     alignItems: "center",
   },
   photo: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 });
 
@@ -464,7 +464,6 @@ const AdvertisementDetailsScreen = ({ navigation }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const navigateToNext = () => {
     navigation.navigate("Detail2", { title, description });
     selectedDATA[0].adtitle = title;
     selectedDATA[0].addescription = description;
@@ -586,9 +585,11 @@ const resetToFirstScreen = (navigation) => {
     routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
   });
 };
-const WhatPriceScreen = ({ navigation,route }) => {
+const WhatPriceScreen = ({ navigation, route }) => {
   const [price, setPrice] = useState("");
   const { photos } = route.params;
+  const navigateToNext = () => {
+
   const navigateToNext = () => {
     const makeitEmpty = (selectedDATA) => {
       selectedDATA.forEach((item) => {
