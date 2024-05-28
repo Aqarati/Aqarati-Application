@@ -200,7 +200,7 @@ export default function MainScreen({ navigation }) {
             </ScrollView>
           </View>
         </View>
-        <ScrollView style={{ backgroundColor: "#fff" , marginBottom:50}}>
+        <ScrollView style={{ backgroundColor: "#fff", marginBottom: 50 }}>
           {loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={COLORS.primary} />
@@ -225,6 +225,7 @@ const Categories_styles = StyleSheet.create({
     flexGrow: 1,
     flexShrink: 1,
     backgroundColor: "#fff",
+    marginTop: -30,
   },
   title: {
     paddingHorizontal: 24,

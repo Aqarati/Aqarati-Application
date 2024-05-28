@@ -111,22 +111,21 @@ function App() {
           component={PropertyDetails}
           options={{ headerShown: true }}
         />
-          <Stack.Screen
+        <Stack.Screen
           name="PropertyCardDashboard"
           component={PropertyCardDashboard}
           options={{ headerShown: true }}
         />
-          <Stack.Screen
+        <Stack.Screen
           name="PropertyDetailsDashboard"
           component={PropertyDetailsDashboard}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-        name="dashboard"
-        component={dashboard}
-        options={{headerShown:false}}>
-
-        </Stack.Screen>
+          name="dashboard"
+          component={dashboard}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

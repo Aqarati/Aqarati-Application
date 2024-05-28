@@ -17,61 +17,6 @@ const users = [
     name: "Mohammed Ahmed",
     phone: "+962790543018",
   },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
-  {
-    img: require("../../assets/images/moh.jpg"),
-    name: "Mohammed Ahmed",
-    phone: "+962790543018",
-  },
 ];
 
 export default function Example() {
