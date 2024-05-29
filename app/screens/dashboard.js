@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, SafeAreaView, ScrollView, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect hook
+import { useFocusEffect } from '@react-navigation/native'; 
 import axios from 'axios';
-import { getValueFor } from '../lib'; // Adjust this import according to your method of retrieving the token
-import PropertyCardDashboard from '../components/PropertyCardDashboard'; // Adjust this import according to your component
+import { getValueFor } from '../lib'; 
+import PropertyCardDashboard from '../components/PropertyCardDashboard'; 
 import Toast from 'react-native-toast-message';
 import COLORS from '../../assets/Colors/colors';
 import { urlPath } from '../lib';
@@ -15,7 +15,7 @@ export default function MainScreen({ navigation }) {
 
   const fetchProperties = async () => {
     console.log("Fetching properties");
-    const url = urlPath + "/property/my"; // Adjust the URL as needed
+    const url = urlPath + "/property/my"; 
     console.log("URL: " + url);
     const token = await getValueFor("token");
 
@@ -60,6 +60,17 @@ export default function MainScreen({ navigation }) {
     }, [])
   );
 
+  useEffect(() => {
+    if (!loading && properties.length === 0) {
+      Toast.show({
+        type: "info",
+        text1: "No properties found",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
+    }
+  }, [loading, properties]);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <Text style={styles.title}>Dashboard</Text>
@@ -76,12 +87,9 @@ export default function MainScreen({ navigation }) {
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.primary} />
           </View>
-        ) : (
-          Array.isArray(properties) &&
-          properties.map((property) => (
-            <PropertyCardDashboard key={property.id} property={property} />
-          ))
-        )}
+        ) : properties.map((property) => (
+          <PropertyCardDashboard key={property.id} property={property} />
+        ))}
       </ScrollView>
       <Toast />
     </SafeAreaView>
@@ -107,3 +115,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+ 
