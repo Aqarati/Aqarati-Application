@@ -16,7 +16,7 @@ import axios from "axios";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import COLORS from "../../assets/Colors/colors";
 import Toast from "react-native-toast-message";
-
+import { useFocusEffect } from '@react-navigation/native'; 
 import { urlPath, getValueFor, delete_token } from "../lib";
 
 const SucessMessage = () => {
@@ -66,8 +66,13 @@ export default function ProfileScreen({ navigation }) {
       .catch((error) => {
         console.log(error);
       });
+      
   };
-
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
   useEffect(() => {
     console.log("profile use effect called");
     fetchData();

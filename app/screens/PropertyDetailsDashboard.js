@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   multilineInput: {
-    height: 80,
+    height: 40,
   },
   saveButton: {
     backgroundColor: COLORS.primary,

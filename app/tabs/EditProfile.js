@@ -14,6 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
 import { getValueFor, urlPath } from "../lib";
+import { useNavigation,useRoute  } from '@react-navigation/native';
 
 const MyAccountItem = ({ title, value, onPress }) => (
   <TouchableOpacity onPress={onPress} style={styles.item}>
@@ -33,7 +34,7 @@ const MyAccountItem = ({ title, value, onPress }) => (
   </TouchableOpacity>
 );
 
-const EditFieldModal = ({ visible, onClose, title, value, onSave }) => {
+const EditFieldModal = ({ visible, onClose, title, value, onSave}) => {
   const [newValue, setNewValue] = useState(value);
 
   useEffect(() => {
@@ -73,9 +74,10 @@ const EditFieldModal = ({ visible, onClose, title, value, onSave }) => {
 };
 
 const MyAccountScreen = () => {
+  const navigation = useNavigation();
   const [editingField, setEditingField] = useState(null);
   const [userData, setUserData] = useState({});
-  const [backgroundImage, setBackgroundImage] = useState(null);
+  const route = useRoute(); // Use useRoute hook to get the route object
 
   const fetchUserProfileData = async () => {
     try {
@@ -102,6 +104,18 @@ const MyAccountScreen = () => {
     requestMediaLibraryPermissions();
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // If the screen should be refreshed
+      if (route.params?.refresh) {
+        // Fetch user profile data or any other necessary refresh operation
+        fetchUserProfileData();
+      }
+    });
+  
+    return unsubscribe;
+  }, [navigation, route.params?.refresh]);
+
   const requestMediaLibraryPermissions = async () => {
     try {
       const { status } =
@@ -125,14 +139,13 @@ const MyAccountScreen = () => {
         ...prevUserData,
         [field]: newValue,
       }));
-      console.log(`Saving new value for ${field}: ${newValue}`);
-
+  
       // Construct the data object with updated values
       const updatedData = { ...userData, [field]: newValue };
-
+  
       // Extract the relevant fields from updatedData
       const { firstName, lastName } = updatedData;
-
+  
       const url = urlPath + "/user/profile";
       const token = await getValueFor("token");
       const config = {
@@ -145,9 +158,12 @@ const MyAccountScreen = () => {
         },
         data: { firstName, lastName }, // Send both firstName and lastName
       };
-
+  
       const response = await axios.request(config);
       console.log("Update response:", response.data);
+  
+      // Navigate back to the previous screen and pass a parameter indicating refresh
+      navigation.goBack({ refresh: true });
     } catch (error) {
       console.error("Error updating user profile data:", error);
     }
@@ -173,7 +189,6 @@ const MyAccountScreen = () => {
       console.error("Error selecting image:", error);
     }
   };
-
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.touchable} onPress={selectImage}>
