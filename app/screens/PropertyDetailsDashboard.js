@@ -10,12 +10,16 @@ import {
   Image,
   FlatList,
   ActivityIndicator,
+  Keyboard 
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 import { urlPath, getValueFor } from "../lib";
 import COLORS from "../../assets/Colors/colors";
 import * as ImagePicker from "expo-image-picker";
+import ImageView from "react-native-image-viewing";
+import { AntDesign } from '@expo/vector-icons';
+
 const PropertyDetailsDashboard = ({ route }) => {
   const navigation = useNavigation();
 
@@ -24,9 +28,11 @@ const PropertyDetailsDashboard = ({ route }) => {
   const [name, setName] = useState(property.name);
   const [description, setDescription] = useState(property.description);
   const [price, setPrice] = useState(property.price.toString());
-  const [propertyImages, setPropertyImages] = useState(property.propertyImages);
+
   const [loading, setLoading] = useState(false);
-  const [images, setImages] = useState([]);
+  
+  const [currentIndex, setCurrentIndex] = useState(0); // For tracking current image index
+  const [visible, setVisible] = useState(false);
 
 
   const handleSave = async () => {
@@ -145,10 +151,63 @@ const PropertyDetailsDashboard = ({ route }) => {
   };
 
     // Open the camera or photo library
-    const handleImagePress = async (index) => {
-      // Open the device's photo library
-      const FormData = require('form-data');
+    const handleImagePress = async () => {
+      const token = await getValueFor("token");
+      try {
+        // Ask for permission to access the photo library
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          throw new Error('Permission to access photo library denied');
+        }
+    
+        // Open the device's photo library
         let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: false,
+          quality: 1,
+        });
+    
+        if (!result.cancelled) {
+          let formData = new FormData();
+          // Append the selected image to FormData
+          formData.append("images", {
+            uri: result.uri,
+            name: `image.png`,
+            type: "image/png",
+          });
+    
+          // Set the headers and other configurations for the Axios request
+          let config = {
+            method: "put",
+            url: urlPath +"/document/",
+            headers: {
+              Authorization:
+                "Bearer " + token,
+              "Content-Type": "multipart/form-data",
+            },
+            data: formData,
+          };
+        
+          // Send the request using Axios
+          let response = await axios(config);
+    
+          console.log("\n \nFinish");
+          console.log(response.data);
+          Alert.alert("Success", "Images uploaded successfully");
+        }
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Image upload failed");
+      }
+    };
+
+    const [images, setImages] = useState([]);
+
+  
+
+    const handlePhotos = async () => {
+    const token = await getValueFor("token");
+    let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsMultipleSelection: true,
       allowsEditing: false,
@@ -156,54 +215,51 @@ const PropertyDetailsDashboard = ({ route }) => {
     });
 
     console.log(result);
-    const url = urlPath;
-    console.log(url);
-    let data = new FormData();
-    console.log(result.assets[0].uri);
-    console.log(property.id);
-    data.append('image', result.assets[0].uri);
-    data.append('property-id', property.id);
-    
-    
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: url+'/document/',
-      headers: { 
-        'Authorization': '{{Authorization}}', 
-        ...data.getHeaders()
-      },
-      data : data
-    };
-    
-    axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch((error) => {
-      console.log(error);
+
+    if (!result.cancelled) {
+      setImages((prevImages) => [...prevImages, result.assets[0].uri]);
+    }
+    let formData = new FormData();
+    images.forEach((uri, index) => {
+      formData.append("images", {
+        uri: uri,
+        name: `image${index}.png`,
+        type: "image/png",
+      });
     });
-    
+
+    let config = {
+      method: "put",
+      url: urlPath+"property/image/"+property.id,
+      headers: {
+        Authorization:
+          "Bearer " +
+         token,
+        "Content-Type": "multipart/form-data",
+      },
+      data: formData,
+    };
+    try {
+      let response = await axios(config);
+      console.log("config");
+      console.log(config);
+
+      console.log("\n \nFinist");
+      console.log(response.data);
+      Alert.alert("Success", "Images uploaded successfully");
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", "Image upload failed");
+    }
+  };
+  const openImageViewer = (index) => {
+    setCurrentIndex(index);
+    setVisible(true);
   };
 
 
-  const renderImageItem = ({ item, index }) => (
-    <View style={styles.imageWrapper}>
-      <Image source={{ uri: item.imgUrl }} style={styles.image} />
-   
-      {item.vr && (
-        <TouchableOpacity
-          style={styles.vrButton}
-          onPress={() => handleVRPress(item.vr_url)}
-        >
-          <Text style={styles.vrButtonText}>View VR</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-
   return (
-    <View style={styles.container}>
+    <View style={styles.container}> 
       {loading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color={COLORS.primary} />
@@ -212,15 +268,28 @@ const PropertyDetailsDashboard = ({ route }) => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Edit Property Details</Text>
         <View style={styles.imageContainer}>
-          <FlatList
-            data={property.propertyImages}
-            renderItem={renderImageItem}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
+  {/* FlatList to display images */}
+  <FlatList
+    data={property.propertyImages}
+    renderItem={({ item, index }) => (
+      <TouchableOpacity onPress={() => openImageViewer(index)}>
+        <Image source={{ uri: item.imgUrl }} style={styles.image} />
+      </TouchableOpacity>
+    )}
+    keyExtractor={(item, index) => index.toString()} // Use index as the key
+    horizontal
+    showsHorizontalScrollIndicator={false}
+  />
+</View>
 
+<ImageView
+  images={property.propertyImages.map((image) => ({
+    uri: image.imgUrl,
+  }))}
+  imageIndex={currentIndex}
+  visible={visible}
+  onRequestClose={() => setVisible(false)}
+/>
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Property Title</Text>
           <TextInput
@@ -228,6 +297,7 @@ const PropertyDetailsDashboard = ({ route }) => {
             value={name}
             onChangeText={setName}
             placeholder="Enter property name"
+            onSubmitEditing={() => Keyboard.dismiss()} // Dismiss keyboard on submit
           />
         </View>
 
@@ -238,6 +308,7 @@ const PropertyDetailsDashboard = ({ route }) => {
             value={description}
             onChangeText={setDescription}
             placeholder="Enter description"
+            
             multiline
           />
         </View>
@@ -249,26 +320,61 @@ const PropertyDetailsDashboard = ({ route }) => {
             value={price}
             onChangeText={setPrice}
             placeholder="Enter price"
+            onSubmitEditing={() => Keyboard.dismiss()} // Dismiss keyboard on submit
             keyboardType="numeric"
           />
         </View>
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+  <TouchableOpacity style={[styles.saveButton, styles.doubleWidth]} onPress={handleSave}>
+    <AntDesign name="save" size={22} color="white" style={styles.icon} />
+    <Text style={styles.saveButtonText}>Save</Text>
+  </TouchableOpacity>
 
-        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-          <Text style={styles.saveButtonText}>Delete</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.docButton} onPress={handleImagePress}>
-          <Text style={styles.saveButtonText}>Upload Document</Text>
-        </TouchableOpacity>
+  <TouchableOpacity style={[styles.deleteButton, styles.doubleWidth]} onPress={handleDelete}>
+    <AntDesign name="delete" size={22} color="white" style={styles.icon} />
+    <Text style={styles.saveButtonText}>Delete</Text>
+  </TouchableOpacity>
+</View>
+
+<View style={styles.buttonContainer1}>
+  <TouchableOpacity style={[styles.saveButton, styles.doubleWidth]} onPress={handleImagePress}>
+    <AntDesign name="addfile" size={22} color="white" style={styles.icon} />
+    <Text style={styles.saveButtonText}>Upload Document</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity style={[styles.saveButton, styles.doubleWidth]} onPress={handlePhotos}>
+    <AntDesign name="upload" size={22} color="white" style={styles.icon} />
+    <Text style={styles.saveButtonText}>Upload Photos</Text>
+  </TouchableOpacity>
+</View>
+        
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+
+  buttonContainer1: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: -15,
+    marginHorizontal: 18,
+  },
+  buttonContainer: {
+
+    flexDirection: "row",
+    justifyContent: "space-between",
+   marginTop:-20,
+    marginHorizontal: 18,
+    
+  },
+  
+  doubleWidth: {
+    flex: 1,
+    marginHorizontal: 2,
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -280,7 +386,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 15,
-    marginTop: 70,
+    marginTop: 80,
     paddingHorizontal: 20,
     textAlign: "center",
     color: COLORS.primary,
@@ -297,6 +403,9 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 10,
+  },
+  icon:{
+    marginRight: 10,
   },
   
   vrButton: {
@@ -318,6 +427,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: COLORS.primary,
     marginBottom: 5,
+    fontWeight: "bold",
   },
   input: {
     borderWidth: 1,
@@ -326,34 +436,34 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   multilineInput: {
-    height: 100,
+    height: 80,
   },
   saveButton: {
     backgroundColor: COLORS.primary,
     padding: 10,
     borderRadius: 5,
     marginTop: 20,
-    marginHorizontal: 20,
+    marginHorizontal: 10, // Adjusted for better alignment
+    flexDirection: "row", // Added to display icon and text in a row
+    alignItems: "center", // Added to vertically center align icon and text
+  },
+  saveButtonText: {
+    color: "white",
+    fontWeight: "bold",
+   
   },
   deleteButton: {
     backgroundColor: COLORS.darkGray,
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
-    marginHorizontal: 20,
+    marginTop: 20,
+    marginHorizontal: 10, // Adjusted for better alignment
+    flexDirection: "row", // Added to display icon and text in a row
+    alignItems: "center", // Added to vertically center align icon and text
   },
-  docButton: {
-    backgroundColor: COLORS.primary,
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
-    marginHorizontal: 20,
-  },
-  saveButtonText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
+
+  
+  
   loadingOverlay: {
     position: "absolute",
     top: 0,
