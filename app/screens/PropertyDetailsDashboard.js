@@ -33,7 +33,7 @@ const PropertyDetailsDashboard = ({ route }) => {
   
   const [currentIndex, setCurrentIndex] = useState(0); // For tracking current image index
   const [visible, setVisible] = useState(false);
-
+  const [images, setImages] = useState([]);
 
   const handleSave = async () => {
     try {
@@ -60,7 +60,7 @@ const PropertyDetailsDashboard = ({ route }) => {
   
       Alert.alert(
         "Confirm Save",
-        "Are you sure you want to save this item?",
+        "Are you sure you want to save the changes ?",
         [
           {
             text: "Cancel",
@@ -90,6 +90,7 @@ const PropertyDetailsDashboard = ({ route }) => {
                     price: propertyPrice,
                   },
                 });
+                navigation.goBack();
               } catch (error) {
                 console.log(error);
               } finally {
@@ -108,7 +109,7 @@ const PropertyDetailsDashboard = ({ route }) => {
   const handleDelete = async () => {
     Alert.alert(
       "Confirm Deletion",
-      "Are you sure you want to delete this item?",
+      "Are you sure you want to delete this Post?",
       [
         {
           text: "Cancel",
@@ -201,7 +202,7 @@ const PropertyDetailsDashboard = ({ route }) => {
       }
     };
 
-    const [images, setImages] = useState([]);
+   
 
   
 

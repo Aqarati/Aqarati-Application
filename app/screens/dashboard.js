@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, SafeAreaView, ScrollView, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect hook
 import axios from 'axios';
-import { getValueFor } from '../lib';// Adjust this import according to your method of retrieving the token
+import { getValueFor } from '../lib'; // Adjust this import according to your method of retrieving the token
 import PropertyCardDashboard from '../components/PropertyCardDashboard'; // Adjust this import according to your component
 import Toast from 'react-native-toast-message';
 import COLORS from '../../assets/Colors/colors';
 import { urlPath } from '../lib';
-
 
 export default function MainScreen({ navigation }) {
   const [properties, setProperties] = useState([]);
@@ -15,7 +15,7 @@ export default function MainScreen({ navigation }) {
 
   const fetchProperties = async () => {
     console.log("Fetching properties");
-    const url = urlPath + "/property/my"// Adjust the URL as needed
+    const url = urlPath + "/property/my"; // Adjust the URL as needed
     console.log("URL: " + url);
     const token = await getValueFor("token");
 
@@ -41,15 +41,24 @@ export default function MainScreen({ navigation }) {
     }
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchProperties();
+  };
+
+  // Fetch properties on initial load
   useEffect(() => {
     console.log("Main screen use effect called");
     fetchProperties();
   }, []);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchProperties();
-  };
+  // Fetch properties when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      console.log("Main screen focused");
+      fetchProperties();
+    }, [])
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -79,7 +88,6 @@ export default function MainScreen({ navigation }) {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     padding: 15,
@@ -88,7 +96,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 33,
     fontWeight: "700",
-  
     color: COLORS.primary,
     marginTop: 30,
     textAlign: "center",
@@ -100,5 +107,3 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
-
-
