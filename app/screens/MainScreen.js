@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -9,6 +9,7 @@ import {
   Image,
   ActivityIndicator,
   RefreshControl,
+  animation
 } from "react-native";
 import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
@@ -49,11 +50,30 @@ const categories = [
   },
 ];
 
-export default function MainScreen({ navigation }) {
+const MainScreen = forwardRef(({navigation}, ref) => {
   const [userData, setUserData] = useState(null);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false); // Add refreshing state
+  const [refreshing, setRefreshing] = useState(false);
+  const scrollViewRef = useRef(null); // Add a ref for the ScrollView
+  useEffect(() => {
+    if (animation) {
+      // Start animation when animation value changes
+      Animated.timing(animation, {
+        toValue: 0, // Reset to initial value
+        duration: 500, // Adjust duration as needed
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start();
+      
+    }
+  }, [animation]);
+  useImperativeHandle(ref, () => ({
+    scrollToTop: () => {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+     
+    },
+  }));
 
   const fetchUserProfileData = async () => {
     console.log("fetch data for profile");
@@ -111,9 +131,7 @@ export default function MainScreen({ navigation }) {
         setRefreshing(false); // Set refreshing to false when data is fetched
       });
   };
-
   useEffect(() => {
-    console.log("Main screen use effect called");
     fetchUserProfileData();
     fetchUserPropertyData();
   }, []);
@@ -122,6 +140,7 @@ export default function MainScreen({ navigation }) {
     setRefreshing(true);
     fetchUserProfileData();
     fetchUserPropertyData();
+    setRefreshing(false); // Set refreshing to false when manual refresh is done
   };
 
   const handleCardPress = (itemDetails) => {
@@ -139,15 +158,10 @@ export default function MainScreen({ navigation }) {
     });
   };
 
-  const handleLikePress = (index) => {
-    const newItems = [...items];
-    newItems[index].saved = !newItems[index].saved;
-    setItems(newItems);
-  };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView
+        ref={scrollViewRef} // Attach the ref here
         contentContainerStyle={[
           styles.container,
           { paddingBottom: 0, backgroundColor: "#fff" },
@@ -216,7 +230,7 @@ export default function MainScreen({ navigation }) {
       <Toast />
     </SafeAreaView>
   );
-}
+});
 
 const Categories_styles = StyleSheet.create({
   container: {
@@ -324,3 +338,5 @@ const profilestyle = StyleSheet.create({
     borderRadius: 9999,
   },
 });
+
+export default MainScreen;
