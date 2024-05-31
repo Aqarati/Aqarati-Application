@@ -11,8 +11,8 @@ const PropertyCardDashboard = ({ property }) => {
   // Default image URL
   // let imageUrl =
   //   "https://aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
-  let imageUrl =
-    "aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
+  // let imageUrl =
+  //   "aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
 
   // Check if propertyImages array exists and has at least one image
   if (property.propertyImages && property.propertyImages.length > 0) {
@@ -32,13 +32,11 @@ const PropertyCardDashboard = ({ property }) => {
 
   return (
     <TouchableOpacity onPress={handleCardPress}>
-
       <View style={styles.card}>
-     
         <View style={styles.cardLikeWrapper}>
           <TouchableOpacity onPress={handleCardPress}>
             <View style={styles.cardLike}>
-              <MaterialIcons color={COLORS.primary } name="verified" size={22} />
+              <MaterialIcons color={COLORS.primary} name="verified" size={22} />
             </View>
           </TouchableOpacity>
         </View>
@@ -76,7 +74,7 @@ const style = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     margin: 10,
-  
+
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

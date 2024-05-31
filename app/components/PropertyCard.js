@@ -9,8 +9,7 @@ const PropertyCard = ({ property }) => {
   const navigation = useNavigation();
 
   // Default image URL
-  // let imageUrl =
-  ("https://aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png");
+  let imageUrl = "https://aqarati-app.s3.me-so1.amazonaws.com/property-image";
   // let imageUrl =
   //   "aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
 
