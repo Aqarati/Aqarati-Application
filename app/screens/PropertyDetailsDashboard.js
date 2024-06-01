@@ -205,8 +205,7 @@ const PropertyDetailsDashboard = ({ route }) => {
         }
       } catch (error) {
         console.error(error.response);
-        Alert.alert("Error", "Image upload failed");
-
+        Alert.alert("Error", "Image upload failed");};
   const handleImagePress = async () => {
     const token = await getValueFor("token");
     try {
@@ -499,7 +498,7 @@ const PropertyDetailsDashboard = ({ route }) => {
       </ScrollView>
     </View>
   );
-};
+}};
 
 const styles = StyleSheet.create({
   buttonContainer1: {
