@@ -287,6 +287,10 @@ const PropertyDetailsDashboard = ({ route }) => {
     }
   };
 
+  const handleDocumentPress = () => {
+    navigation.navigate("DocumentPage", { propertyId: property.id });
+  };
+
   return (
     <View style={styles.container}>
       {loading && (
@@ -415,6 +419,23 @@ const PropertyDetailsDashboard = ({ route }) => {
               style={styles.icon}
             />
             <Text style={styles.saveButtonText}>Upload Photos</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.buttonContainer1}>
+          <TouchableOpacity
+            style={[styles.saveButton, styles.doubleWidth]}
+            onPress={handleDocumentPress}
+          >
+            <AntDesign
+              name="filetext1"
+              size={22}
+              color="white"
+              style={styles.icon}
+            />
+            <Text style={styles.saveButtonText}>
+              Look at Property Document{" "}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

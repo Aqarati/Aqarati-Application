@@ -17,7 +17,6 @@ import {
   FlatList,
   TouchableWithoutFeedback,
   Keyboard,
-
   Alert,
 } from "react-native";
 import { COLORS } from "../../assets/theme";
@@ -27,7 +26,7 @@ const Tab = createBottomTabNavigator();
 const SettingsStack = createNativeStackNavigator();
 import Octicons from "react-native-vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
-import axios from 'axios';
+import axios from "axios";
 import { getValueFor, urlPath } from "../lib";
 const selectedDATA = [
   {
@@ -51,7 +50,7 @@ const selectedDATA = [
     adtitle: [],
     addescription: [],
     adprice: [],
-    images:[],
+    images: [],
   },
 ];
 const items = [
@@ -267,11 +266,12 @@ const DetailsScreen2 = ({ navigation }) => {
   useEffect(() => {
     // Request permission to access the camera and photo library
     (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
         Alert.alert(
-          'Permission Required',
-          'Sorry, we need camera roll permissions to make this work!'
+          "Permission Required",
+          "Sorry, we need camera roll permissions to make this work!"
         );
       }
     })();
@@ -287,12 +287,12 @@ const DetailsScreen2 = ({ navigation }) => {
       quality: 1,
     });
 
-    console.log('ImagePicker result:', result);
+    console.log("ImagePicker result:", result);
 
     if (!result.canceled) {
       // If images are selected, update the photo array
       const newPhotos = [...photos];
-      const selectedUris = result.assets.slice(0, 12).map(asset => asset.uri);
+      const selectedUris = result.assets.slice(0, 12).map((asset) => asset.uri);
       selectedUris.forEach((uri, idx) => {
         if (index + idx < 12) {
           newPhotos[index + idx] = uri;
@@ -303,8 +303,8 @@ const DetailsScreen2 = ({ navigation }) => {
       // Update selectedDATA with the selected image URIs
       selectedDATA[0].images = selectedUris;
 
-      console.log('Updated photos:', newPhotos);
-      console.log('selectedDATA:', selectedDATA);
+      console.log("Updated photos:", newPhotos);
+      console.log("selectedDATA:", selectedDATA);
     }
   };
 
@@ -316,10 +316,12 @@ const DetailsScreen2 = ({ navigation }) => {
       {item ? (
         <Image
           source={{ uri: item }}
-          style={[styles2.photo, { resizeMode: 'cover' }]}
+          style={[styles2.photo, { resizeMode: "cover" }]}
         />
       ) : (
-        <View style={index === 0 ? styles2.firstAddIconBox : styles2.addIconBox}>
+        <View
+          style={index === 0 ? styles2.firstAddIconBox : styles2.addIconBox}
+        >
           <AntDesign name="pluscircleo" size={24} color={COLORS.primary2} />
         </View>
       )}
@@ -331,13 +333,16 @@ const DetailsScreen2 = ({ navigation }) => {
       <Text style={styles2.title}>Add pictures to the advertise</Text>
       <View style={styles2.dashedBox}>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Up to 12 photos can be added
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Up to 12
+          photos can be added
         </Text>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Pictures increase the number of views
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Pictures
+          increase the number of views
         </Text>
         <Text style={styles2.dashedBoxText}>
-          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Hint: You can rearrange photos by dragging them from one place to another
+          <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Hint:
+          You can rearrange photos by dragging them from one place to another
         </Text>
       </View>
 
@@ -352,14 +357,14 @@ const DetailsScreen2 = ({ navigation }) => {
       <TouchableOpacity
         style={styles2.bottomButton}
         onPress={() => {
-          navigation.push('WhatPriceScreen',{ photos: photos });
+          navigation.push("WhatPriceScreen", { photos: photos });
         }}
       >
         <Text style={styles2.bottomButtonText}>Next</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles2 = StyleSheet.create({
   container: {
@@ -440,8 +445,8 @@ const styles2 = StyleSheet.create({
     alignItems: "center",
   },
   photo: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 });
 
@@ -458,7 +463,6 @@ const SettingItem = ({ text }) => {
     </View>
   );
 };
-
 
 const AdvertisementDetailsScreen = ({ navigation }) => {
   const [title, setTitle] = useState("");
@@ -586,7 +590,7 @@ const resetToFirstScreen = (navigation) => {
     routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
   });
 };
-const WhatPriceScreen = ({ navigation,route }) => {
+const WhatPriceScreen = ({ navigation, route }) => {
   const [price, setPrice] = useState("");
   const { photos } = route.params;
   const navigateToNext = () => {
@@ -654,52 +658,47 @@ const WhatPriceScreen = ({ navigation,route }) => {
                 })
                 .catch((error) => {
                   console.log(error);
-                 
                 });
             };
 
             const handleAddImageToPost = async (propertyId) => {
               const token = await getValueFor("token");
-              const  url = urlPath +"/property/image/"+propertyId;
-              const filteredPhotos = photos.filter(photo => photo !== null);
-              console.log(filteredPhotos)
+              const url = urlPath + "/property/image/" + propertyId;
+              const filteredPhotos = photos.filter((photo) => photo !== null);
+              console.log(filteredPhotos);
               let formData = new FormData();
               filteredPhotos.forEach((uri, index) => {
-                console.log(uri)
-      formData.append("images", {
-        uri: uri,
-        name: `image${index}.png`,
-        type: "image/png",
-      });
-    });
+                console.log(uri);
+                formData.append("images", {
+                  uri: uri,
+                  name: `image${index}.png`,
+                  type: "image/png",
+                });
+              });
 
-    let config = {
-      method: "put",
-      url: url,
-      headers: {
-        Authorization:
-          "Bearer " +token,
-        "Content-Type": "multipart/form-data",
-      },
-      data: formData,
-    }
-    console.log("config",config);
-    try {
-     
+              let config = {
+                method: "put",
+                url: url,
+                headers: {
+                  Authorization: "Bearer " + token,
+                  "Content-Type": "multipart/form-data",
+                },
+                data: formData,
+              };
+              console.log("config", config);
+              try {
+                let response = await axios(config);
+                console.log("config");
+                console.log(config);
 
-      let response = await axios(config);
-      console.log("config");
-      console.log(config);
-
-      console.log("\n \nFinist");
-      console.log(response.data);
-      Alert.alert("Success", "Images uploaded successfully");
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Image upload failed");
-    }
+                console.log("\n \nFinist");
+                console.log(response.data);
+                Alert.alert("Success", "Images uploaded successfully");
+              } catch (error) {
+                console.error(error);
+                Alert.alert("Error", "Image upload failed");
+              }
             };
-            
 
             console.log("Handling Save Post");
 
@@ -856,7 +855,7 @@ export default function App() {
                 component={DetailsScreen2}
                 options={{ headerShown: false }}
               />
-                  <SettingsStack.Screen
+              <SettingsStack.Screen
                 name="AdvertisementDetailsScreen"
                 component={AdvertisementDetailsScreen}
                 options={{ headerShown: false }}
@@ -866,8 +865,6 @@ export default function App() {
                 component={WhatPriceScreen}
                 options={{ headerShown: false }}
               />
-         
-          
             </SettingsStack.Navigator>
           )}
         </Tab.Screen>
