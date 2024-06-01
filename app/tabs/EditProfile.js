@@ -8,13 +8,15 @@ import {
   Modal,
   TextInput,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
 import { getValueFor, urlPath } from "../lib";
-import { useNavigation,useRoute  } from '@react-navigation/native';
+import { useNavigation, useRoute } from "@react-navigation/native";
+
 
 const MyAccountItem = ({ title, value, onPress }) => (
   <TouchableOpacity onPress={onPress} style={styles.item}>
@@ -22,7 +24,6 @@ const MyAccountItem = ({ title, value, onPress }) => (
     <Text numberOfLines={1} style={styles.value}>
       {value}
     </Text>
-    {/* Render edit icon only if onPress is provided */}
     {onPress && (
       <AntDesign
         name="edit"
@@ -34,7 +35,7 @@ const MyAccountItem = ({ title, value, onPress }) => (
   </TouchableOpacity>
 );
 
-const EditFieldModal = ({ visible, onClose, title, value, onSave}) => {
+const EditFieldModal = ({ visible, onClose, title, value, onSave }) => {
   const [newValue, setNewValue] = useState(value);
 
   useEffect(() => {
@@ -77,15 +78,14 @@ const MyAccountScreen = () => {
   const navigation = useNavigation();
   const [editingField, setEditingField] = useState(null);
   const [userData, setUserData] = useState({});
-  const route = useRoute(); // Use useRoute hook to get the route object
+  const route = useRoute();
 
   const fetchUserProfileData = async () => {
     try {
-      const url = urlPath + "/user/profile";
+      const url = `${urlPath}/user/profile`;
       const token = await getValueFor("token");
       const config = {
         method: "get",
-        maxBodyLength: Infinity,
         url: url,
         headers: {
           Authorization: "Bearer " + token,
@@ -105,21 +105,18 @@ const MyAccountScreen = () => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      // If the screen should be refreshed
+    const unsubscribe = navigation.addListener("focus", () => {
       if (route.params?.refresh) {
-        // Fetch user profile data or any other necessary refresh operation
         fetchUserProfileData();
       }
     });
-  
+
     return unsubscribe;
   }, [navigation, route.params?.refresh]);
 
   const requestMediaLibraryPermissions = async () => {
     try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         alert("Sorry, we need camera roll permissions to make this work!");
       }
@@ -134,35 +131,28 @@ const MyAccountScreen = () => {
 
   const handleSave = async (newValue, field) => {
     try {
-      // Update the specific field in the userData state
       setUserData((prevUserData) => ({
         ...prevUserData,
         [field]: newValue,
       }));
-  
-      // Construct the data object with updated values
+
       const updatedData = { ...userData, [field]: newValue };
-  
-      // Extract the relevant fields from updatedData
       const { firstName, lastName } = updatedData;
-  
-      const url = urlPath + "/user/profile";
+
+      const url = `${urlPath}/user/profile`;
       const token = await getValueFor("token");
       const config = {
         method: "put",
-        maxBodyLength: Infinity,
         url: url,
         headers: {
           Authorization: "Bearer " + token,
           "Content-Type": "application/json",
         },
-        data: { firstName, lastName }, // Send both firstName and lastName
+        data: { firstName, lastName },
       };
-  
+
       const response = await axios.request(config);
       console.log("Update response:", response.data);
-  
-      // Navigate back to the previous screen and pass a parameter indicating refresh
       navigation.goBack({ refresh: true });
     } catch (error) {
       console.error("Error updating user profile data:", error);
@@ -174,28 +164,62 @@ const MyAccountScreen = () => {
   };
 
   const selectImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsMultipleSelection: false,
+      allowsEditing: true, // Enable editing to allow cropping
+      aspect: [1, 1], // Set aspect ratio to 1:1 for a square crop
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      let data = new FormData();
+      const token = await getValueFor("token");
+
+      data.append("profile-image", {
+        uri: result.assets[0].uri,
+        name: `image.png`,
+        type: "image/png",
       });
 
-      if (!result.cancelled) {
-        setBackgroundImage(result.uri);
-      }
-    } catch (error) {
-      console.error("Error selecting image:", error);
+      let config = {
+        method: "put",
+        url: `${urlPath}/user/profile/image`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+        data: data,
+      };
+
+      axios
+        .request(config)
+        .then(async (response) => {
+          console.log(JSON.stringify(response.data));
+          Alert.alert("Success");
+          setUserData((prevData) => ({
+            ...prevData,
+            imageUrl: response.data.imageUrl,
+          }));
+
+          // Fetch updated user profile data to refresh the imageUrl
+          await fetchUserProfileData();
+        })
+        .catch((error) => {
+          console.log(JSON.stringify(error.response.data));
+        });
     }
   };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.touchable} onPress={selectImage}>
-        <Image
+      <Image
           style={profilestyle.avatar}
           source={
-            userData.imageUrl
+            userData.imageUrl && userData.imageUrl !== ""
               ? { uri: userData.imageUrl }
               : require("../../assets/images/logo.png")
           }
@@ -203,21 +227,17 @@ const MyAccountScreen = () => {
       </TouchableOpacity>
       <Text style={styles.screenTitle}>MY ACCOUNT</Text>
       <ScrollView style={styles.listContainer}>
-        {/* First Name */}
         <MyAccountItem
           key="firstName"
           title="First Name"
           value={userData.firstName}
           onPress={() => handleEdit("firstName")}
-          onSave={(newValue) => handleSave(newValue, "firstName")}
         />
-        {/* Last Name */}
         <MyAccountItem
           key="lastName"
           title="Last Name"
           value={userData.lastName}
           onPress={() => handleEdit("lastName")}
-          onSave={(newValue) => handleSave(newValue, "lastName")}
         />
       </ScrollView>
       <EditFieldModal
@@ -230,18 +250,8 @@ const MyAccountScreen = () => {
     </View>
   );
 };
+
 const profilestyle = StyleSheet.create({
-  container: {
-    padding: 24,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    backgroundColor: "#fff",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "flex-end", // Aligns children (the avatar) to the right
-  },
   avatar: {
     width: 150,
     height: 150,

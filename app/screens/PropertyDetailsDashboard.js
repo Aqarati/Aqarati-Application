@@ -34,7 +34,7 @@ const PropertyDetailsDashboard = ({ route }) => {
   const [currentIndex, setCurrentIndex] = useState(0); // For tracking current image index
   const [visible, setVisible] = useState(false);
   const [images, setImages] = useState([]);
-
+  const propertyId = property.id;
   const handleSave = async () => {
     try {
       const token = await getValueFor("token");
@@ -43,7 +43,7 @@ const PropertyDetailsDashboard = ({ route }) => {
         throw new Error("Token not found");
       }
   
-      const propertyId = property.id;
+   
       const propertyName = name;
       const propertyDescription = description;
       const propertyPrice = parseInt(price);
@@ -127,7 +127,7 @@ const PropertyDetailsDashboard = ({ route }) => {
                 throw new Error("Token not found");
               }
 
-              const propertyId = property.id;
+              
               const url = `${urlPath}/property/${propertyId}`;
 
               const response = await axios.delete(url, {
@@ -167,28 +167,31 @@ const PropertyDetailsDashboard = ({ route }) => {
           allowsEditing: false,
           quality: 1,
         });
-    
+       
         if (!result.cancelled) {
-          let formData = new FormData();
+          let data = new FormData();
           // Append the selected image to FormData
-          formData.append("images", {
-            uri: result.uri,
+  
+         
+          data.append('image\n', {
+            uri: result.assets[0].uri,
             name: `image.png`,
             type: "image/png",
           });
-    
+          data.append('property-id', propertyId);
           // Set the headers and other configurations for the Axios request
           let config = {
-            method: "put",
-            url: urlPath +"/document/",
-            headers: {
-              Authorization:
-                "Bearer " + token,
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: urlPath+'/document/',
+            headers: { 
+              Authorization: `Bearer ${token}`,
               "Content-Type": "multipart/form-data",
             },
-            data: formData,
+            data : data
           };
-        
+          console.log("ddddddddddddddddddddddddd");
+          console.log(data.image)
           // Send the request using Axios
           let response = await axios(config);
     
@@ -197,7 +200,7 @@ const PropertyDetailsDashboard = ({ route }) => {
           Alert.alert("Success", "Images uploaded successfully");
         }
       } catch (error) {
-        console.error(error);
+        console.error(error.response);
         Alert.alert("Error", "Image upload failed");
       }
     };

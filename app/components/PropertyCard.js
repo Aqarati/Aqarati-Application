@@ -9,17 +9,14 @@ const PropertyCard = ({ property }) => {
   const navigation = useNavigation();
 
   // Default image URL
-  // let imageUrl =
-  ("https://aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png");
-  // let imageUrl =
-  //   "aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
+  let imageUrls = "https://aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
 
   // Check if propertyImages array exists and has at least one image
   if (property.propertyImages && property.propertyImages.length > 0) {
     // Loop through propertyImages array to find the first non-VR image
     for (let i = 0; i < property.propertyImages.length; i++) {
       if (!property.propertyImages[i].vr) {
-        imageUrl = property.propertyImages[i].imgUrl;
+        imageUrls = property.propertyImages[i].imgUrl;
         break;
       }
     }
@@ -45,8 +42,8 @@ const PropertyCard = ({ property }) => {
           <Image
             alt=""
             resizeMode="cover"
-            style={styles.cardImg}
-            source={{ uri: imageUrl }}
+            style={styles.cardImg} 
+            source={{ uri: imageUrls }}
           />
         </View>
 
@@ -60,7 +57,7 @@ const PropertyCard = ({ property }) => {
           </View>
 
           <View style={styles.cardFooter}>
-            <Text style={style.description}>{property.description}</Text>
+            <Text style={styles.description}>{property.description}</Text>
           </View>
         </View>
       </View>

@@ -1,6 +1,6 @@
 const COLORS = {
   primary: "#7C9A92",
-  primary1: "#FFBF00",
+  primary2: "#FFBF00",
   white: "#FFFFFF",
   dark: "#000",
   ligh: "#f6f6f6",
@@ -12,7 +12,7 @@ const COLORS = {
   requiredcolor: "#FBA834",
   placeholdercolor: "#67729D",
   darkGray: "#333333",
-  lightGray: "#CCCCCC",
+  lightGray: "#CCCCCC",  
   darkBlue: "#003366",
 };
 
