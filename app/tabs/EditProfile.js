@@ -164,6 +164,8 @@ const MyAccountScreen = () => {
   };
 
   const selectImage = async () => {
+   
+  
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsMultipleSelection: false,
@@ -171,19 +173,19 @@ const MyAccountScreen = () => {
       aspect: [1, 1], // Set aspect ratio to 1:1 for a square crop
       quality: 1,
     });
-
+  
     console.log(result);
-
+  
     if (!result.cancelled) {
       let data = new FormData();
       const token = await getValueFor("token");
-
+  
       data.append("profile-image", {
         uri: result.assets[0].uri,
         name: `image.png`,
         type: "image/png",
       });
-
+  
       let config = {
         method: "put",
         url: `${urlPath}/user/profile/image`,
@@ -193,19 +195,23 @@ const MyAccountScreen = () => {
         },
         data: data,
       };
-
+  
       axios
         .request(config)
         .then(async (response) => {
           console.log(JSON.stringify(response.data));
-          Alert.alert("Success");
+       
           setUserData((prevData) => ({
             ...prevData,
             imageUrl: response.data.imageUrl,
           }));
-
+  
           // Fetch updated user profile data to refresh the imageUrl
           await fetchUserProfileData();
+  
+          // Navigate to the previous screen and refresh the data
+          navigation.goBack();
+          navigation.navigate("profilescreen", { refresh: true });
         })
         .catch((error) => {
           console.log(JSON.stringify(error.response.data));

@@ -10,14 +10,14 @@ import {
   Image,
   Linking,
   Alert,
+  RefreshControl,
 } from "react-native";
 import axios from "axios";
-
+import { useFocusEffect } from '@react-navigation/native'; 
+import Toast from "react-native-toast-message";
+import { urlPath, getValueFor, delete_token } from "../lib";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import COLORS from "../../assets/Colors/colors";
-import Toast from "react-native-toast-message";
-import { useFocusEffect } from '@react-navigation/native'; 
-import { urlPath, getValueFor, delete_token } from "../lib";
 
 const SucessMessage = () => {
   Toast.show({
@@ -29,10 +29,11 @@ const SucessMessage = () => {
     position: "top",
   });
 };
+
 const resetToFirstScreen = (navigation) => {
   navigation.reset({
     index: 0,
-    routes: [{ name: "Home" }], // Replace 'Details' with the name of your first screen
+    routes: [{ name: "Home" }],
   });
 };
 
@@ -42,7 +43,9 @@ export default function ProfileScreen({ navigation }) {
     emailNotifications: true,
     pushNotifications: false,
   });
-  const [userData, setUserData] = useState(null); // Add this line to initialize user data state
+  const [userData, setUserData] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
   const fetchData = async () => {
     console.log("fetch data for profile");
     const url = urlPath + "/user/profile";
@@ -66,44 +69,49 @@ export default function ProfileScreen({ navigation }) {
       .catch((error) => {
         console.log(error);
       });
-      
   };
+
   useFocusEffect(
     React.useCallback(() => {
       fetchData();
     }, [])
   );
+
   useEffect(() => {
     console.log("profile use effect called");
     fetchData();
   }, []);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchData()
+      .then(() => setRefreshing(false))
+      .catch((error) => {
+        console.error("Error refreshing data:", error);
+        setRefreshing(false);
+      });
+  };
+
   const bugreport = () => {
     const formurl = "https://forms.gle/QZLQoRXa3G9RKzKE6";
-
     Linking.openURL(formurl)
       .then(() => console.log("Form URL: " + formurl))
       .catch((error) => console.error("Error opening Form:", error));
   };
-  const instahandlePress = () => {
-    // Your Instagram username
-    const username = "aqaratiofficial";
-    // Construct the Instagram URL using string interpolation
-    const instagramUrl = `https://www.instagram.com/${username}/`;
 
-    // Open the Instagram profile in the browser
+  const instahandlePress = () => {
+    const username = "aqaratiofficial";
+    const instagramUrl = `https://www.instagram.com/${username}/`;
     Linking.openURL(instagramUrl)
       .then(() => console.log("Instagram profile opened"))
       .catch((error) =>
         console.error("Error opening Instagram profile:", error)
       );
   };
-  const xhandlePress = () => {
-    // Your Twitter username
-    const username = "Aqaratiofficial";
-    // Construct the Twitter URL using string interpolation
-    const xUrl = `https://twitter.com/${username}/`;
 
-    // Open the Twitter profile in the browser
+  const xhandlePress = () => {
+    const username = "Aqaratiofficial";
+    const xUrl = `https://twitter.com/${username}/`;
     Linking.openURL(xUrl)
       .then(() => console.log("X profile opened"))
       .catch((error) => console.error("Error opening X profile:", error));
@@ -121,7 +129,6 @@ export default function ProfileScreen({ navigation }) {
         {
           text: "Logout",
           onPress: () => {
-            // Perform logout actions here
             SucessMessage();
             delete_token();
             resetToFirstScreen(navigation);
@@ -139,7 +146,9 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.title}>Settings</Text>
         </View>
 
-        <ScrollView>
+        <ScrollView refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+  }>
           <View style={styles.profile}>
             <View style={styles.profileHeader}>
               <Image
