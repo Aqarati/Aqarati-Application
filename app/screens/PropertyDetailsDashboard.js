@@ -22,7 +22,6 @@ import { AntDesign } from "@expo/vector-icons";
 
 const PropertyDetailsDashboard = ({ route }) => {
   const navigation = useNavigation();
-
   const { property } = route.params;
 
   const [name, setName] = useState(property.name);
@@ -30,11 +29,10 @@ const PropertyDetailsDashboard = ({ route }) => {
   const [price, setPrice] = useState(property.price.toString());
 
   const [loading, setLoading] = useState(false);
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visible, setVisible] = useState(false);
-  const [images, setImages] = useState([]);
-  const propertyId = property.id;
+  const [images, setImages] = useState(property.propertyImages.map(img => img.imgUrl));
+
   const handleSave = async () => {
     try {
       const token = await getValueFor("token");
@@ -43,28 +41,22 @@ const PropertyDetailsDashboard = ({ route }) => {
         throw new Error("Token not found");
       }
 
-  
-   
-
-
-      const propertyId = property.id;
-
       const propertyName = name;
       const propertyDescription = description;
       const propertyPrice = parseInt(price);
 
       const data = {
-        id: propertyId,
+        id: property.id,
         name: propertyName,
         description: propertyDescription,
         price: propertyPrice,
       };
 
-      const url = urlPath + "/property/";
+      const url = `${urlPath}/property/`;
 
       Alert.alert(
         "Confirm Save",
-        "Are you sure you want to save the changes ?",
+        "Are you sure you want to save the changes?",
         [
           {
             text: "Cancel",
@@ -130,8 +122,7 @@ const PropertyDetailsDashboard = ({ route }) => {
                 throw new Error("Token not found");
               }
 
-              
-              const url = `${urlPath}/property/${propertyId}`;
+              const url = `${urlPath}/property/${property.id}`;
 
               const response = await axios.delete(url, {
                 headers: {
@@ -154,152 +145,88 @@ const PropertyDetailsDashboard = ({ route }) => {
     );
   };
 
-
-    // Open the camera or photo library
-    const handleImagePress = async () => {
-      const token = await getValueFor("token");
-      try {
-        // Ask for permission to access the photo library
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          throw new Error('Permission to access photo library denied');
-        }
-    
-        // Open the device's photo library
-        let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: false,
-          quality: 1,
-        });
-       
-        if (!result.cancelled) {
-          let data = new FormData();
-          // Append the selected image to FormData
-  
-         
-          data.append('image\n', {
-            uri: result.assets[0].uri,
-            name: `image.png`,
-            type: "image/png",
-          });
-          data.append('property-id', propertyId);
-          // Set the headers and other configurations for the Axios request
-          let config = {
-            method: 'post',
-            maxBodyLength: Infinity,
-            url: urlPath+'/document/',
-            headers: { 
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-            data : data
-          };
-          console.log("ddddddddddddddddddddddddd");
-          console.log(data.image)
-          // Send the request using Axios
-          let response = await axios(config);
-    
-          console.log("\n \nFinish");
-          console.log(response.data);
-          Alert.alert("Success", "Images uploaded successfully");
-        }
-      } catch (error) {
-        console.error(error.response);
-        Alert.alert("Error", "Image upload failed");};
-  const handleImagePress = async () => {
-    const token = await getValueFor("token");
+  const UploadDocument = async () => {
     try {
+      const token = await getValueFor("token");
+  
       // Ask for permission to access the photo library
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        throw new Error("Permission to access photo library denied");
-
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        throw new Error('Permission to access photo library denied');
       }
-
+  
       // Open the device's photo library
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: false,
         quality: 1,
       });
-
+  
       if (!result.cancelled) {
         let data = new FormData();
         // Append the selected image to FormData
-        data.append("image\n", {
+        data.append("image", {
           uri: result.assets[0].uri,
-          name: "image.png",
+          name: `image.png`,
           type: "image/png",
         });
-        data.append("property-id", property.id);
-        // Set the headers and other configurations for the Axios request
+        data.append('property-id', property.id);
+  
         let config = {
-          method: "post",
+          method: 'post',
           maxBodyLength: Infinity,
-          url: `${urlPath}/document/`,
-          headers: {
+          url: urlPath+'/document/',
+          headers: { 
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
           data: data,
         };
-
-        console.log("Data being sent:", data);
-
-        // Send the request using Axios
+  
         let response = await axios(config);
-
-        console.log("\n \nFinish");
-        console.log(response.data);
-        Alert.alert("Success", "Images uploaded successfully");
+        console.log(JSON.stringify(response.data));
+        Alert.alert("Success", "Image uploaded successfully");
       }
     } catch (error) {
-      console.error(error.response);
+      console.error(error);
       Alert.alert("Error", "Image upload failed");
     }
   };
 
   const handlePhotos = async () => {
     const token = await getValueFor("token");
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsMultipleSelection: true,
-      allowsEditing: false,
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.cancelled) {
-      setImages((prevImages) => [...prevImages, result.assets[0].uri]);
-    }
-    let formData = new FormData();
-    images.forEach((uri, index) => {
-      formData.append("images", {
-        uri: uri,
-        name: `image${index}.png`,
-        type: "image/png",
-      });
-    });
-
-    let config = {
-      method: "put",
-      url: urlPath + "property/image/" + property.id,
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "multipart/form-data",
-      },
-      data: formData,
-    };
     try {
-      let response = await axios(config);
-      console.log("config");
-      console.log(config);
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        allowsEditing: false,
+        quality: 1,
+      });
 
-      console.log("\n \nFinish");
-      console.log(response.data);
-      Alert.alert("Success", "Images uploaded successfully");
+      if (!result.cancelled) {
+        let formData = new FormData();
+        result.selected.map((uri, index) => {
+          formData.append("images", {
+            uri: uri,
+            name: `image${index}.png`,
+            type: "image/png",
+          });
+        });
+
+        let config = {
+          method: "put",
+          url: `${urlPath}/property/image/${property.id}`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+          data: formData,
+        };
+
+        let response = await axios(config);
+        console.log(response.data);
+        Alert.alert("Success", "Images uploaded successfully");
+      }
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "Image upload failed");
@@ -333,11 +260,10 @@ const PropertyDetailsDashboard = ({ route }) => {
 
       console.log(response.data);
 
-      // Update the UI by toggling the VR status locally
       property.propertyImages = property.propertyImages.map((image) =>
         image.id === imageId ? { ...image, vr: !currentStatus } : image
       );
-      setImages([...property.propertyImages]);
+      setImages(property.propertyImages.map(img => img.imgUrl));
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "Failed to update VR status");
@@ -454,7 +380,7 @@ const PropertyDetailsDashboard = ({ route }) => {
         <View style={styles.buttonContainer1}>
           <TouchableOpacity
             style={[styles.saveButton, styles.doubleWidth]}
-            onPress={handleImagePress}
+            onPress={UploadDocument}
           >
             <AntDesign
               name="addfile"
@@ -491,14 +417,14 @@ const PropertyDetailsDashboard = ({ route }) => {
               style={styles.icon}
             />
             <Text style={styles.saveButtonText}>
-              Look at Property Document{" "}
+              Look at Property Document
             </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
   );
-}};
+};
 
 const styles = StyleSheet.create({
   buttonContainer1: {
