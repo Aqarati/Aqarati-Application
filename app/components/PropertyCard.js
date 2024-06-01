@@ -9,7 +9,13 @@ const PropertyCard = ({ property }) => {
   const navigation = useNavigation();
 
   // Default image URL
+<<<<<<< HEAD
   let imageUrls = "https://aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
+=======
+  let imageUrl = "https://aqarati-app.s3.me-so1.amazonaws.com/property-image";
+  // let imageUrl =
+  //   "aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";
+>>>>>>> 45aa43c8047d0b94bc3a9e7570bd9454ad245b1d
 
   // Check if propertyImages array exists and has at least one image
   if (property.propertyImages && property.propertyImages.length > 0) {

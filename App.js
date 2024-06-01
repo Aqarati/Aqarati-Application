@@ -22,6 +22,7 @@ import "react-native-reanimated";
 import PropertyDetails from "./app/screens/PropertyDetails";
 import dashboard from "./app/screens/dashboard";
 import PropertyDetailsDashboard from "./app/screens/PropertyDetailsDashboard";
+import DocumentPage from "./app/screens/DocumentPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -119,6 +120,11 @@ function App() {
         <Stack.Screen
           name="PropertyDetailsDashboard"
           component={PropertyDetailsDashboard}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="DocumentPage"
+          component={DocumentPage}
           options={{ headerShown: false }}
         />
         <Stack.Screen
