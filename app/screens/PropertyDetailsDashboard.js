@@ -42,13 +42,13 @@ const PropertyDetailsDashboard = ({ route }) => {
       if (!token) {
         throw new Error("Token not found");
       }
-<<<<<<< HEAD
+
   
    
-=======
+
 
       const propertyId = property.id;
->>>>>>> 45aa43c8047d0b94bc3a9e7570bd9454ad245b1d
+
       const propertyName = name;
       const propertyDescription = description;
       const propertyPrice = parseInt(price);
@@ -154,7 +154,7 @@ const PropertyDetailsDashboard = ({ route }) => {
     );
   };
 
-<<<<<<< HEAD
+
     // Open the camera or photo library
     const handleImagePress = async () => {
       const token = await getValueFor("token");
@@ -206,7 +206,7 @@ const PropertyDetailsDashboard = ({ route }) => {
       } catch (error) {
         console.error(error.response);
         Alert.alert("Error", "Image upload failed");
-=======
+
   const handleImagePress = async () => {
     const token = await getValueFor("token");
     try {
@@ -215,7 +215,7 @@ const PropertyDetailsDashboard = ({ route }) => {
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         throw new Error("Permission to access photo library denied");
->>>>>>> 45aa43c8047d0b94bc3a9e7570bd9454ad245b1d
+
       }
 
       // Open the device's photo library
@@ -234,7 +234,6 @@ const PropertyDetailsDashboard = ({ route }) => {
           type: "image/png",
         });
         data.append("property-id", property.id);
-
         // Set the headers and other configurations for the Axios request
         let config = {
           method: "post",
