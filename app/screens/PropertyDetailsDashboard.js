@@ -194,25 +194,27 @@ const PropertyDetailsDashboard = ({ route }) => {
   };
 
   const handlePhotos = async () => {
-    const token = await getValueFor("token");
     try {
+      const token = await getValueFor("token");
+  
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsMultipleSelection: true,
         allowsEditing: false,
         quality: 1,
       });
-
+  
       if (!result.cancelled) {
         let formData = new FormData();
-        result.selected.map((uri, index) => {
+        result.assets.map((asset, index) => {
           formData.append("images", {
-            uri: uri,
+            uri: asset.uri,
             name: `image${index}.png`,
             type: "image/png",
           });
+          console.log(asset.uri);
         });
-
+  
         let config = {
           method: "put",
           url: `${urlPath}/property/image/${property.id}`,
@@ -222,7 +224,7 @@ const PropertyDetailsDashboard = ({ route }) => {
           },
           data: formData,
         };
-
+  
         let response = await axios(config);
         console.log(response.data);
         Alert.alert("Success", "Images uploaded successfully");
