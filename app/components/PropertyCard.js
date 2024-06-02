@@ -118,7 +118,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#fff",
     marginBottom: 20,
-
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -164,6 +163,9 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "500",
     color: "#232425",
+    flex: 1,
+    flexShrink: 1,
+    marginRight: 10, // Add some space between the title and price
   },
   cardPrice: {
     fontSize: 15,
@@ -172,21 +174,10 @@ const styles = StyleSheet.create({
   },
   cardFooter: {
     marginTop: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
   },
-  cardStars: {
-    marginLeft: 2,
-    marginRight: 6,
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#232425",
-  },
-  cardReviews: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: "#595a63",
+  description: {
+    fontSize: 16,
+    color: "#666",
   },
 });
 export default PropertyCard;

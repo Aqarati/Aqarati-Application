@@ -11,6 +11,8 @@ import {
   FlatList,
   ActivityIndicator,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
@@ -158,7 +160,7 @@ const PropertyDetailsDashboard = ({ route }) => {
       // Open the device's photo library
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: false,
+        allowsEditing: true,
         quality: 1,
       });
   
@@ -277,157 +279,161 @@ const PropertyDetailsDashboard = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
-      )}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>Edit Property Details</Text>
-        <View style={styles.imageContainer}>
-          <FlatList
-            data={property.propertyImages}
-            renderItem={({ item, index }) => (
-              <View style={styles.imageWrapper}>
-                <TouchableOpacity onPress={() => openImageViewer(index)}>
-                  <Image source={{ uri: item.imgUrl }} style={styles.image} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.vrButton}
-                  onPress={() => toggleVRStatus(item.id, item.vr)}
-                >
-                  <Text style={styles.vrButtonText}>
-                    {item.vr ? "Deactivate VR" : "Activate VR"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View style={styles.container}>
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        )}
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>Edit Property Details</Text>
+          <View style={styles.imageContainer}>
+            <FlatList
+              data={property.propertyImages}
+              renderItem={({ item, index }) => (
+                <View style={styles.imageWrapper}>
+                  <TouchableOpacity onPress={() => openImageViewer(index)}>
+                    <Image source={{ uri: item.imgUrl }} style={styles.image} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.vrButton}
+                    onPress={() => toggleVRStatus(item.id, item.vr)}
+                  >
+                    <Text style={styles.vrButtonText}>
+                      {item.vr ? "Deactivate VR" : "Activate VR"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            />
+          </View>
+
+          <ImageView
+            images={property.propertyImages.map((image) => ({
+              uri: image.imgUrl,
+            }))}
+            imageIndex={currentIndex}
+            visible={visible}
+            onRequestClose={() => setVisible(false)}
           />
-        </View>
 
-        <ImageView
-          images={property.propertyImages.map((image) => ({
-            uri: image.imgUrl,
-          }))}
-          imageIndex={currentIndex}
-          visible={visible}
-          onRequestClose={() => setVisible(false)}
-        />
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Property Title</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="Enter title"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Property Description</Text>
-          <TextInput
-            style={[styles.input, styles.multilineInput]}
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Enter description"
-            multiline
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Property Price</Text>
-          <TextInput
-            style={styles.input}
-            value={price}
-            onChangeText={setPrice}
-            placeholder="Enter price"
-            onSubmitEditing={() => Keyboard.dismiss()}
-            keyboardType="numeric"
-          />
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.saveButton, styles.doubleWidth]}
-            onPress={handleSave}
-          >
-            <AntDesign
-              name="save"
-              size={22}
-              color="white"
-              style={styles.icon}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Property Title</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter title"
             />
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity
-            style={[styles.deleteButton, styles.doubleWidth]}
-            onPress={handleDelete}
-          >
-            <AntDesign
-              name="delete"
-              size={22}
-              color="white"
-              style={styles.icon}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Property Description</Text>
+            <TextInput
+              style={[styles.input, styles.multilineInput]}
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Enter description"
+              multiline
             />
-            <Text style={styles.saveButtonText}>Delete</Text>
-          </TouchableOpacity>
-        </View>
+          </View>
 
-        <View style={styles.buttonContainer1}>
-          <TouchableOpacity
-            style={[styles.saveButton, styles.doubleWidth]}
-            onPress={UploadDocument}
-          >
-            <AntDesign
-              name="addfile"
-              size={22}
-              color="white"
-              style={styles.icon}
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Property Price</Text>
+            <TextInput
+              style={styles.input}
+              value={price}
+              onChangeText={setPrice}
+              placeholder="Enter price"
+              onSubmitEditing={() => Keyboard.dismiss()}
+              keyboardType="numeric"
             />
-            <Text style={styles.saveButtonText}>Upload Document</Text>
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity
-            style={[styles.saveButton, styles.doubleWidth]}
-            onPress={handlePhotos}
-          >
-            <AntDesign
-              name="upload"
-              size={22}
-              color="white"
-              style={styles.icon}
-            />
-            <Text style={styles.saveButtonText}>Upload Photos</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[styles.saveButton, styles.doubleWidth]}
+              onPress={handleSave}
+            >
+              <AntDesign
+                name="save"
+                size={22}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.saveButtonText}>Save</Text>
+            </TouchableOpacity>
 
-        <View style={styles.buttonContainer1}>
-          <TouchableOpacity
-            style={[styles.saveButton, styles.doubleWidth]}
-            onPress={handleDocumentPress}
-          >
-            <AntDesign
-              name="filetext1"
-              size={22}
-              color="white"
-              style={styles.icon}
-            />
-            <Text style={styles.saveButtonText}>
-              Look at Property Document
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
+            <TouchableOpacity
+              style={[styles.deleteButton, styles.doubleWidth]}
+              onPress={handleDelete}
+            >
+              <AntDesign
+                name="delete"
+                size={22}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.saveButtonText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.buttonContainer1}>
+            <TouchableOpacity
+              style={[styles.saveButton, styles.doubleWidth]}
+              onPress={UploadDocument}
+            >
+              <AntDesign
+                name="addfile"
+                size={22}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.saveButtonText}>Upload Document</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.saveButton, styles.doubleWidth]}
+              onPress={handlePhotos}
+            >
+              <AntDesign
+                name="upload"
+                size={22}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.saveButtonText}>Upload Photos</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.buttonContainer1}>
+            <TouchableOpacity
+              style={[styles.saveButton, styles.doubleWidth]}
+              onPress={handleDocumentPress}
+            >
+              <AntDesign
+                name="filetext1"
+                size={22}
+                color="white"
+                style={styles.icon}
+              />
+              <Text style={styles.saveButtonText}>
+                Look at Property Document
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
-
 const styles = StyleSheet.create({
   buttonContainer1: {
     flexDirection: "row",
@@ -481,7 +487,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 5,
     left: 5,
-    backgroundColor: "blue",
+    backgroundColor: COLORS.primary,
     borderRadius: 5,
     padding: 5,
   },
@@ -505,7 +511,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   multilineInput: {
-    height: 40,
+    height: 100,
   },
   saveButton: {
     backgroundColor: COLORS.primary,

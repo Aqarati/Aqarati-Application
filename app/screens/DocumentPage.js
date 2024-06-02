@@ -29,7 +29,11 @@ const DocumentPage = () => {
 
       try {
         const response = await axios.request(config);
-        setDocuments(response.data);
+        const sortedDocuments = response.data.sort((a, b) => {
+          const statusOrder = { "APPROVED": 1, "PENDING": 2, "REJECTED": 3 };
+          return statusOrder[a.status] - statusOrder[b.status];
+        });
+        setDocuments(sortedDocuments);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching documents:", error);
@@ -51,10 +55,10 @@ const DocumentPage = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'PENDING':
-        return <HourglassLoadingIcon size={24} color={COLORS.pending} />;
       case 'APPROVED':
         return <Icon name="check-circle" size={24} color={COLORS.approved} />;
+      case 'PENDING':
+        return <HourglassLoadingIcon size={24} color={COLORS.pending} />;
       case 'REJECTED':
         return <Icon name="cancel" size={24} color={COLORS.rejected} />;
       default:
@@ -72,7 +76,7 @@ const DocumentPage = () => {
           <Card containerStyle={styles.card}>
             <Image source={{ uri: item.imgUrl }} style={styles.image} PlaceholderContent={<ActivityIndicator />} />
             <View style={styles.cardContent}>
-              <RNText style={styles.documentId}>ID: {item.id}</RNText>
+              <RNText style={styles.documentId}>Document ID: {item.id}</RNText>
               <View style={styles.statusContainer}>
                 {getStatusIcon(item.status)}
                 <RNText style={{ ...styles.statusText, color: getStatusIcon(item.status).props.color }}>

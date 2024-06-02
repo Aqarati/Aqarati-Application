@@ -16,8 +16,8 @@ const COLORS = {
   darkBlue: "#003366",
   pending: '#f1c40f',
   approved: '#2ecc71',
-  rejected: '#e74c3c',
-  default: '#95a5a6',
+  rejected: '#ff0000',
+  default: '#ff0000',
 };
 
 export default COLORS;
