@@ -177,15 +177,10 @@ const MainScreen = forwardRef(({navigation}, ref) => {
               <TouchableOpacity
                 onPress={() => navigation.navigate("profilescreen")}
               >
-                <Image
-                  source={{
-                    uri:
-                      userData && userData.imageUrl
-                        ? userData.imageUrl
-                        : "default_image_url",
-                  }} // Replace with actual default image URL
-                  style={profilestyle.avatar}
-                />
+              <Image
+  source={userData && userData.imageUrl ? { uri: userData.imageUrl } : require("../../assets/images/userD.png")}
+  style={profilestyle.avatar}
+/>
               </TouchableOpacity>
             </View>
           </View>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,14 +8,26 @@ import {
   TouchableOpacity,
   Linking,
   ScrollView,
+  Animated,
 } from "react-native";
 import ImageView from "react-native-image-viewing";
 import LikeSection from "./components/likeSection";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import COLORS from "../../assets/Colors/colors";
 
 const PropertyDetails = ({ route }) => {
   const { property } = route.params;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
 
   const renderImageItem = ({ item, index }) => (
     <TouchableOpacity onPress={() => handleImagePress(index)}>
@@ -45,7 +57,7 @@ const PropertyDetails = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>{property.name}</Text>
         <View style={styles.imageContainer}>
@@ -59,8 +71,10 @@ const PropertyDetails = ({ route }) => {
         </View>
         <View style={styles.detailsContainer}>
           <Text style={styles.description}>{property.description}</Text>
-          <Text style={styles.price}>Price: {property.price}</Text>
-          {/* Add more details here */}
+          <View style={styles.priceContainer}>
+            <MaterialIcons name="attach-money" size={24} color={COLORS.primary} />
+            <Text style={styles.price}>{property.price}</Text>
+          </View>
         </View>
         <ImageView
           images={property.propertyImages.map((image) => ({
@@ -74,47 +88,54 @@ const PropertyDetails = ({ route }) => {
       <View style={styles.likeSectionContainer}>
         <LikeSection p={property} />
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    marginTop:0,
+    
+        flex: 1,
     backgroundColor: "#fff",
   },
   scrollContent: {
-    paddingBottom: 100, // Ensure there's enough space for the footer
+    paddingBottom: 100,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 15,
-    marginTop: 15,
+    marginTop: 60,
     paddingHorizontal: 20,
+    color: COLORS.primary,
+    textAlign: "center",
   },
   description: {
     fontSize: 18,
     color: "#666",
     marginBottom: 10,
-  },
-  imageContainer: {
     paddingHorizontal: 20,
-    marginBottom: 10,
   },
   image: {
     width: 300,
     height: 200,
     resizeMode: "cover",
     marginRight: 10,
+    borderRadius: 10,
+    marginLeft: 10,
   },
   detailsContainer: {
     padding: 20,
   },
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   price: {
     fontSize: 20,
-    color: "#000",
-    marginBottom: 10,
+    color: COLORS.primary,
+    marginLeft: 5,
   },
   vrButton: {
     position: "absolute",
@@ -135,6 +156,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderTopWidth: 1,
     borderTopColor: "#ddd",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
 });
 

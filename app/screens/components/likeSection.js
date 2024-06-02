@@ -1,28 +1,26 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Button,
   TouchableOpacity,
   Text,
   StyleSheet,
   ActivityIndicator,
+  Linking,
 } from "react-native";
-import { Linking } from "react-native";
-import { urlPath } from "../../lib";
-import { getValueFor } from "../../lib";
+import { urlPath, getValueFor } from "../../lib";
 import axios from "axios";
 import COLORS from "../../../assets/Colors/colors";
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+
 const LikeSection = ({ p }) => {
   const [liked, setLiked] = useState(null);
-  const [loading, setLoading] = useState(false); // New state for loading indicator
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchFavouriteIdData = async () => {
-      setLoading(true); // Show loading indicator
+      setLoading(true);
       console.log("fetch fav id for Like Section");
       const url = urlPath + "/user/favourite";
-      console.log("url : " + url);
       const token = await getValueFor("token");
       const config = {
         method: "get",
@@ -32,20 +30,17 @@ const LikeSection = ({ p }) => {
           Authorization: "Bearer " + token,
         },
       };
-      console.log(config);
       await axios
         .request(config)
         .then((response) => {
-          var favId = response.data;
-          console.log(favId);
-          console.log(favId.includes(p.id));
+          const favId = response.data;
           setLiked(favId.includes(p.id));
         })
         .catch((error) => {
           console.log(error);
         })
         .finally(() => {
-          setLoading(false); // Hide loading indicator
+          setLoading(false);
         });
     };
 
@@ -53,12 +48,12 @@ const LikeSection = ({ p }) => {
   }, [p.id]);
 
   const handleLikePress = async () => {
-    setLoading(true); // Show loading indicator
+    setLoading(true);
     const url = urlPath + "/user/favourite?id=" + p.id;
     const token = await getValueFor("token");
 
-    let config = {
-      method: liked ? "delete" : "post", // Toggle between post and delete
+    const config = {
+      method: liked ? "delete" : "post",
       maxBodyLength: Infinity,
       url: url,
       headers: {
@@ -69,14 +64,13 @@ const LikeSection = ({ p }) => {
     await axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
         setLiked(!liked);
       })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
-        setLoading(false); // Hide loading indicator
+        setLoading(false);
       });
   };
 
@@ -96,8 +90,8 @@ const LikeSection = ({ p }) => {
         {loading ? (
           <ActivityIndicator size="small" color={COLORS.primary} />
         ) : (
-          <TouchableOpacity onPress={handleLikePress}style={styles.icons}>
-            <FontAwesome name="heart" size={30} color={liked ? '#CD1818' : 'white'} />
+          <TouchableOpacity onPress={handleLikePress} style={styles.icons}>
+            <FontAwesome name="heart" size={30} color={liked ? "#CD1818" : "white"} />
           </TouchableOpacity>
         )}
       </View>
@@ -106,39 +100,36 @@ const LikeSection = ({ p }) => {
 };
 
 const styles = StyleSheet.create({
-  icons:{
+  icons: {
     backgroundColor: COLORS.primary,
     borderRadius: 50,
     width: 50,
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft:20
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 10,
   },
   container: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 15,
+ marginBottom: 10,
   },
   button: {
     backgroundColor: COLORS.primary,
     padding: 15,
     paddingHorizontal: 80,
     margin: 5,
-    borderRadius: 5,
-    borderRadius:40,
+    borderRadius: 40,
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     textAlign: "center",
     fontWeight: "bold",
-   
   },
   buttonWrapper: {
     marginRight: 20,
-    
   },
 });
 

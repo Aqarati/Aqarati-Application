@@ -8,7 +8,6 @@ import {
   Modal,
   TextInput,
   StyleSheet,
-  Alert,
 } from "react-native";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -16,7 +15,7 @@ import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
 import { getValueFor, urlPath } from "../lib";
 import { useNavigation, useRoute } from "@react-navigation/native";
-
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const MyAccountItem = ({ title, value, onPress }) => (
   <TouchableOpacity onPress={onPress} style={styles.item}>
@@ -57,6 +56,7 @@ const EditFieldModal = ({ visible, onClose, title, value, onSave }) => {
             value={newValue}
             onChangeText={setNewValue}
             placeholder={`Enter new ${title}`}
+            placeholderTextColor="#aaa" 
           />
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
@@ -164,24 +164,31 @@ const MyAccountScreen = () => {
   };
 
   const selectImage = async () => {
-   
+    try {
+      // Request permission to access the photo library
+      let { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Permission to access the photo library is required!');
+        return;
+      }
   
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsMultipleSelection: false,
-      allowsEditing: true, // Enable editing to allow cropping
-      aspect: [1, 1], // Set aspect ratio to 1:1 for a square crop
-      quality: 1,
-    });
+      // Launch the image library
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsMultipleSelection: false,
+        allowsEditing: true, // Enable editing to allow cropping
+        aspect: [1, 1], // Set aspect ratio to 1:1 for a square crop
+        quality: 1,
+      });
   
-    console.log(result);
+     
   
-    if (!result.cancelled) {
+      console.log(result);
       let data = new FormData();
       const token = await getValueFor("token");
   
       data.append("profile-image", {
-        uri: result.assets[0].uri,
+        uri: result.assets[0].uri, // Use result.uri directly since assets is not defined
         name: `image.png`,
         type: "image/png",
       });
@@ -196,40 +203,39 @@ const MyAccountScreen = () => {
         data: data,
       };
   
-      axios
-        .request(config)
-        .then(async (response) => {
-          console.log(JSON.stringify(response.data));
-       
-          setUserData((prevData) => ({
-            ...prevData,
-            imageUrl: response.data.imageUrl,
-          }));
+      const response = await axios.request(config);
+      console.log(JSON.stringify(response.data));
   
-          // Fetch updated user profile data to refresh the imageUrl
-          await fetchUserProfileData();
+      setUserData((prevData) => ({
+        ...prevData,
+        imageUrl: response.data.imageUrl,
+      }));
   
-          // Navigate to the previous screen and refresh the data
-          navigation.goBack();
-          navigation.navigate("profilescreen", { refresh: true });
-        })
-        .catch((error) => {
-          console.log(JSON.stringify(error.response.data));
-        });
+      // Fetch updated user profile data to refresh the imageUrl
+      await fetchUserProfileData();
+  
+      // Navigate to the previous screen and refresh the data
+      navigation.goBack();
+      navigation.navigate("Main", { refresh: true });
+    } catch (error) {
+     
     }
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.touchable} onPress={selectImage}>
+      <View>
       <Image
           style={profilestyle.avatar}
           source={
             userData.imageUrl && userData.imageUrl !== ""
               ? { uri: userData.imageUrl }
-              : require("../../assets/images/logo.png")
+              : require("../../assets/images/userD.png")
           }
         />
+        
+        </View>
       </TouchableOpacity>
       <Text style={styles.screenTitle}>MY ACCOUNT</Text>
       <ScrollView style={styles.listContainer}>
@@ -259,10 +265,29 @@ const MyAccountScreen = () => {
 
 const profilestyle = StyleSheet.create({
   avatar: {
-    width: 150,
-    height: 150,
+    width: 225,
+    height: 225,
     borderRadius: 9999,
   },
+  avatarWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 250,
+    height: 250,
+    borderRadius: 9999,
+    backgroundColor:"#fff", // Fallback background color
+  },
+  icon: {
+    alignSelf: "center",
+  },
+  iconWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 250,
+    height: 250,
+    borderRadius: 9999,
+    backgroundColor: COLORS.primary,
+  }
 });
 
 const styles = StyleSheet.create({
@@ -276,55 +301,35 @@ const styles = StyleSheet.create({
     paddingTop: 70,
     backgroundColor: "#fff",
   },
-  photoWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-  },
   screenTitle: {
-    fontSize: 25,
-    color: COLORS.primary,
-    textAlign: "center",
-    marginBottom: 20,
+    fontSize: 24,
     fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 30,
   },
   listContainer: {
     flex: 1,
-    width: "100%",
   },
   item: {
-    flexDirection: "row",
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: "auto",
     backgroundColor: "#fff",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 2,
-    borderRadius: 10,
-    borderColor: "grey",
-    marginBottom: 20,
-    width: "100%",
-    maxWidth: 600,
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
   },
   label: {
     fontSize: 16,
-    color: "black",
-    fontWeight: "bold",
-    width: "30%",
+    color: COLORS.primary,
+    marginBottom: 5,
   },
   value: {
-    fontSize: 16,
-    color: "black",
-    width: "62%",
-    overflow: "hidden",
+    fontSize: 18,
+    color: "#333",
   },
   editIcon: {
-    marginLeft: 10,
+    position: "absolute",
+    right: 10,
+    top: 40,
+    transform: [{ translateY: -10 }],
   },
   modalContainer: {
     flex: 1,
@@ -333,66 +338,52 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: COLORS.primary,
     width: "80%",
-    padding: 20,
+    backgroundColor: "#fff",
     borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "grey",
+    padding: 20,
+    alignItems: "center",
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
-    marginTop: 10,
-    color: "#fff",
   },
   input: {
-    height: 40,
-    borderColor: "gray",
+    width: "100%",
     borderWidth: 1,
+    borderColor: "#ccc",
     borderRadius: 5,
+    padding: 10,
+    fontSize: 16,
     marginBottom: 20,
-    paddingHorizontal: 10,
-    backgroundColor: "#fff",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  saveButton: {
-    backgroundColor: COLORS.light,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-    alignItems: "center",
-    width: 120,
-    height: 60,
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    width: "100%",
   },
   cancelButton: {
-    backgroundColor: COLORS.light,
-    paddingHorizontal: 20,
+    flexDirection: "row",
+    backgroundColor: "red",
     paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 5,
     alignItems: "center",
-    width: 120,
-    height: 60,
+    marginRight: 10,
   },
-  cancelButtonText: {
-    color: "#000",
-    fontWeight: "bold",
+  saveButton: {
+    flexDirection: "row",
+    backgroundColor: COLORS.primary,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+    marginLeft: 10,
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "bold",
     marginLeft: 5,
-    fontSize: 18,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -18,7 +18,7 @@ import Toast from "react-native-toast-message";
 import { urlPath, getValueFor, delete_token } from "../lib";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import COLORS from "../../assets/Colors/colors";
-
+import EvilIcons from "react-native-vector-icons/EvilIcons";
 const SucessMessage = () => {
   Toast.show({
     type: "success",
@@ -56,7 +56,7 @@ export default function ProfileScreen({ navigation }) {
       maxBodyLength: Infinity,
       url: url,
       headers: {
-        Authorization: "Bearer  " + token,
+        Authorization: "Bearer " + token,
       },
     };
     console.log(config);
@@ -64,7 +64,15 @@ export default function ProfileScreen({ navigation }) {
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
-        setUserData(response.data);
+        const data = response.data;
+  
+        // Set default names if firstName or lastName is null
+        if (!data.firstName || !data.lastName) {
+          data.firstName = data.firstName || "";
+          data.lastName = data.lastName || "";
+        }
+  
+        setUserData(data);
       })
       .catch((error) => {
         console.log(error);
@@ -72,15 +80,10 @@ export default function ProfileScreen({ navigation }) {
   };
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       fetchData();
     }, [])
   );
-
-  useEffect(() => {
-    console.log("profile use effect called");
-    fetchData();
-  }, []);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -138,32 +141,37 @@ export default function ProfileScreen({ navigation }) {
       { cancelable: false }
     );
   };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Settings</Text>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Settings</Text>
+      </View>
 
-        <ScrollView refreshControl={
-    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-  }>
-          <View style={styles.profile}>
-            <View style={styles.profileHeader}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        <View style={styles.profile}>
+          <View style={styles.profileHeader}>
+            {userData && userData.imageUrl ? (
               <Image
-                alt=""
-                source={{
-                  uri: userData && userData.imageUrl ? userData.imageUrl : "s",
-                }}
+                source={{ uri: userData.imageUrl }}
                 style={styles.profileAvatar}
               />
+            ) : (
+              <Image
+                source={require("../../assets/images/userD.png")}
+                style={styles.profileAvatar}
+              />
+            )}
 
               <View>
                 <Text style={styles.profileName}>
                   {userData
                     ? `${userData.firstName} ${userData.lastName}`
-                    : " "}
+                    : ""}
                 </Text>
 
                 <Text style={styles.profileHandle}>

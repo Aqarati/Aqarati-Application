@@ -14,6 +14,10 @@ const COLORS = {
   darkGray: "#333333",
   lightGray: "#CCCCCC",  
   darkBlue: "#003366",
+  pending: '#f1c40f',
+  approved: '#2ecc71',
+  rejected: '#e74c3c',
+  default: '#95a5a6',
 };
 
 export default COLORS;

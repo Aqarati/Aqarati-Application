@@ -60,22 +60,22 @@ function App() {
         <Stack.Screen
           name="addscreen"
           component={AddScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="chats"
           component={ChatScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="likescreen"
           component={LikeScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="searchscreen"
           component={SearchScreen}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="editprofile"
@@ -85,7 +85,7 @@ function App() {
         <Stack.Screen
           name="ownhome"
           component={OwnHome}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="ownland"
@@ -95,12 +95,12 @@ function App() {
         <Stack.Screen
           name="rentapartment"
           component={RentApartment}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="renthome"
           component={RentHome}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="invest"
@@ -110,12 +110,12 @@ function App() {
         <Stack.Screen
           name="PropertyDetails"
           component={PropertyDetails}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="PropertyCardDashboard"
           component={PropertyCardDashboard}
-          options={{ headerShown: true }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="PropertyDetailsDashboard"
