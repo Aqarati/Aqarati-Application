@@ -13,12 +13,13 @@ import {
   RefreshControl,
 } from "react-native";
 import axios from "axios";
-import { useFocusEffect } from '@react-navigation/native'; 
+import { useFocusEffect } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { urlPath, getValueFor, delete_token } from "../lib";
 import FeatherIcon from "react-native-vector-icons/Feather";
+import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import COLORS from "../../assets/Colors/colors";
-import EvilIcons from "react-native-vector-icons/EvilIcons";
+
 const SucessMessage = () => {
   Toast.show({
     type: "success",
@@ -65,13 +66,13 @@ export default function ProfileScreen({ navigation }) {
       .then((response) => {
         console.log(JSON.stringify(response.data));
         const data = response.data;
-  
+
         // Set default names if firstName or lastName is null
         if (!data.firstName || !data.lastName) {
           data.firstName = data.firstName || "";
           data.lastName = data.lastName || "";
         }
-  
+
         setUserData(data);
       })
       .catch((error) => {
@@ -143,35 +144,33 @@ export default function ProfileScreen({ navigation }) {
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
-      </View>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Settings</Text>
+        </View>
 
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-      >
-        <View style={styles.profile}>
-          <View style={styles.profileHeader}>
-            {userData && userData.imageUrl ? (
-              <Image
-                source={{ uri: userData.imageUrl }}
-                style={styles.profileAvatar}
-              />
-            ) : (
-              <Image
-                source={require("../../assets/images/userD.png")}
-                style={styles.profileAvatar}
-              />
-            )}
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+        >
+          <View style={styles.profile}>
+            <View style={styles.profileHeader}>
+              {userData && userData.imageUrl ? (
+                <Image
+                  source={{ uri: userData.imageUrl }}
+                  style={styles.profileAvatar}
+                />
+              ) : (
+                <Image
+                  source={require("../../assets/images/userD.png")}
+                  style={styles.profileAvatar}
+                />
+              )}
 
               <View>
                 <Text style={styles.profileName}>
-                  {userData
-                    ? `${userData.firstName} ${userData.lastName}`
-                    : ""}
+                  {userData ? `${userData.firstName} ${userData.lastName}` : ""}
                 </Text>
 
                 <Text style={styles.profileHandle}>
@@ -195,7 +194,12 @@ export default function ProfileScreen({ navigation }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Management</Text>
 
-            <TouchableOpacity onPress={() => {navigation.navigate("dashboard")}} style={styles.row}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("dashboard");
+              }}
+              style={styles.row}
+            >
               <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
                 <FeatherIcon
                   color={COLORS.primary}
@@ -213,16 +217,30 @@ export default function ProfileScreen({ navigation }) {
                 size={20}
               />
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("myproperty");
+              }}
+              style={styles.row}
+            >
+              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+                <FontAwesome6 color={COLORS.primary} name="house" size={20} />
+              </View>
+
+              <Text style={styles.rowLabel}>My property</Text>
+              <View style={styles.rowSpacer} />
+
+              <FeatherIcon
+                color={COLORS.primary}
+                name="chevron-right"
+                size={20}
+              />
+            </TouchableOpacity>
           </View>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Preferences</Text>
 
-            <TouchableOpacity
-              onPress={() => {
-              
-              }}
-              style={styles.row}
-            >
+            <TouchableOpacity onPress={() => {}} style={styles.row}>
               <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
                 <FeatherIcon color={COLORS.primary} name="globe" size={20} />
               </View>

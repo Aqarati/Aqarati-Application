@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -9,7 +15,8 @@ import {
   Image,
   ActivityIndicator,
   RefreshControl,
-  animation
+  Animated,
+  Easing,
 } from "react-native";
 import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
@@ -50,28 +57,26 @@ const categories = [
   },
 ];
 
-const MainScreen = forwardRef(({navigation}, ref) => {
+const MainScreen = forwardRef(({ navigation }, ref) => {
   const [userData, setUserData] = useState(null);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const scrollViewRef = useRef(null); // Add a ref for the ScrollView
+  const scrollViewRef = useRef(null);
+  const animation = useRef(new Animated.Value(0)).current; // Create an Animated.Value
+
   useEffect(() => {
-    if (animation) {
-      // Start animation when animation value changes
-      Animated.timing(animation, {
-        toValue: 0, // Reset to initial value
-        duration: 500, // Adjust duration as needed
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }).start();
-      
-    }
+    Animated.timing(animation, {
+      toValue: 0, // Reset to initial value
+      duration: 500, // Adjust duration as needed
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start();
   }, [animation]);
+
   useImperativeHandle(ref, () => ({
     scrollToTop: () => {
       scrollViewRef.current.scrollTo({ y: 0, animated: true });
-     
     },
   }));
 
@@ -85,7 +90,7 @@ const MainScreen = forwardRef(({navigation}, ref) => {
       maxBodyLength: Infinity,
       url: url,
       headers: {
-        Authorization: "Bearer  " + token,
+        Authorization: "Bearer " + token,
       },
     };
     console.log(config);
@@ -111,7 +116,7 @@ const MainScreen = forwardRef(({navigation}, ref) => {
       maxBodyLength: Infinity,
       url: url,
       headers: {
-        Authorization: "Bearer  " + token,
+        Authorization: "Bearer " + token,
       },
     };
 
@@ -119,21 +124,27 @@ const MainScreen = forwardRef(({navigation}, ref) => {
     await axios
       .request(config)
       .then((response) => {
-        setProperties(response.data);
-        console.log("\n \n");
-        console.log(properties);
+        const availableProperties = response.data.filter(
+          (property) => property.propertyStatus === "AVAILABLE"
+        );
+        setProperties(availableProperties);
       })
       .catch((error) => {
         console.log(error);
       })
       .finally(() => {
         setLoading(false);
-        setRefreshing(false); // Set refreshing to false when data is fetched
+        setRefreshing(false);
       });
   };
+
   useEffect(() => {
     fetchUserProfileData();
     fetchUserPropertyData();
+
+    const intervalId = setInterval(fetchUserPropertyData, 6000); // Fetch every 60 seconds
+
+    return () => clearInterval(intervalId); // Clear interval on component unmount
   }, []);
 
   const onRefresh = () => {
@@ -141,10 +152,6 @@ const MainScreen = forwardRef(({navigation}, ref) => {
     fetchUserProfileData();
     fetchUserPropertyData();
     setRefreshing(false); // Set refreshing to false when manual refresh is done
-  };
-
-  const handleCardPress = (itemDetails) => {
-    navigation.navigate("Details", { itemDetails });
   };
 
   const Message = () => {
@@ -170,21 +177,23 @@ const MainScreen = forwardRef(({navigation}, ref) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-          <View style={profilestyle.container}>
-            <View style={profilestyle.header}>
-              <Text style={styles.title}>Places to stay</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("profilescreen")}
-              >
+        <View style={profilestyle.container}>
+          <View style={profilestyle.header}>
+            <Text style={styles.title}>Places to stay</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("profilescreen")}
+            >
               <Image
-  source={userData && userData.imageUrl ? { uri: userData.imageUrl } : require("../../assets/images/userD.png")}
-  style={profilestyle.avatar}
-/>
-              </TouchableOpacity>
-            </View>
+                source={
+                  userData && userData.imageUrl
+                    ? { uri: userData.imageUrl }
+                    : require("../../assets/images/userD.png")
+                }
+                style={profilestyle.avatar}
+              />
+            </TouchableOpacity>
           </View>
-        </SafeAreaView>
+        </View>
         <View style={Categories_styles.container}>
           <View style={Categories_styles.list}>
             <View style={Categories_styles.listHeader}></View>
@@ -193,7 +202,7 @@ const MainScreen = forwardRef(({navigation}, ref) => {
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             >
-              {categories.map(({ img, label, color, screen }, index) => (
+              {categories.map(({ img, label, color }, index) => (
                 <TouchableOpacity key={index} onPress={Message}>
                   <View
                     style={[Categories_styles.card, { backgroundColor: color }]}

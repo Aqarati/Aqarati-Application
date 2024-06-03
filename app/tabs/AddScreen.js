@@ -28,6 +28,7 @@ import Octicons from "react-native-vector-icons/Octicons";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { getValueFor, urlPath } from "../lib";
+import Toast from "react-native-toast-message";
 const selectedDATA = [
   {
     adtype: [],
@@ -590,6 +591,26 @@ const resetToFirstScreen = (navigation) => {
     routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
   });
 };
+
+const showToast = () => {
+  Toast.show({
+    type: "error",
+    text1: "Warning",
+    text2: "Please enter all required data before posting.",
+    autoHide: true,
+    visibilityTime: 2000,
+  });
+};
+
+const PostedDeniedToast = () => {
+  Toast.show({
+    type: "error",
+    text1: "Warning",
+    text2: "Your post was not Uploaded !",
+    autoHide: true,
+    visibilityTime: 3000, // 3 seconds
+  });
+};
 const WhatPriceScreen = ({ navigation, route }) => {
   const [price, setPrice] = useState("");
   const { photos } = route.params;
@@ -623,9 +644,16 @@ const WhatPriceScreen = ({ navigation, route }) => {
           onPress: async () => {
             // Handle the case when the user confirms to share the post
             selectedDATA[0].adprice = price;
-            console.log(selectedDATA[0].adprice);
-            console.log(selectedDATA);
+
             const handleSavePost = async () => {
+              if (
+                !selectedDATA[0].adtitle ||
+                !selectedDATA[0].addescription ||
+                !selectedDATA[0].adprice
+              ) {
+                showToast();
+                return;
+              }
               const url = urlPath + "/property";
               const token = await getValueFor("token");
               let data = JSON.stringify({
@@ -656,47 +684,40 @@ const WhatPriceScreen = ({ navigation, route }) => {
                   makeitEmpty(selectedDATA);
                   resetToFirstScreen(navigation);
                 })
-                .catch((error) => {
-                  console.log(error);
-                });
+                .catch((error) => {});
             };
 
             const handleAddImageToPost = async (propertyId) => {
-              const token = await getValueFor("token");
-              const url = urlPath + "/property/image/" + propertyId;
-              const filteredPhotos = photos.filter((photo) => photo !== null);
-              console.log(filteredPhotos);
-              let formData = new FormData();
-              filteredPhotos.forEach((uri, index) => {
-                console.log(uri);
-                formData.append("images", {
-                  uri: uri,
-                  name: `image${index}.png`,
-                  type: "image/png",
-                });
-              });
-
-              let config = {
-                method: "put",
-                url: url,
-                headers: {
-                  Authorization: "Bearer " + token,
-                  "Content-Type": "multipart/form-data",
-                },
-                data: formData,
-              };
-              console.log("config", config);
               try {
-                let response = await axios(config);
-                console.log("config");
-                console.log(config);
+                const token = await getValueFor("token");
+                const url = urlPath + "/property/image/" + propertyId;
+                const filteredPhotos = photos.filter((photo) => photo !== null);
 
-                console.log("\n \nFinist");
-                console.log(response.data);
-                Alert.alert("Success", "Images uploaded successfully");
+                let formData = new FormData();
+                filteredPhotos.forEach((uri, index) => {
+                  formData.append("images", {
+                    uri: uri,
+                    name: `image${index}.png`,
+                    type: "image/png",
+                  });
+                });
+
+                let config = {
+                  method: "put",
+                  url: url,
+                  headers: {
+                    Authorization: "Bearer " + token,
+                    "Content-Type": "multipart/form-data",
+                  },
+                  data: formData,
+                };
+                console.log("config", config);
+
+                let response = await axios(config);
+                // handle success response if needed
               } catch (error) {
-                console.error(error);
-                Alert.alert("Error", "Image upload failed");
+                PostedDeniedToast();
+                console.log(error);
               }
             };
 
@@ -774,6 +795,7 @@ const WhatPriceScreen = ({ navigation, route }) => {
         >
           <Text style={styles12.bottomButtonText}>Post</Text>
         </TouchableOpacity>
+        <Toast />
       </View>
     </TouchableWithoutFeedback>
   );

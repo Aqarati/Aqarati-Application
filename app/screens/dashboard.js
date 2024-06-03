@@ -1,12 +1,20 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, SafeAreaView, ScrollView, ActivityIndicator, RefreshControl, StyleSheet } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native'; 
-import axios from 'axios';
-import { getValueFor } from '../lib'; 
-import PropertyCardDashboard from '../components/PropertyCardDashboard'; 
-import Toast from 'react-native-toast-message';
-import COLORS from '../../assets/Colors/colors';
-import { urlPath } from '../lib';
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  ActivityIndicator,
+  RefreshControl,
+  StyleSheet,
+} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import axios from "axios";
+import { getValueFor } from "../lib";
+import PropertyCardDashboard from "../components/PropertyCardDashboard";
+import Toast from "react-native-toast-message";
+import COLORS from "../../assets/Colors/colors";
+import { urlPath } from "../lib";
 
 export default function MainScreen({ navigation }) {
   const [properties, setProperties] = useState([]);
@@ -15,7 +23,7 @@ export default function MainScreen({ navigation }) {
 
   const fetchProperties = async () => {
     console.log("Fetching properties");
-    const url = urlPath + "/property/my"; 
+    const url = urlPath + "/property/my";
     console.log("URL: " + url);
     const token = await getValueFor("token");
 
@@ -50,6 +58,11 @@ export default function MainScreen({ navigation }) {
   useEffect(() => {
     console.log("Main screen use effect called");
     fetchProperties();
+    // const interval = setInterval(() => {
+    //   fetchProperties(); // Fetch properties every 5 minutes
+    // }, 1 * 10 * 500);
+
+    // return () => clearInterval(interval); // Clear interval on component unmount
   }, []);
 
   // Fetch properties when screen is focused
@@ -87,9 +100,11 @@ export default function MainScreen({ navigation }) {
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={COLORS.primary} />
           </View>
-        ) : properties.map((property) => (
-          <PropertyCardDashboard key={property.id} property={property} />
-        ))}
+        ) : (
+          properties.map((property) => (
+            <PropertyCardDashboard key={property.id} property={property} />
+          ))
+        )}
       </ScrollView>
       <Toast />
     </SafeAreaView>
@@ -115,4 +130,3 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
- 

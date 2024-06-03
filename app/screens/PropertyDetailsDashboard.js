@@ -12,7 +12,8 @@ import {
   ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Modal,
 } from "react-native";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
@@ -20,11 +21,13 @@ import { urlPath, getValueFor } from "../lib";
 import COLORS from "../../assets/Colors/colors";
 import * as ImagePicker from "expo-image-picker";
 import ImageView from "react-native-image-viewing";
-import { AntDesign } from "@expo/vector-icons";
-
+import { AntDesign, Feather, MaterialIcons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
 const PropertyDetailsDashboard = ({ route }) => {
   const navigation = useNavigation();
   const { property } = route.params;
+  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
+  const [status, setStatus] = useState(property.status); // State for property status
 
   const [name, setName] = useState(property.name);
   const [description, setDescription] = useState(property.description);
@@ -33,7 +36,9 @@ const PropertyDetailsDashboard = ({ route }) => {
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visible, setVisible] = useState(false);
-  const [images, setImages] = useState(property.propertyImages.map(img => img.imgUrl));
+  const [images, setImages] = useState(
+    property.propertyImages.map((img) => img.imgUrl)
+  );
 
   const handleSave = async () => {
     try {
@@ -103,67 +108,24 @@ const PropertyDetailsDashboard = ({ route }) => {
     }
   };
 
-  const handleDelete = async () => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Are you sure you want to delete this Post?",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Deletion canceled"),
-          style: "cancel",
-        },
-        {
-          text: "OK",
-          onPress: async () => {
-            setLoading(true);
-            try {
-              const token = await getValueFor("token");
-
-              if (!token) {
-                throw new Error("Token not found");
-              }
-
-              const url = `${urlPath}/property/${property.id}`;
-
-              const response = await axios.delete(url, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              });
-
-              console.log(JSON.stringify(response.data));
-              navigation.goBack();
-            } catch (error) {
-              console.log(error);
-            } finally {
-              setLoading(false);
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
-
   const UploadDocument = async () => {
     try {
       const token = await getValueFor("token");
-  
+
       // Ask for permission to access the photo library
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        throw new Error('Permission to access photo library denied');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        throw new Error("Permission to access photo library denied");
       }
-  
+
       // Open the device's photo library
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         quality: 1,
       });
-  
+
       if (!result.cancelled) {
         let data = new FormData();
         // Append the selected image to FormData
@@ -172,40 +134,37 @@ const PropertyDetailsDashboard = ({ route }) => {
           name: `image.png`,
           type: "image/png",
         });
-        data.append('property-id', property.id);
-  
+        data.append("property-id", property.id);
+
         let config = {
-          method: 'post',
+          method: "post",
           maxBodyLength: Infinity,
-          url: urlPath+'/document/',
-          headers: { 
+          url: urlPath + "/document/",
+          headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
           data: data,
         };
-  
+
         let response = await axios(config);
         console.log(JSON.stringify(response.data));
         Alert.alert("Success", "Image uploaded successfully");
       }
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Image upload failed");
-    }
+    } catch (error) {}
   };
 
   const handlePhotos = async () => {
     try {
       const token = await getValueFor("token");
-  
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsMultipleSelection: true,
         allowsEditing: false,
         quality: 1,
       });
-  
+
       if (!result.cancelled) {
         let formData = new FormData();
         result.assets.map((asset, index) => {
@@ -216,7 +175,7 @@ const PropertyDetailsDashboard = ({ route }) => {
           });
           console.log(asset.uri);
         });
-  
+
         let config = {
           method: "put",
           url: `${urlPath}/property/image/${property.id}`,
@@ -226,15 +185,12 @@ const PropertyDetailsDashboard = ({ route }) => {
           },
           data: formData,
         };
-  
+
         let response = await axios(config);
         console.log(response.data);
         Alert.alert("Success", "Images uploaded successfully");
       }
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Image upload failed");
-    }
+    } catch (error) {}
   };
 
   const openImageViewer = (index) => {
@@ -267,7 +223,7 @@ const PropertyDetailsDashboard = ({ route }) => {
       property.propertyImages = property.propertyImages.map((image) =>
         image.id === imageId ? { ...image, vr: !currentStatus } : image
       );
-      setImages(property.propertyImages.map(img => img.imgUrl));
+      setImages(property.propertyImages.map((img) => img.imgUrl));
     } catch (error) {
       console.error(error);
       Alert.alert("Error", "Failed to update VR status");
@@ -276,6 +232,66 @@ const PropertyDetailsDashboard = ({ route }) => {
 
   const handleDocumentPress = () => {
     navigation.navigate("DocumentPage", { propertyId: property.id });
+  };
+
+  const updateStatus = async (newStatus) => {
+    let status;
+    switch (newStatus) {
+      case "Rented":
+        status = "RENTED";
+        break;
+      case "Available":
+        status = "AVAILABLE";
+        break;
+      case "Undermaintenance":
+        status = "UNDER_MAINTENANCE";
+        break;
+    }
+    try {
+      const token = await getValueFor("token");
+
+      if (!token) {
+        throw new Error("Token not found");
+      }
+      let statusresult = await status.toString();
+      console.log(statusresult);
+      let data = JSON.stringify({
+        id: property.id,
+        propertyStatus: statusresult,
+      });
+
+      let config = {
+        method: "put",
+        maxBodyLength: Infinity,
+        url: urlPath + "/property/",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        data: data,
+      };
+      setModalVisible(false); // Hide modal
+
+      const response = await axios.request(config);
+      console.log(JSON.stringify(response.data));
+
+      Toast.show({
+        type: "success",
+        text1: "Status Updated",
+        text2: `Property status updated to ${newStatus}`,
+        visibilityTime: 1500, // 3 seconds
+        autoHide: true,
+      });
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        type: "error",
+        text1: "Status Update Failed",
+        text2: `Failed to update property status to ${newStatus}`,
+        visibilityTime: 1500, // 3 seconds
+        autoHide: true,
+      });
+    }
   };
 
   return (
@@ -289,7 +305,10 @@ const PropertyDetailsDashboard = ({ route }) => {
             <ActivityIndicator size="large" color={COLORS.primary} />
           </View>
         )}
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <Text style={styles.title}>Edit Property Details</Text>
           <View style={styles.imageContainer}>
             <FlatList
@@ -372,16 +391,16 @@ const PropertyDetailsDashboard = ({ route }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.deleteButton, styles.doubleWidth]}
-              onPress={handleDelete}
+              style={[styles.statusButton, styles.doubleWidth]}
+              onPress={() => setModalVisible(true)}
             >
-              <AntDesign
-                name="delete"
+              <Feather
+                name="menu"
                 size={22}
                 color="white"
                 style={styles.icon}
               />
-              <Text style={styles.saveButtonText}>Delete</Text>
+              <Text style={styles.saveButtonText}>Status</Text>
             </TouchableOpacity>
           </View>
 
@@ -429,12 +448,130 @@ const PropertyDetailsDashboard = ({ route }) => {
               </Text>
             </TouchableOpacity>
           </View>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <TouchableOpacity
+              style={styles.modalBackground}
+              activeOpacity={1}
+              onPressOut={() => setModalVisible(false)}
+            >
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Update Status</Text>
+                {[
+                  {
+                    status: "Available",
+                    color: COLORS.approved,
+                    icon: "check-circle",
+                  },
+                  {
+                    status: "Undermaintenance",
+                    color: COLORS.pending,
+                    icon: "build",
+                  },
+                  { status: "Rented", color: COLORS.rejected, icon: "home" },
+                ].map((statusOption) => (
+                  <TouchableOpacity
+                    key={statusOption.status}
+                    style={[
+                      styles.modalButton,
+                      { backgroundColor: statusOption.color },
+                      status === statusOption.status &&
+                        styles.modalButtonSelected,
+                    ]}
+                    onPress={() => updateStatus(statusOption.status)}
+                  >
+                    <MaterialIcons
+                      name={statusOption.icon}
+                      size={24}
+                      color={status === statusOption.status ? "#fff" : "#fff"}
+                      style={{ marginRight: 10 }}
+                    />
+                    <Text
+                      style={[
+                        styles.modalButtonText,
+                        status === statusOption.status &&
+                          styles.modalButtonTextSelected,
+                      ]}
+                    >
+                      {statusOption.status.charAt(0).toUpperCase() +
+                        statusOption.status.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </TouchableOpacity>
+          </Modal>
         </ScrollView>
       </View>
+      <Toast></Toast>
     </KeyboardAvoidingView>
   );
 };
 const styles = StyleSheet.create({
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "80%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  modalButton: {
+    width: "100%",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginVertical: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  modalButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  modalButtonSelected: {
+    backgroundColor: COLORS.secondary,
+  },
+  modalButtonTextSelected: {
+    color: "#fff",
+  },
+
+  button: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 8,
+  },
+  saveButton: {
+    backgroundColor: COLORS.primary,
+  },
+  uploadButton: {
+    backgroundColor: COLORS.secondary,
+  },
+  documentButton: {
+    backgroundColor: COLORS.tertiary,
+  },
+  statusButton: {
+    backgroundColor: COLORS.quaternary,
+  },
+
   buttonContainer1: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -526,8 +663,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  deleteButton: {
-    backgroundColor: COLORS.darkGray,
+  statusButton: {
+    backgroundColor: COLORS.primary,
     padding: 10,
     borderRadius: 5,
     marginTop: 20,
