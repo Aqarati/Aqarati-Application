@@ -23,6 +23,7 @@ import PropertyDetails from "./app/screens/PropertyDetails";
 import dashboard from "./app/screens/dashboard";
 import PropertyDetailsDashboard from "./app/screens/PropertyDetailsDashboard";
 import DocumentPage from "./app/screens/DocumentPage";
+import Myproperty from "./app/screens/Myproperty";
 
 const Stack = createNativeStackNavigator();
 
@@ -125,6 +126,11 @@ function App() {
         <Stack.Screen
           name="DocumentPage"
           component={DocumentPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="myproperty"
+          component={Myproperty}
           options={{ headerShown: false }}
         />
         <Stack.Screen
