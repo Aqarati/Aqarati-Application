@@ -1,19 +1,20 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
   TouchableOpacity,
-  Alert,
+  Animated,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import COLORS from "../../assets/Colors/colors";
-import { getValueFor, urlPath } from "../lib";
-import axios from "axios";
-const PropertyCardDashboard = ({ property }) => {
+
+const MyPropertyCards = ({ property }) => {
   const navigation = useNavigation();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   // Default image URL
   let imageUrl =
@@ -30,58 +31,59 @@ const PropertyCardDashboard = ({ property }) => {
     }
   }
 
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
   const handleCardPress = () => {
     // Navigate to the details screen, passing the property object as a parameter
-    navigation.navigate("PropertyDetailsDashboard", { property });
+    // navigation.navigate("PropertyDetails", { property });
   };
 
-  const handleDelete = async () => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Are you sure you want to delete this Post?",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Deletion canceled"),
-          style: "cancel",
-        },
-        {
-          text: "OK",
-          onPress: async () => {
-            try {
-              const token = await getValueFor("token");
+  const renderStatus = (status) => {
+    let iconName, color, text;
 
-              if (!token) {
-                throw new Error("Token not found");
-              }
+    switch (status) {
+      case "AVAILABLE":
+        iconName = "check-circle";
+        color = "green";
+        text = "Available";
+        break;
+      case "UNDER_MAINTENANCE":
+        iconName = "tools";
+        color = COLORS.pending;
+        text = "Under Maintenance";
+        break;
+      case "RENTED":
+        iconName = "home";
+        color = COLORS.primary;
+        text = "Rented";
+        break;
+      default:
+        iconName = "check-circle";
+        color = "green";
+        text = "Available";
+    }
 
-              const url = `${urlPath}/property/${property.id}`;
-
-              const response = await axios.delete(url, {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              });
-              navigation.goBack();
-              console.log(JSON.stringify(response.data));
-            } catch (error) {
-              console.log(error);
-            } finally {
-            }
-          },
-        },
-      ],
-      { cancelable: false }
+    return (
+      <Animated.View style={[styles.statusContainer, { opacity: fadeAnim }]}>
+        <FontAwesome5 name={iconName} size={28} color={color} />
+        <Text style={[styles.statusText, { color }]}>{text}</Text>
+      </Animated.View>
     );
   };
+
   return (
     <TouchableOpacity onPress={handleCardPress}>
       <View style={styles.card}>
-        <View style={styles.cardDeleteWrapper}>
-          <TouchableOpacity onPress={handleDelete}>
-            <View style={styles.cardDelete}>
-              <MaterialIcons color={COLORS.rejected} name="delete" size={30} />
+        <View style={styles.cardLikeWrapper}>
+          <TouchableOpacity>
+            <View style={styles.cardLike}>
+              <MaterialIcons color={COLORS.primary} name="verified" size={22} />
             </View>
           </TouchableOpacity>
         </View>
@@ -98,14 +100,13 @@ const PropertyCardDashboard = ({ property }) => {
         <View style={styles.cardBody}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>{property.name}</Text>
-
             <Text style={styles.cardPrice}>
               <Text style={{ fontWeight: "600" }}>{property.price} $</Text>
             </Text>
           </View>
 
           <View style={styles.cardFooter}>
-            <Text style={styles.description}>{property.description}</Text>
+            {renderStatus(property.propertyStatus)}
           </View>
         </View>
       </View>
@@ -114,33 +115,27 @@ const PropertyCardDashboard = ({ property }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 15,
-    backgroundColor: "#fff",
-  },
   card: {
-    position: "relative",
-    borderRadius: 8,
     backgroundColor: "#fff",
-    marginBottom: 20,
+    borderRadius: 10,
+    padding: 20,
+    margin: 10,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
-  cardDeleteWrapper: {
+  cardLikeWrapper: {
     position: "absolute",
     zIndex: 1,
     top: 12,
     right: 12,
   },
-  cardDelete: {
-    width: 40,
-    height: 40,
+  cardLike: {
+    width: 32,
+    height: 32,
+    margin: 15,
     borderRadius: 9999,
     backgroundColor: "#fff",
     alignItems: "center",
@@ -180,10 +175,19 @@ const styles = StyleSheet.create({
   cardFooter: {
     marginTop: 8,
   },
-  description: {
-    fontSize: 16,
-    color: "#666",
+
+  statusContainer: {
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    marginTop: 5,
+    justifyContent: "center",
+  },
+  statusText: {
+    fontSize: 25,
+    marginLeft: 5,
+    fontWeight: "600",
+    color: "#232425",
   },
 });
 
-export default PropertyCardDashboard;
+export default MyPropertyCards;
