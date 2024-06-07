@@ -54,9 +54,9 @@ const DocumentPage = ({ route }) => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles(darkMode).loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.primary} />
-        <RNText>Loading...</RNText>
+        <RNText style={styles.loading}> Loading...</RNText>
       </View>
     );
   }
@@ -119,10 +119,14 @@ const styles = (darkMode) =>
       padding: 16,
       backgroundColor: darkMode ? COLORS.darkGray : COLORS.lightBackground,
     },
+    loading: {
+      color: darkMode ? COLORS.white : COLORS.primary,
+    },
     loadingContainer: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
+      backgroundColor: darkMode ? COLORS.darkGray : COLORS.lightBackground,
     },
     header: {
       textAlign: "center",
