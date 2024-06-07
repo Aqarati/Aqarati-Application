@@ -12,7 +12,11 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../assets/Colors/colors";
 import { getValueFor, urlPath } from "../lib";
 import axios from "axios";
-const PropertyCardDashboard = ({ property }) => {
+const PropertyCardDashboard = ({
+  property,
+  darkMode,
+  handleDarkModeToggle,
+}) => {
   const navigation = useNavigation();
 
   // Default image URL
@@ -32,7 +36,11 @@ const PropertyCardDashboard = ({ property }) => {
 
   const handleCardPress = () => {
     // Navigate to the details screen, passing the property object as a parameter
-    navigation.navigate("PropertyDetailsDashboard", { property });
+    navigation.navigate("PropertyDetailsDashboard", {
+      property,
+      darkMode,
+      handleDarkModeToggle,
+    });
   };
 
   const handleDelete = async () => {
