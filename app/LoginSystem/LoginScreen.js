@@ -143,7 +143,7 @@ const LoginScreen = ({ navigation }) => {
         save("token", response.data.token);
         save("email", data.email);
         save("password", data.password);
-        SucessMessage();
+
         navigation.dispatch(
           CommonActions.reset({
             index: 0,

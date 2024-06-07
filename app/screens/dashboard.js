@@ -16,11 +16,11 @@ import Toast from "react-native-toast-message";
 import COLORS from "../../assets/Colors/colors";
 import { urlPath } from "../lib";
 
-export default function MainScreen({ navigation }) {
+export default function MainScreen({ navigation, route }) {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
+  const { darkMode, handleDarkModeToggle } = route.params;
   const fetchProperties = async () => {
     console.log("Fetching properties");
     const url = urlPath + "/property/my";
@@ -85,24 +85,40 @@ export default function MainScreen({ navigation }) {
   }, [loading, properties]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Text style={styles.title}>Dashboard</Text>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: darkMode ? COLORS.backgroundDark : COLORS.white,
+      }}
+    >
+      <Text style={styles(darkMode).title}>Dashboard</Text>
       <ScrollView
         contentContainerStyle={[
-          styles.container,
-          { paddingBottom: 0, backgroundColor: "#fff" },
+          styles(darkMode).container,
+          {
+            paddingBottom: 0,
+            backgroundColor: darkMode ? COLORS.backgroundDark : COLORS.white,
+          },
         ]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
         {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
+          <View style={styles(darkMode).loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color={darkMode ? COLORS.primary : COLORS.primary}
+            />
           </View>
         ) : (
           properties.map((property) => (
-            <PropertyCardDashboard key={property.id} property={property} />
+            <PropertyCardDashboard
+              key={property.id}
+              property={property}
+              darkMode={route.params.darkMode}
+              handleDarkModeToggle={route.params.handleDarkModeToggle}
+            />
           ))
         )}
       </ScrollView>
@@ -111,22 +127,24 @@ export default function MainScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 15,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 33,
-    fontWeight: "700",
-    color: COLORS.primary,
-    marginTop: 30,
-    textAlign: "center",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-  },
-});
+const styles = (darkMode) =>
+  StyleSheet.create({
+    container: {
+      padding: 15,
+      backgroundColor: darkMode ? COLORS.backgroundDark : COLORS.white,
+    },
+    title: {
+      fontSize: 33,
+      fontWeight: "700",
+      color: COLORS.primary,
+      marginTop: 30,
+      textAlign: "center",
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 20,
+      backgroundColor: darkMode ? COLORS.backgroundDark : COLORS.white,
+    },
+  });
