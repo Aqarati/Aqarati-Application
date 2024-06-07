@@ -413,3 +413,131 @@ export const DATA = [
     ],
   },
 ];
+
+const provinces = [
+  { label: "Amman", value: "1" },
+  { label: "Zarqa", value: "2" },
+  { label: "Irbid", value: "3" },
+  { label: "Aqaba", value: "4" },
+  { label: "Mafraq", value: "5" },
+  { label: "Ajloun", value: "6" },
+  { label: "Jarash", value: "7" },
+  { label: "Madaba", value: "8" },
+  { label: "Karak", value: "9" },
+  { label: "Tafilah", value: "10" },
+  { label: "Ma'an", value: "11" },
+  { label: "Balqa", value: "12" },
+];
+
+const regions = {
+  1: [
+    { label: "Jabal Amman", value: "1-1" },
+    { label: "Abdoun", value: "1-2" },
+    { label: "Swefieh", value: "1-3" },
+  ],
+  2: [
+    { label: "Zarqa North", value: "2-1" },
+    { label: "Zarqa South", value: "2-2" },
+  ],
+  3: [
+    { label: "Irbid City", value: "3-1" },
+    { label: "Ramtha", value: "3-2" },
+  ],
+  4: [
+    { label: "Aqaba City", value: "4-1" },
+    { label: "Al-Quwayrah", value: "4-2" },
+  ],
+  5: [
+    { label: "Mafraq City", value: "5-1" },
+    { label: "Khalidiya", value: "5-2" },
+  ],
+  6: [
+    { label: "Ajloun City", value: "6-1" },
+    { label: "Anjara", value: "6-2" },
+  ],
+  7: [
+    { label: "Jarash City", value: "7-1" },
+    { label: "Sakib", value: "7-2" },
+  ],
+  8: [
+    { label: "Madaba City", value: "8-1" },
+    { label: "Ma'in", value: "8-2" },
+  ],
+  9: [
+    { label: "Karak City", value: "9-1" },
+    { label: "Mazar", value: "9-2" },
+  ],
+  10: [
+    { label: "Tafilah City", value: "10-1" },
+    { label: "Busrra", value: "10-2" },
+  ],
+  11: [
+    { label: "Ma'an City", value: "11-1" },
+    { label: "Petra", value: "11-2" },
+  ],
+  12: [
+    { label: "Salt City", value: "12-1" },
+    { label: "Fuhais", value: "12-2" },
+  ],
+};
+
+const propertyFeatures = [
+  { label: "Elevator", value: "1" },
+  { label: "Parking", value: "2" },
+  { label: "Gym", value: "3" },
+  { label: "Pool", value: "4" },
+  { label: "Garden", value: "5" },
+  { label: "Security", value: "6" },
+  { label: "Playground", value: "7" },
+  { label: "Wi-Fi", value: "8" },
+];
+
+const nearbyLocations = [
+  { label: "School", value: "1" },
+  { label: "Hospital", value: "2" },
+  { label: "Mall", value: "3" },
+  { label: "Park", value: "4" },
+  { label: "Restaurant", value: "5" },
+];
+
+const lessons = [
+  {
+    name: "Apartments for Rent",
+    name2: "Home for rent",
+  },
+  {
+    name: "Apartments for sale",
+    name2: "Home for sale",
+  },
+  {
+    name: "Hotel apartments and suites",
+    name2: "Home suitable for rent",
+  },
+  {
+    name: "Student apartments",
+    name2: "Student Home for rent",
+  },
+  {
+    name: "Apartments for sale",
+    name2: "Home suitable for sale",
+  },
+];
+const items = [
+  {
+    img: "https://images.pexels.com/photos/425343/pexels-photo-425343.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    address: "Apartments for Rent",
+  },
+  {
+    img: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    address: "Houses for Rent",
+  },
+];
+
+export {
+  lessons,
+  nearbyLocations,
+  propertyFeatures,
+  provinces,
+  regions,
+  items,
+};
