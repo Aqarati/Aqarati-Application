@@ -23,7 +23,7 @@ import COLORS from "../../assets/Colors/colors";
 import { urlPath, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
 import PropertyCard from "../components/PropertyCard";
-
+import { getStoredBoolValue } from "../tabs/AddScreenStyles";
 const categories = [
   {
     img: "https://img.icons8.com/?size=256&id=J3w76cMS9cUS&format=png",
@@ -58,6 +58,7 @@ const categories = [
 ];
 
 const MainScreen = forwardRef(({ navigation }, ref) => {
+  const darkMode = getStoredBoolValue();
   const [userData, setUserData] = useState(null);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +82,7 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
   }));
 
   const fetchUserProfileData = async () => {
+    console.log(darkMode);
     console.log("fetch data for profile");
     const url = urlPath + "/user/profile";
     console.log("url : " + url);
@@ -166,20 +168,35 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: darkMode ? COLORS.backgroundDark : "#fff",
+      }}
+    >
       <ScrollView
         ref={scrollViewRef} // Attach the ref here
         contentContainerStyle={[
-          styles.container,
-          { paddingBottom: 0, backgroundColor: "#fff" },
+          styles(darkMode).container,
+          {
+            paddingBottom: 0,
+            backgroundColor: darkMode ? COLORS.backgroundDark : "#fff",
+          },
         ]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View style={profilestyle.container}>
-          <View style={profilestyle.header}>
-            <Text style={styles.title}>Places to stay</Text>
+        <View style={profilestyle(darkMode).container}>
+          <View style={profilestyle(darkMode).header}>
+            <Text
+              style={[
+                styles(darkMode).title,
+                { color: darkMode ? COLORS.textDark : "#1d1d1d" },
+              ]}
+            >
+              Places to stay
+            </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("profilescreen")}
             >
@@ -189,39 +206,57 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
                     ? { uri: userData.imageUrl }
                     : require("../../assets/images/userD.png")
                 }
-                style={profilestyle.avatar}
+                style={profilestyle(darkMode).avatar}
               />
             </TouchableOpacity>
           </View>
         </View>
-        <View style={Categories_styles.container}>
-          <View style={Categories_styles.list}>
-            <View style={Categories_styles.listHeader}></View>
+        <View style={Categories_styles(darkMode).container}>
+          <View style={Categories_styles(darkMode).list}>
+            <View style={Categories_styles(darkMode).listHeader}></View>
             <ScrollView
-              contentContainerStyle={Categories_styles.listContent}
+              contentContainerStyle={Categories_styles(darkMode).listContent}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             >
               {categories.map(({ img, label, color }, index) => (
                 <TouchableOpacity key={index} onPress={Message}>
                   <View
-                    style={[Categories_styles.card, { backgroundColor: color }]}
+                    style={[
+                      Categories_styles(darkMode).card,
+                      { backgroundColor: color },
+                    ]}
                   >
                     <Image
                       source={{ uri: img }}
-                      style={Categories_styles.cardImg}
+                      style={Categories_styles(darkMode).cardImg}
                     />
-                    <Text style={Categories_styles.cardLabel}>{label}</Text>
+                    <Text
+                      style={[
+                        Categories_styles(darkMode).cardLabel,
+                        { color: darkMode ? COLORS.white : "#1d1d1d" },
+                      ]}
+                    >
+                      {label}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
         </View>
-        <ScrollView style={{ backgroundColor: "#fff", marginBottom: 50 }}>
+        <ScrollView
+          style={{
+            backgroundColor: darkMode ? COLORS.backgroundDark : "#fff",
+            marginBottom: 50,
+          }}
+        >
           {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={COLORS.primary} />
+            <View style={styles(darkMode).loadingContainer}>
+              <ActivityIndicator
+                size="large"
+                color={darkMode ? COLORS.primary : COLORS.primary}
+              />
             </View>
           ) : (
             Array.isArray(properties) &&
@@ -236,111 +271,115 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
   );
 });
 
-const Categories_styles = StyleSheet.create({
-  container: {
-    paddingVertical: 24,
-    paddingHorizontal: 0,
-    flexGrow: 1,
-    flexShrink: 1,
-    backgroundColor: "#fff",
-    marginTop: -30,
-  },
-  title: {
-    paddingHorizontal: 24,
-    fontSize: 32,
-    fontWeight: "700",
-    color: "#1d1d1d",
-    marginBottom: 12,
-  },
-  list: {
-    marginBottom: 0,
-  },
-  listHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-  },
-  listTitle: {
-    fontWeight: "600",
-    fontSize: 20,
-    lineHeight: 28,
-    color: "#323142",
-  },
-  listAction: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  listActionText: {
-    fontSize: 14,
-    fontWeight: "500",
-    lineHeight: 20,
-    color: "#706f7b",
-    marginRight: 2,
-  },
-  listContent: {
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-  },
-  card: {
-    width: 80,
-    paddingVertical: 16,
-    paddingHorizontal: 6,
-    borderRadius: 12,
-    flexDirection: "column",
-    alignItems: "center",
-    marginHorizontal: 6,
-  },
-  cardImg: {
-    width: 40,
-    height: 40,
-    marginBottom: 10,
-  },
-  cardLabel: {
-    fontWeight: "600",
-    fontSize: 14,
-    lineHeight: 18,
-    color: COLORS.white,
-  },
-});
+const Categories_styles = (darkMode) =>
+  StyleSheet.create({
+    container: {
+      paddingVertical: 24,
+      paddingHorizontal: 0,
+      flexGrow: 1,
+      flexShrink: 1,
+      backgroundColor: darkMode ? COLORS.backgroundDark : "#fff", // Dark mode or fallback background color
+      marginTop: -30,
+    },
+    title: {
+      paddingHorizontal: 24,
+      fontSize: 32,
+      fontWeight: "700",
+      color: darkMode ? COLORS.textDark : "#1d1d1d", // Dark mode or fallback text color
+      marginBottom: 12,
+    },
+    list: {
+      marginBottom: 0,
+    },
+    listHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 24,
+    },
+    listTitle: {
+      fontWeight: "600",
+      fontSize: 20,
+      lineHeight: 28,
+      color: darkMode ? COLORS.textDark : "#323142", // Dark mode or fallback text color
+    },
+    listAction: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+    },
+    listActionText: {
+      fontSize: 14,
+      fontWeight: "500",
+      lineHeight: 20,
+      color: darkMode ? COLORS.gray : "#706f7b", // Dark mode or fallback text color
+      marginRight: 2,
+    },
+    listContent: {
+      paddingVertical: 12,
+      paddingHorizontal: 18,
+    },
+    card: {
+      width: 80,
+      paddingVertical: 16,
+      paddingHorizontal: 6,
+      borderRadius: 12,
+      flexDirection: "column",
+      alignItems: "center",
+      marginHorizontal: 6,
+      backgroundColor: darkMode ? COLORS.darkGray : "#fff", // Dark mode or fallback background color
+    },
+    cardImg: {
+      width: 40,
+      height: 40,
+      marginBottom: 10,
+    },
+    cardLabel: {
+      fontWeight: "600",
+      fontSize: 14,
+      lineHeight: 18,
+      color: darkMode ? COLORS.white : "#1d1d1d", // Dark mode or fallback text color
+    },
+  });
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 15,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 33,
-    fontWeight: "700",
-    marginEnd: 70,
-    color: COLORS.primary,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-  },
-});
+const styles = (darkMode) =>
+  StyleSheet.create({
+    container: {
+      padding: 15,
+      backgroundColor: darkMode ? COLORS.white : "#fff", // Dark mode or fallback background color
+    },
+    title: {
+      fontSize: 33,
+      fontWeight: "700",
+      marginEnd: 70,
+      color: darkMode ? COLORS.primary : COLORS.primary, // Adjust this to the appropriate dark mode color
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 20,
+    },
+  });
 
-const profilestyle = StyleSheet.create({
-  container: {
-    padding: 24,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    backgroundColor: "#fff",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 9999,
-  },
-});
+const profilestyle = (darkMode) =>
+  StyleSheet.create({
+    container: {
+      padding: 24,
+      flexGrow: 1,
+      flexShrink: 1,
+      flexBasis: 0,
+      backgroundColor: darkMode ? COLORS.backgroundDark : "#fff", // Dark mode or fallback background color
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+    },
+    avatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 9999,
+    },
+  });
 
 export default MainScreen;

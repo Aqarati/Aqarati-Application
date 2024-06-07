@@ -20,7 +20,7 @@ import { urlPath, getValueFor, delete_token } from "../lib";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import COLORS from "../../assets/Colors/colors";
-import { Profilestyles } from "./AddScreenStyles";
+import { Profilestyles, storeBoolValue } from "./AddScreenStyles";
 const SucessMessage = () => {
   Toast.show({
     type: "success",
@@ -72,6 +72,7 @@ export default function ProfileScreen({ navigation }) {
   const handleDarkModeToggle = (darkMode) => {
     setDarkMode(darkMode);
     saveDarkModeState(darkMode);
+    storeBoolValue(darkMode);
   };
   useEffect(() => {
     loadDarkModeState();

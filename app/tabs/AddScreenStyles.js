@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+
 import COLORS from "../../assets/Colors/colors";
 const sttyles = StyleSheet.create({
   container: {
@@ -375,7 +376,23 @@ const styles1 = StyleSheet.create({
     backgroundColor: "#fff",
   },
 });
+let storedBoolValue = false; // Initialize stored boolean value
 
+const storeBoolValue = (boolValue) => {
+  // Validate if the passed parameter is a boolean
+  if (typeof boolValue !== "boolean") {
+    console.error("Parameter must be a boolean");
+    return;
+  }
+
+  // Store the boolean value
+  storedBoolValue = boolValue;
+};
+
+const getStoredBoolValue = () => {
+  // Return an object containing the stored boolean value
+  return { darkMode: storedBoolValue };
+};
 const Profilestyles = (darkMode) =>
   StyleSheet.create({
     container: {
@@ -487,4 +504,14 @@ const Profilestyles = (darkMode) =>
       flexBasis: 0,
     },
   });
-export { sttyles, styles11, styles12, styles2, styles, styles1, Profilestyles };
+export {
+  sttyles,
+  styles11,
+  styles12,
+  styles2,
+  styles,
+  styles1,
+  Profilestyles,
+  getStoredBoolValue,
+  storeBoolValue,
+};
