@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import {
-  StyleSheet,
   SafeAreaView,
   View,
   ScrollView,
@@ -19,7 +20,7 @@ import { urlPath, getValueFor, delete_token } from "../lib";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import COLORS from "../../assets/Colors/colors";
-
+import { Profilestyles } from "./AddScreenStyles";
 const SucessMessage = () => {
   Toast.show({
     type: "success",
@@ -39,6 +40,7 @@ const resetToFirstScreen = (navigation) => {
 };
 
 export default function ProfileScreen({ navigation }) {
+  const [darkMode, setDarkMode] = useState(false);
   const [form, setForm] = useState({
     darkMode: false,
     emailNotifications: true,
@@ -46,6 +48,34 @@ export default function ProfileScreen({ navigation }) {
   });
   const [userData, setUserData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+
+  const loadDarkModeState = async () => {
+    try {
+      const darkModeState = await AsyncStorage.getItem("darkMode");
+      if (darkModeState !== null) {
+        setDarkMode(JSON.parse(darkModeState));
+      }
+    } catch (error) {
+      console.error("Error loading Dark Mode state:", error);
+    }
+  };
+
+  const saveDarkModeState = async (darkMode) => {
+    try {
+      await AsyncStorage.setItem("darkMode", JSON.stringify(darkMode));
+    } catch (error) {
+      console.error("Error saving Dark Mode state:", error);
+    }
+  };
+
+  // Function to handle Dark Mode toggle
+  const handleDarkModeToggle = (darkMode) => {
+    setDarkMode(darkMode);
+    saveDarkModeState(darkMode);
+  };
+  useEffect(() => {
+    loadDarkModeState();
+  }, []);
 
   const fetchData = async () => {
     console.log("fetch data for profile");
@@ -143,10 +173,15 @@ export default function ProfileScreen({ navigation }) {
     );
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Settings</Text>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: darkMode ? COLORS.backgroundDark : COLORS.white,
+      }}
+    >
+      <View style={Profilestyles(darkMode).container}>
+        <View style={Profilestyles(darkMode).header}>
+          <Text style={Profilestyles(darkMode).title}>Settings</Text>
         </View>
 
         <ScrollView
@@ -154,26 +189,26 @@ export default function ProfileScreen({ navigation }) {
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         >
-          <View style={styles.profile}>
-            <View style={styles.profileHeader}>
+          <View style={Profilestyles(darkMode).profile}>
+            <View style={Profilestyles(darkMode).profileHeader}>
               {userData && userData.imageUrl ? (
                 <Image
                   source={{ uri: userData.imageUrl }}
-                  style={styles.profileAvatar}
+                  style={Profilestyles(darkMode).profileAvatar}
                 />
               ) : (
                 <Image
                   source={require("../../assets/images/userD.png")}
-                  style={styles.profileAvatar}
+                  style={Profilestyles(darkMode).profileAvatar}
                 />
               )}
 
               <View>
-                <Text style={styles.profileName}>
+                <Text style={Profilestyles(darkMode).profileName}>
                   {userData ? `${userData.firstName} ${userData.lastName}` : ""}
                 </Text>
 
-                <Text style={styles.profileHandle}>
+                <Text style={Profilestyles(darkMode).profileHandle}>
                   {userData ? `@${userData.uname}` : ""}
                 </Text>
               </View>
@@ -181,26 +216,39 @@ export default function ProfileScreen({ navigation }) {
 
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("editprofile");
+                navigation.navigate("editprofile", {
+                  darkMode,
+                  handleDarkModeToggle,
+                });
               }}
             >
-              <View style={styles.profileAction}>
-                <Text style={styles.profileActionText}>Edit Profile</Text>
+              <View style={Profilestyles(darkMode).profileAction}>
+                <Text style={Profilestyles(darkMode).profileActionText}>
+                  Edit Profile
+                </Text>
 
                 <FeatherIcon color={COLORS.white} name="edit-3" size={16} />
               </View>
             </TouchableOpacity>
           </View>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Management</Text>
+          <View style={Profilestyles(darkMode).section}>
+            <Text style={Profilestyles(darkMode).sectionTitle}>Management</Text>
 
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("dashboard");
+                navigation.navigate("dashboard", {
+                  darkMode,
+                  handleDarkModeToggle,
+                });
               }}
-              style={styles.row}
+              style={Profilestyles(darkMode).row}
             >
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon
                   color={COLORS.primary}
                   name="book-open"
@@ -208,8 +256,8 @@ export default function ProfileScreen({ navigation }) {
                 />
               </View>
 
-              <Text style={styles.rowLabel}>Dashboard</Text>
-              <View style={styles.rowSpacer} />
+              <Text style={Profilestyles(darkMode).rowLabel}>Dashboard</Text>
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -219,16 +267,24 @@ export default function ProfileScreen({ navigation }) {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("myproperty");
+                navigation.navigate("myproperty", {
+                  darkMode,
+                  handleDarkModeToggle,
+                });
               }}
-              style={styles.row}
+              style={Profilestyles(darkMode).row}
             >
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FontAwesome6 color={COLORS.primary} name="house" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>My property</Text>
-              <View style={styles.rowSpacer} />
+              <Text style={Profilestyles(darkMode).rowLabel}>My property</Text>
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -237,35 +293,50 @@ export default function ProfileScreen({ navigation }) {
               />
             </TouchableOpacity>
           </View>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preferences</Text>
+          <View style={Profilestyles(darkMode).section}>
+            <Text style={Profilestyles(darkMode).sectionTitle}>
+              Preferences
+            </Text>
 
-            <TouchableOpacity onPress={() => {}} style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <TouchableOpacity
+              onPress={() => {}}
+              style={Profilestyles(darkMode).row}
+            >
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="globe" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Language</Text>
+              <Text style={Profilestyles(darkMode).rowLabel}>Language</Text>
 
-              <View style={styles.rowSpacer} />
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon color="#C6C6C6" name="chevron-right" size={20} />
             </TouchableOpacity>
 
-            <View style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <View style={Profilestyles(darkMode).row}>
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="moon" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Dark Mode</Text>
+              <Text style={Profilestyles(darkMode).rowLabel}>Dark Mode</Text>
 
-              <View style={styles.rowSpacer} />
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <Switch
-                onValueChange={(darkMode) => setForm({ ...form, darkMode })}
-                value={form.darkMode}
+                onValueChange={(darkMode) => handleDarkModeToggle(darkMode)}
+                value={darkMode}
                 trackColor={{ false: "#767577", true: COLORS.primary }}
-                thumbColor={form.darkMode ? "#fff" : "#f4f3f4"}
+                thumbColor={darkMode ? "#fff" : "#f4f3f4"}
               />
             </View>
 
@@ -273,9 +344,14 @@ export default function ProfileScreen({ navigation }) {
               onPress={() => {
                 // handle onPress
               }}
-              style={styles.row}
+              style={Profilestyles(darkMode).row}
             >
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon
                   color={COLORS.primary}
                   name="navigation"
@@ -283,9 +359,9 @@ export default function ProfileScreen({ navigation }) {
                 />
               </View>
 
-              <Text style={styles.rowLabel}>Location</Text>
+              <Text style={Profilestyles(darkMode).rowLabel}>Location</Text>
 
-              <View style={styles.rowSpacer} />
+              <View style={Profilestyles.rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -294,14 +370,21 @@ export default function ProfileScreen({ navigation }) {
               />
             </TouchableOpacity>
 
-            <View style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <View style={Profilestyles(darkMode).row}>
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="at-sign" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Email Notifications</Text>
+              <Text style={Profilestyles(darkMode).rowLabel}>
+                Email Notifications
+              </Text>
 
-              <View style={styles.rowSpacer} />
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <Switch
                 onValueChange={(emailNotifications) =>
@@ -313,14 +396,21 @@ export default function ProfileScreen({ navigation }) {
               />
             </View>
 
-            <View style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <View style={Profilestyles(darkMode).row}>
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="bell" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Push Notifications</Text>
+              <Text style={Profilestyles(darkMode).rowLabel}>
+                Push Notifications
+              </Text>
 
-              <View style={styles.rowSpacer} />
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <Switch
                 onValueChange={(pushNotifications) =>
@@ -333,17 +423,25 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Resources</Text>
+          <View style={Profilestyles(darkMode).section}>
+            <Text style={Profilestyles(darkMode).sectionTitle}>Resources</Text>
 
-            <TouchableOpacity onPress={bugreport} style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <TouchableOpacity
+              onPress={bugreport}
+              style={Profilestyles(darkMode).row}
+            >
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="flag" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Report Bug</Text>
+              <Text style={Profilestyles(darkMode).rowLabel}>Report Bug</Text>
 
-              <View style={styles.rowSpacer} />
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -352,14 +450,22 @@ export default function ProfileScreen({ navigation }) {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={instahandlePress} style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <TouchableOpacity
+              onPress={instahandlePress}
+              style={Profilestyles(darkMode).row}
+            >
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="mail" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Contact Us</Text>
+              <Text style={Profilestyles(darkMode).rowLabel}>Contact Us</Text>
 
-              <View style={styles.rowSpacer} />
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -372,15 +478,22 @@ export default function ProfileScreen({ navigation }) {
               onPress={() => {
                 // handle onPress
               }}
-              style={styles.row}
+              style={Profilestyles(darkMode).row}
             >
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="star" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Rate in App Store</Text>
+              <Text style={Profilestyles(darkMode).rowLabel}>
+                Rate in App Store
+              </Text>
 
-              <View style={styles.rowSpacer} />
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -389,11 +502,21 @@ export default function ProfileScreen({ navigation }) {
               />
             </TouchableOpacity>
           </View>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Social media</Text>
+          <View style={Profilestyles(darkMode).section}>
+            <Text style={Profilestyles(darkMode).sectionTitle}>
+              Social media
+            </Text>
 
-            <TouchableOpacity onPress={instahandlePress} style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <TouchableOpacity
+              onPress={instahandlePress}
+              style={Profilestyles(darkMode).row}
+            >
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon
                   color={COLORS.primary}
                   name="instagram"
@@ -401,8 +524,8 @@ export default function ProfileScreen({ navigation }) {
                 />
               </View>
 
-              <Text style={styles.rowLabel}>instagram</Text>
-              <View style={styles.rowSpacer} />
+              <Text style={Profilestyles(darkMode).rowLabel}>instagram</Text>
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -414,14 +537,19 @@ export default function ProfileScreen({ navigation }) {
               onPress={() => {
                 // handle onPress
               }}
-              style={styles.row}
+              style={Profilestyles(darkMode).row}
             >
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="facebook" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Facebook</Text>
-              <View style={styles.rowSpacer} />
+              <Text style={Profilestyles(darkMode).rowLabel}>Facebook</Text>
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -429,13 +557,21 @@ export default function ProfileScreen({ navigation }) {
                 size={20}
               />
             </TouchableOpacity>
-            <TouchableOpacity onPress={xhandlePress} style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <TouchableOpacity
+              onPress={xhandlePress}
+              style={Profilestyles(darkMode).row}
+            >
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="x" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>X</Text>
-              <View style={styles.rowSpacer} />
+              <Text style={Profilestyles(darkMode).rowLabel}>X</Text>
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -444,16 +580,26 @@ export default function ProfileScreen({ navigation }) {
               />
             </TouchableOpacity>
           </View>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Account</Text>
+          <View style={Profilestyles(darkMode).section}>
+            <Text style={Profilestyles(darkMode).sectionTitle}>Account</Text>
 
-            <TouchableOpacity onPress={handleLogout} style={styles.row}>
-              <View style={[styles.rowIcon, { backgroundColor: COLORS.ligh }]}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={Profilestyles(darkMode).row}
+            >
+              <View
+                style={[
+                  Profilestyles(darkMode).rowIcon,
+                  { backgroundColor: COLORS.ligh },
+                ]}
+              >
                 <FeatherIcon color={COLORS.primary} name="log-out" size={20} />
               </View>
 
-              <Text style={styles.rowLabel}>Account Log out</Text>
-              <View style={styles.rowSpacer} />
+              <Text style={Profilestyles(darkMode).rowLabel}>
+                Account Log out
+              </Text>
+              <View style={Profilestyles(darkMode).rowSpacer} />
 
               <FeatherIcon
                 color={COLORS.primary}
@@ -468,122 +614,3 @@ export default function ProfileScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 24,
-    paddingHorizontal: 0,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-  },
-  header: {
-    paddingLeft: 24,
-    paddingRight: 24,
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: COLORS.primary,
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#929292",
-  },
-
-  /** Profile */
-  profile: {
-    paddingTop: 12,
-    paddingHorizontal: 24,
-    paddingBottom: 24,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: "#e3e3e3",
-  },
-  profileHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  profileAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 9999,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginRight: 12,
-  },
-  profileName: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#3d3d3d",
-  },
-  profileHandle: {
-    marginTop: 4,
-    fontSize: 15,
-    color: "#989898",
-  },
-  profileAction: {
-    marginTop: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-  },
-  profileActionText: {
-    marginRight: 8,
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#fff",
-  },
-  /** Section */
-  section: {
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    paddingVertical: 12,
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#9e9e9e",
-    textTransform: "uppercase",
-    letterSpacing: 1.1,
-  },
-  /** Row */
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    height: 50,
-    backgroundColor: "#f2f2f2",
-    borderRadius: 8,
-    marginBottom: 12,
-    paddingLeft: 12,
-    paddingRight: 12,
-  },
-  rowIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 9999,
-    marginRight: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  rowLabel: {
-    fontSize: 17,
-    fontWeight: "400",
-    color: "#0c0c0c",
-  },
-  rowSpacer: {
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-  },
-});

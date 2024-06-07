@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
+import { Dropdown, MultiSelect } from "react-native-element-dropdown";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { LogBox } from "react-native";
 import {
   StyleSheet,
   SafeAreaView,
@@ -18,6 +20,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  StatusBar,
 } from "react-native";
 import { COLORS } from "../../assets/theme";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -29,39 +32,39 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { getValueFor, urlPath } from "../lib";
 import Toast from "react-native-toast-message";
-const selectedDATA = [
+import {
+  sttyles,
+  styles11,
+  styles12,
+  styles2,
+  styles,
+  styles1,
+} from "./AddScreenStyles";
+import {
+  lessons,
+  nearbyLocations,
+  propertyFeatures,
+  provinces,
+  regions,
+  items,
+} from "./data";
+LogBox.ignoreAllLogs();
+const SelectedValues = [
   {
-    adtype: [],
-    adsubtype: [],
-    photos: [],
-    rel: [],
-    city: [],
-    areas: [],
-    rooms: [],
-    bathrooms: [],
-    roomstate: [],
-    buildingarea: [],
-    buildingfloor: [],
-    buildingage: [],
-    buildingrentperiod: [],
-    buildingkeyFeatures: [],
-    buildingadditionalBenefits: [],
-    buildingnearbyLocations: [],
-    buildingorientations: [],
-    adtitle: [],
-    addescription: [],
-    adprice: [],
     images: [],
-  },
-];
-const items = [
-  {
-    img: "https://images.pexels.com/photos/425343/pexels-photo-425343.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    address: "Apartments for Rent",
-  },
-  {
-    img: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    address: "Houses for Rent",
+    adsubtype: [],
+    addescription: [],
+    adtitle: [],
+    adprice: [],
+    Province: [],
+    Region: [],
+    FeatureLabels: [],
+    NearbyLocationLabels: [],
+    floor: [],
+    numberOfRooms: [],
+    numberOfBathrooms: [],
+    buildingAge: [],
+    PropertyArea: [],
   },
 ];
 
@@ -100,78 +103,6 @@ const DetailsScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  scrollViewContent: {
-    padding: 15,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 5,
-    color: COLORS.primary,
-    marginTop: 30,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 18,
-    marginBottom: 30,
-    color: COLORS.grey,
-    textAlign: "center",
-  },
-  card: {
-    borderRadius: 12,
-    borderColor: COLORS.grey,
-    borderWidth: 1,
-    marginBottom: 20,
-    marginTop: 5,
-  },
-  cardImg: {
-    width: "100%",
-    height: 180,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-  },
-  cardContent: {
-    padding: 15,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: COLORS.primary,
-    textAlign: "center",
-  },
-});
-
-const lessons = [
-  {
-    name: "Apartments for Rent",
-    name2: "Home for rent",
-  },
-  {
-    name: "Apartments for sale",
-    name2: "Home for sale",
-  },
-  {
-    name: "Hotel apartments and suites",
-    name2: "Home suitable for rent",
-  },
-  {
-    name: "Student apartments",
-    name2: "Student Home for rent",
-  },
-  {
-    name: "Apartments for sale",
-    name2: "Home suitable for sale",
-  },
-];
-
 const ListItems = ({ title, onPress }) => (
   <TouchableOpacity onPress={onPress} style={styles1.item}>
     <AntDesign name="arrowright" size={20} color="black" />
@@ -187,9 +118,9 @@ const DetailsScreen1 = () => {
   const handlePress = (item) => {
     const selectedName =
       address === "Apartments for Rent" ? item.name : item.name2;
-    selectedDATA[0].adsubtype = selectedName;
-    console.log(selectedDATA[0].adsubtype);
-    navigation.navigate("AdvertisementDetailsScreen", { selectedItem: item });
+    SelectedValues[0].adsubtype = selectedName;
+
+    navigation.navigate("detaillscreen");
   };
 
   const renderItem = ({ item }) => (
@@ -210,55 +141,244 @@ const DetailsScreen1 = () => {
     </View>
   );
 };
-const styles1 = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 70,
-  },
-  screenTitle: {
-    fontSize: 25,
 
-    textAlign: "center",
-    marginBottom: 20,
-    fontWeight: "bold",
-    color: COLORS.primary,
-  },
-  item: {
-    backgroundColor: "#fff",
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    flexDirection: "row-reverse",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderWidth: 2,
-    borderRadius: 5,
-    borderColor: "grey",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 16,
-  },
-  searchSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#000",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginHorizontal: 10,
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  input: {
-    flex: 1,
-    height: 40,
-    textAlign: "center",
-    backgroundColor: "#fff",
-  },
-});
+const Detailss = ({ navigation }) => {
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  const [selectedNearbyLocations, setSelectedNearbyLocations] = useState([]);
+  const [province, setProvince] = useState(null);
+  const [region, setRegion] = useState(null);
+  const [isProvinceFocus, setIsProvinceFocus] = useState(false);
+  const [isRegionFocus, setIsRegionFocus] = useState(false);
+  const [numberOfRooms, setNumberOfRooms] = useState("");
+  const [numberOfBathrooms, setNumberOfBathrooms] = useState("");
+  const [buildingAge, setBuildingAge] = useState("");
+  const [floor, setFloor] = useState("");
+  const [PropertyArea, setPropertyArea] = useState("");
+
+  const handleNumberOfRooms = (input = "") => {
+    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    setNumberOfRooms(numericValue);
+  };
+  const handlePropertyArea = (input = "") => {
+    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    setPropertyArea(numericValue);
+  };
+  const handleFloor = (input = "") => {
+    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    setFloor(numericValue);
+  };
+  const handleBuildingAge = (input = "") => {
+    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    setBuildingAge(numericValue);
+  };
+  const handleNumberOfBathrooms = (input = "") => {
+    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    setNumberOfBathrooms(numericValue);
+  };
+
+  const handleNext = () => {
+    if (
+      !province ||
+      !region ||
+      selectedFeatures.length === 0 ||
+      selectedNearbyLocations.length === 0 ||
+      floor == 0 ||
+      numberOfBathrooms == 0 ||
+      numberOfRooms == 0 ||
+      buildingAge == 0 ||
+      PropertyArea == 0
+    ) {
+      Alert.alert(
+        "Error",
+        "Please select a province, a region, at least one property feature, and at least one nearby location."
+      );
+      return;
+    }
+
+    const selectedProvince = provinces.find(
+      (item) => item.value === province
+    ).label;
+    const selectedRegion = regions[province].find(
+      (item) => item.value === region
+    ).label;
+    const selectedFeatureLabels = selectedFeatures
+      .map(
+        (item) =>
+          propertyFeatures.find((feature) => feature.value === item).label
+      )
+      .join(", ");
+    const selectedNearbyLocationLabels = selectedNearbyLocations
+      .map(
+        (item) =>
+          nearbyLocations.find((location) => location.value === item).label
+      )
+      .join(", ");
+
+    SelectedValues[0].Province = selectedProvince;
+    SelectedValues[0].PropertyArea = PropertyArea;
+    SelectedValues[0].Region = selectedRegion;
+    SelectedValues[0].numberOfRooms = numberOfRooms;
+    SelectedValues[0].numberOfBathrooms = numberOfBathrooms;
+    SelectedValues[0].buildingAge = buildingAge;
+    SelectedValues[0].floor = floor;
+    SelectedValues[0].FeatureLabels = selectedFeatureLabels;
+    SelectedValues[0].NearbyLocationLabels = selectedNearbyLocationLabels;
+    navigation.navigate("AdvertisementDetailsScreen");
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={sttyles.dismiss}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={sttyles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        <StatusBar barStyle={"dark-content"} />
+        <Text style={sttyles.title}>Property Selection</Text>
+        <View style={sttyles.card}>
+          <Dropdown
+            style={[
+              sttyles.dropdown,
+              isProvinceFocus && { borderColor: "blue" },
+            ]}
+            placeholderStyle={sttyles.placeholderStyle}
+            selectedTextStyle={sttyles.selectedTextStyle}
+            inputSearchStyle={sttyles.inputSearchStyle}
+            data={provinces}
+            search
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder={!isProvinceFocus ? "Select Province" : "..."}
+            searchPlaceholder="Search..."
+            value={province}
+            onFocus={() => setIsProvinceFocus(true)}
+            onBlur={() => setIsProvinceFocus(false)}
+            onChange={(item) => {
+              setProvince(item.value);
+              setRegion(null); // Reset region when province changes
+              setIsProvinceFocus(false);
+            }}
+          />
+          {province && (
+            <Dropdown
+              style={[
+                sttyles.dropdown,
+                isRegionFocus && { borderColor: "blue" },
+              ]}
+              placeholderStyle={sttyles.placeholderStyle}
+              selectedTextStyle={sttyles.selectedTextStyle}
+              inputSearchStyle={sttyles.inputSearchStyle}
+              iconStyle={sttyles.iconStyle}
+              data={regions[province]}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder={!isRegionFocus ? "Select Region" : "..."}
+              searchPlaceholder="Search..."
+              value={region}
+              onFocus={() => setIsRegionFocus(true)}
+              onBlur={() => setIsRegionFocus(false)}
+              onChange={(item) => {
+                setRegion(item.value);
+                setIsRegionFocus(false);
+              }}
+            />
+          )}
+
+          {region && (
+            <MultiSelect
+              style={sttyles.Selected}
+              placeholderStyle={sttyles.placeholderStyle}
+              selectedTextStyle={sttyles.selectedTextStyle}
+              inputSearchStyle={sttyles.inputSearchStyle}
+              iconStyle={sttyles.iconStyle}
+              search
+              data={propertyFeatures}
+              labelField="label"
+              valueField="value"
+              placeholder="Property Features"
+              searchPlaceholder="Search..."
+              value={selectedFeatures}
+              onChange={(item) => {
+                setSelectedFeatures(item);
+              }}
+              selectedStyle={sttyles.selectedStyle}
+            />
+          )}
+          {region && (
+            <MultiSelect
+              style={sttyles.Selected}
+              placeholderStyle={sttyles.placeholderStyle}
+              selectedTextStyle={sttyles.selectedTextStyle}
+              inputSearchStyle={sttyles.inputSearchStyle}
+              iconStyle={sttyles.iconStyle}
+              search
+              data={nearbyLocations}
+              labelField="label"
+              valueField="value"
+              placeholder="Nearby Locations"
+              searchPlaceholder="Search..."
+              value={selectedNearbyLocations}
+              onChange={(item) => {
+                setSelectedNearbyLocations(item);
+              }}
+              selectedStyle={sttyles.selectedStyle}
+            />
+          )}
+          <TextInput
+            style={sttyles.input}
+            value={floor}
+            onChangeText={(input = "") => handleFloor(input)}
+            keyboardType="numeric"
+            maxLength={3}
+            placeholder="Floor"
+            placeholderTextColor="#686D76"
+          />
+          <TextInput
+            style={sttyles.input}
+            value={numberOfRooms}
+            onChangeText={(input = "") => handleNumberOfRooms(input)}
+            keyboardType="numeric"
+            maxLength={2}
+            placeholder="Number of Rooms"
+            placeholderTextColor="#686D76"
+          />
+          <TextInput
+            style={sttyles.input}
+            value={numberOfBathrooms}
+            onChangeText={(input = "") => handleNumberOfBathrooms(input)}
+            keyboardType="numeric"
+            maxLength={3}
+            placeholder="Number of Bathrooms"
+            placeholderTextColor="#686D76"
+          />
+          <TextInput
+            style={sttyles.input}
+            value={buildingAge}
+            onChangeText={(input = "") => handleBuildingAge(input)}
+            keyboardType="numeric"
+            maxLength={3}
+            placeholder="Property Age ( Years )"
+            placeholderTextColor="#686D76"
+          />
+          <TextInput
+            style={sttyles.input}
+            value={PropertyArea}
+            onChangeText={(input = "") => handlePropertyArea(input)}
+            keyboardType="numeric"
+            maxLength={3}
+            placeholder="Property Area ( m² )"
+            placeholderTextColor="#686D76"
+          />
+          <TouchableOpacity style={sttyles.button} onPress={handleNext}>
+            <Text style={sttyles.buttonText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAwareScrollView>
+    </TouchableWithoutFeedback>
+  );
+};
 
 const DetailsScreen2 = ({ navigation }) => {
   const initialPhotos = new Array(12).fill(null);
@@ -302,10 +422,7 @@ const DetailsScreen2 = ({ navigation }) => {
       setPhotos(newPhotos);
 
       // Update selectedDATA with the selected image URIs
-      selectedDATA[0].images = selectedUris;
-
-      console.log("Updated photos:", newPhotos);
-      console.log("selectedDATA:", selectedDATA);
+      SelectedValues[0].images = selectedUris;
     }
   };
 
@@ -367,115 +484,17 @@ const DetailsScreen2 = ({ navigation }) => {
   );
 };
 
-const styles2 = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: "#fff",
-    paddingTop: 70,
-  },
-  title: {
-    fontSize: 25,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: COLORS.primary,
-    textAlign: "center",
-  },
-  dashedBox: {
-    borderWidth: 1,
-    borderColor: "lightblue",
-    borderRadius: 5,
-    borderStyle: "dashed",
-    padding: 10,
-    marginBottom: 30,
-    marginTop: 30,
-    marginLeft: 6,
-    width: "95%",
-  },
-  dashedBoxText: {
-    color: "grey",
-    textAlign: "left",
-    fontSize: 16,
-    paddingLeft: 5,
-  },
-  photoBox: {
-    width: "25%",
-    height: 80,
-    borderColor: "grey",
-    borderWidth: 1,
-    borderRadius: 5,
-    margin: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  addIconBox: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    flexWrap: "wrap",
-  },
-  bottomButton: {
-    backgroundColor: COLORS.primary,
-    padding: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
-    marginBottom: 36,
-  },
-  bottomButtonText: {
-    color: "#fff",
-    fontSize: 18,
-  },
-  firstPhotoBox: {
-    width: "25%",
-    height: 80,
-    borderColor: "grey",
-    borderWidth: 1,
-    borderRadius: 5,
-    margin: 5,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  firstAddIconBox: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  photo: {
-    width: "100%",
-    height: "100%",
-  },
-});
-
-const SettingItem = ({ text }) => {
-  return (
-    <View style={styles3.settingItem}>
-      <Text style={styles3.settingText}>{text}</Text>
-      <AntDesign
-        name="checkcircleo"
-        size={24}
-        color={COLORS.primary}
-        style={styles3.icon}
-      />
-    </View>
-  );
-};
-
 const AdvertisementDetailsScreen = ({ navigation }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
   const navigateToNext = () => {
-    navigation.navigate("Detail2", { title, description });
-    selectedDATA[0].adtitle = title;
-    selectedDATA[0].addescription = description;
-    console.log(selectedDATA[0].adtitle);
-    console.log(selectedDATA[0].addescription);
-    console.log(selectedDATA);
+    navigation.navigate("Detail2", {
+      title,
+      description,
+    });
+    SelectedValues[0].adtitle = title;
+    SelectedValues[0].addescription = description;
   };
 
   return (
@@ -488,7 +507,6 @@ const AdvertisementDetailsScreen = ({ navigation }) => {
           <Text style={styles11.subtitle}>
             Details increase your chance of getting a suitable tenant
           </Text>
-
           <View style={styles11.inputContainer}>
             <Text style={styles11.label}>Title:</Text>
             <TextInput
@@ -521,76 +539,6 @@ const AdvertisementDetailsScreen = ({ navigation }) => {
     </TouchableWithoutFeedback>
   );
 };
-const styles11 = {
-  container: {
-    flex: 1,
-    padding: 20,
-    paddingTop: 70,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 25,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: COLORS.primary,
-  },
-  subtitleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-  },
-  subtitle: {
-    fontWeight: "bold",
-    fontSize: 16,
-    color: "gray",
-    marginLeft: 10,
-    marginBottom: 20,
-  },
-
-  inputContainer: {
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 18,
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  bottomButton: {
-    backgroundColor: COLORS.primary,
-    padding: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
-  },
-  bottomButtonText: {
-    color: "#fff",
-    fontSize: 18,
-  },
-};
-const makeitEmpty = (selectedDATA) => {
-  selectedDATA.forEach((item) => {
-    Object.keys(item).forEach((key) => {
-      item[key] = [];
-    });
-  });
-
-  return selectedDATA;
-};
-const resetToFirstScreen = (navigation) => {
-  navigation.reset({
-    index: 0,
-    routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
-  });
-};
 
 const showToast = () => {
   Toast.show({
@@ -598,10 +546,9 @@ const showToast = () => {
     text1: "Warning",
     text2: "Please enter all required data before posting.",
     autoHide: true,
-    visibilityTime: 2000,
+    visibilityTime: 1000,
   });
 };
-
 const PostedDeniedToast = () => {
   Toast.show({
     type: "error",
@@ -611,18 +558,19 @@ const PostedDeniedToast = () => {
     visibilityTime: 3000, // 3 seconds
   });
 };
+
 const WhatPriceScreen = ({ navigation, route }) => {
   const [price, setPrice] = useState("");
   const { photos } = route.params;
   const navigateToNext = () => {
-    const makeitEmpty = (selectedDATA) => {
-      selectedDATA.forEach((item) => {
+    const makeitEmpty = (SelectedValues) => {
+      SelectedValues.forEach((item) => {
         Object.keys(item).forEach((key) => {
           item[key] = [];
         });
       });
 
-      return selectedDATA;
+      return SelectedValues;
     };
     const resetToFirstScreen = (navigation) => {
       navigation.reset({
@@ -643,13 +591,24 @@ const WhatPriceScreen = ({ navigation, route }) => {
           text: "Yes",
           onPress: async () => {
             // Handle the case when the user confirms to share the post
-            selectedDATA[0].adprice = price;
 
+            SelectedValues[0].adprice = price;
             const handleSavePost = async () => {
+              console.log(
+                SelectedValues[0].NearbyLocationLabels,
+                SelectedValues[0].Province,
+                SelectedValues[0].PropertyArea,
+                SelectedValues[0].Region,
+                SelectedValues[0].numberOfRooms,
+                SelectedValues[0].numberOfBathrooms,
+                SelectedValues[0].buildingAge,
+                SelectedValues[0].floor,
+                SelectedValues[0].FeatureLabels
+              );
               if (
-                !selectedDATA[0].adtitle ||
-                !selectedDATA[0].addescription ||
-                !selectedDATA[0].adprice
+                !SelectedValues[0].adtitle ||
+                !SelectedValues[0].addescription ||
+                !SelectedValues[0].adprice
               ) {
                 showToast();
                 return;
@@ -657,9 +616,9 @@ const WhatPriceScreen = ({ navigation, route }) => {
               const url = urlPath + "/property";
               const token = await getValueFor("token");
               let data = JSON.stringify({
-                name: selectedDATA[0].adtitle,
-                description: selectedDATA[0].addescription,
-                price: selectedDATA[0].adprice,
+                name: SelectedValues[0].adtitle,
+                description: SelectedValues[0].addescription,
+                price: SelectedValues[0].adprice,
               });
 
               let config = {
@@ -672,8 +631,7 @@ const WhatPriceScreen = ({ navigation, route }) => {
                 },
                 data: data,
               };
-              console.log("saving Post");
-              console.log(config);
+
               await axios
                 .request(config)
                 .then((response) => {
@@ -681,7 +639,7 @@ const WhatPriceScreen = ({ navigation, route }) => {
                   console.log(JSON.stringify("ID For Property"));
                   console.log(JSON.stringify(response.data.id));
                   handleAddImageToPost(response.data.id);
-                  makeitEmpty(selectedDATA);
+                  makeitEmpty(SelectedValues);
                   resetToFirstScreen(navigation);
                 })
                 .catch((error) => {});
@@ -729,7 +687,7 @@ const WhatPriceScreen = ({ navigation, route }) => {
         {
           text: "No",
           onPress: () => {
-            makeitEmpty(selectedDATA);
+            makeitEmpty();
             resetToFirstScreen(navigation);
           },
         },
@@ -801,60 +759,6 @@ const WhatPriceScreen = ({ navigation, route }) => {
   );
 };
 
-const styles12 = {
-  container: {
-    flex: 1,
-    padding: 20,
-    paddingTop: 70,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 25,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 25,
-    color: COLORS.primary,
-  },
-  subtitleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontWeight: "bold",
-    fontSize: 16,
-    color: "black",
-    marginLeft: 10,
-  },
-  icon: {
-    marginRight: 10,
-  },
-  label: {
-    fontSize: 18,
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  bottomButton: {
-    backgroundColor: COLORS.primary,
-    padding: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
-  },
-  bottomButtonText: {
-    color: "#fff",
-    fontSize: 18,
-  },
-};
-
 export default function App() {
   return (
     <NavigationContainer independent={true}>
@@ -885,6 +789,12 @@ export default function App() {
               <SettingsStack.Screen
                 name="WhatPriceScreen"
                 component={WhatPriceScreen}
+                options={{ headerShown: false }}
+              />
+
+              <SettingsStack.Screen
+                name="detaillscreen"
+                component={Detailss}
                 options={{ headerShown: false }}
               />
             </SettingsStack.Navigator>

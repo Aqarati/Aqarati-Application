@@ -142,9 +142,9 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
     fetchUserProfileData();
     fetchUserPropertyData();
 
-    const intervalId = setInterval(fetchUserPropertyData, 6000); // Fetch every 60 seconds
+    // const intervalId = setInterval(fetchUserPropertyData, 6000); // Fetch every 60 seconds
 
-    return () => clearInterval(intervalId); // Clear interval on component unmount
+    // return () => clearInterval(intervalId); // Clear interval on component unmount
   }, []);
 
   const onRefresh = () => {

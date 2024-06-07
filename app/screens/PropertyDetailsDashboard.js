@@ -32,7 +32,7 @@ const PropertyDetailsDashboard = ({ route }) => {
   const [name, setName] = useState(property.name);
   const [description, setDescription] = useState(property.description);
   const [price, setPrice] = useState(property.price.toString());
-
+  const { darkMode, handleDarkModeToggle } = route.params;
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visible, setVisible] = useState(false);
@@ -146,10 +146,15 @@ const PropertyDetailsDashboard = ({ route }) => {
           },
           data: data,
         };
-
+        console.log(config);
         let response = await axios(config);
+        console.log(response);
         console.log(JSON.stringify(response.data));
-        Alert.alert("Success", "Image uploaded successfully");
+        Toast.show({
+          type: "success",
+          text1: "Image saved successfully",
+          text2: "The Document Uploaded ..",
+        });
       }
     } catch (error) {}
   };
@@ -231,7 +236,11 @@ const PropertyDetailsDashboard = ({ route }) => {
   };
 
   const handleDocumentPress = () => {
-    navigation.navigate("DocumentPage", { propertyId: property.id });
+    navigation.navigate("DocumentPage", {
+      propertyId: property.id,
+      handleDarkModeToggle,
+      darkMode,
+    });
   };
 
   const updateStatus = async (newStatus) => {
@@ -299,30 +308,33 @@ const PropertyDetailsDashboard = ({ route }) => {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.container}>
+      <View style={styles(darkMode).container}>
         {loading && (
-          <View style={styles.loadingOverlay}>
+          <View style={styles(darkMode).loadingOverlay}>
             <ActivityIndicator size="large" color={COLORS.primary} />
           </View>
         )}
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={styles(darkMode).scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Edit Property Details</Text>
-          <View style={styles.imageContainer}>
+          <Text style={styles(darkMode).title}>Edit Property Details</Text>
+          <View style={styles(darkMode).imageContainer}>
             <FlatList
               data={property.propertyImages}
               renderItem={({ item, index }) => (
-                <View style={styles.imageWrapper}>
+                <View style={styles(darkMode).imageWrapper}>
                   <TouchableOpacity onPress={() => openImageViewer(index)}>
-                    <Image source={{ uri: item.imgUrl }} style={styles.image} />
+                    <Image
+                      source={{ uri: item.imgUrl }}
+                      style={styles(darkMode).image}
+                    />
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.vrButton}
+                    style={styles(darkMode).vrButton}
                     onPress={() => toggleVRStatus(item.id, item.vr)}
                   >
-                    <Text style={styles.vrButtonText}>
+                    <Text style={styles(darkMode).vrButtonText}>
                       {item.vr ? "Deactivate VR" : "Activate VR"}
                     </Text>
                   </TouchableOpacity>
@@ -343,20 +355,22 @@ const PropertyDetailsDashboard = ({ route }) => {
             onRequestClose={() => setVisible(false)}
           />
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Property Title</Text>
+          <View style={styles(darkMode).inputContainer}>
+            <Text style={styles(darkMode).inputLabel}>Property Title</Text>
             <TextInput
-              style={styles.input}
+              style={styles(darkMode).input}
               value={name}
               onChangeText={setName}
               placeholder="Enter title"
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Property Description</Text>
+          <View style={styles(darkMode).inputContainer}>
+            <Text style={styles(darkMode).inputLabel}>
+              Property Description
+            </Text>
             <TextInput
-              style={[styles.input, styles.multilineInput]}
+              style={[styles(darkMode).input, styles(darkMode).multilineInput]}
               value={description}
               onChangeText={setDescription}
               placeholder="Enter description"
@@ -364,10 +378,10 @@ const PropertyDetailsDashboard = ({ route }) => {
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Property Price</Text>
+          <View style={styles(darkMode).inputContainer}>
+            <Text style={styles(darkMode).inputLabel}>Property Price</Text>
             <TextInput
-              style={styles.input}
+              style={styles(darkMode).input}
               value={price}
               onChangeText={setPrice}
               placeholder="Enter price"
@@ -376,74 +390,91 @@ const PropertyDetailsDashboard = ({ route }) => {
             />
           </View>
 
-          <View style={styles.buttonContainer}>
+          <View style={styles(darkMode).buttonContainer}>
             <TouchableOpacity
-              style={[styles.saveButton, styles.doubleWidth]}
+              style={[
+                styles(darkMode).saveButton,
+                styles(darkMode).doubleWidth,
+              ]}
               onPress={handleSave}
             >
               <AntDesign
                 name="save"
                 size={22}
                 color="white"
-                style={styles.icon}
+                style={styles(darkMode).icon}
               />
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles(darkMode).saveButtonText}>Save</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.statusButton, styles.doubleWidth]}
+              style={[
+                styles(darkMode).saveButton,
+                styles(darkMode).doubleWidth,
+              ]}
               onPress={() => setModalVisible(true)}
             >
               <Feather
                 name="menu"
                 size={22}
                 color="white"
-                style={styles.icon}
+                style={styles(darkMode).icon}
               />
-              <Text style={styles.saveButtonText}>Status</Text>
+              <Text style={styles(darkMode).saveButtonText}>Status</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.buttonContainer1}>
+          <View style={styles(darkMode).buttonContainer1}>
             <TouchableOpacity
-              style={[styles.saveButton, styles.doubleWidth]}
+              style={[
+                styles(darkMode).saveButton,
+                styles(darkMode).doubleWidth,
+              ]}
               onPress={UploadDocument}
             >
               <AntDesign
                 name="addfile"
                 size={22}
                 color="white"
-                style={styles.icon}
+                style={styles(darkMode).icon}
               />
-              <Text style={styles.saveButtonText}>Upload Document</Text>
+              <Text style={styles(darkMode).saveButtonText}>
+                Upload Document
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.saveButton, styles.doubleWidth]}
+              style={[
+                styles(darkMode).saveButton,
+                styles(darkMode).doubleWidth,
+              ]}
               onPress={handlePhotos}
             >
               <AntDesign
                 name="upload"
                 size={22}
                 color="white"
-                style={styles.icon}
+                style={styles(darkMode).icon}
               />
-              <Text style={styles.saveButtonText}>Upload Photos</Text>
+              <Text style={styles(darkMode).saveButtonText}>Upload Photos</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.buttonContainer1}>
+          <View style={styles(darkMode).buttonContainer1}>
             <TouchableOpacity
-              style={[styles.saveButton, styles.doubleWidth]}
+              style={[
+                styles(darkMode).saveButton,
+                styles(darkMode).doubleWidth,
+              ]}
               onPress={handleDocumentPress}
             >
               <AntDesign
                 name="filetext1"
                 size={22}
                 color="white"
-                style={styles.icon}
+                style={styles(darkMode).icon}
               />
-              <Text style={styles.saveButtonText}>
+              <Text style={styles(darkMode).saveButtonText}>
                 Look at Property Document
               </Text>
             </TouchableOpacity>
@@ -455,12 +486,12 @@ const PropertyDetailsDashboard = ({ route }) => {
             onRequestClose={() => setModalVisible(false)}
           >
             <TouchableOpacity
-              style={styles.modalBackground}
+              style={styles(darkMode).modalBackground}
               activeOpacity={1}
               onPressOut={() => setModalVisible(false)}
             >
-              <View style={styles.modalContainer}>
-                <Text style={styles.modalTitle}>Update Status</Text>
+              <View style={styles(darkMode).modalContainer}>
+                <Text style={styles(darkMode).modalTitle}>Update Status</Text>
                 {[
                   {
                     status: "Available",
@@ -477,10 +508,10 @@ const PropertyDetailsDashboard = ({ route }) => {
                   <TouchableOpacity
                     key={statusOption.status}
                     style={[
-                      styles.modalButton,
+                      styles(darkMode).modalButton,
                       { backgroundColor: statusOption.color },
                       status === statusOption.status &&
-                        styles.modalButtonSelected,
+                        styles(darkMode).modalButtonSelected,
                     ]}
                     onPress={() => updateStatus(statusOption.status)}
                   >
@@ -492,9 +523,9 @@ const PropertyDetailsDashboard = ({ route }) => {
                     />
                     <Text
                       style={[
-                        styles.modalButtonText,
+                        styles(darkMode).modalButtonText,
                         status === statusOption.status &&
-                          styles.modalButtonTextSelected,
+                          styles(darkMode).modalButtonTextSelected,
                       ]}
                     >
                       {statusOption.status.charAt(0).toUpperCase() +
@@ -511,178 +542,172 @@ const PropertyDetailsDashboard = ({ route }) => {
     </KeyboardAvoidingView>
   );
 };
-const styles = StyleSheet.create({
-  modalBackground: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "80%",
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  modalButton: {
-    width: "100%",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginVertical: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  modalButtonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  modalButtonSelected: {
-    backgroundColor: COLORS.secondary,
-  },
-  modalButtonTextSelected: {
-    color: "#fff",
-  },
+const styles = (darkMode) =>
+  StyleSheet.create({
+    modalBackground: {
+      flex: 1,
+      backgroundColor: darkMode
+        ? "rgba(255, 255, 255, 0.5)"
+        : "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContainer: {
+      width: "80%",
+      backgroundColor: darkMode ? "#333" : "#fff",
+      padding: 20,
+      borderRadius: 10,
+      alignItems: "center",
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 16,
+      color: darkMode ? "#fff" : COLORS.primary,
+    },
+    modalButton: {
+      width: "100%",
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      marginVertical: 8,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    modalButtonText: {
+      color: "#FFF",
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    modalButtonSelected: {
+      backgroundColor: COLORS.secondary,
+    },
+    modalButtonTextSelected: {
+      color: "#fff",
+    },
 
-  button: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 8,
-  },
-  saveButton: {
-    backgroundColor: COLORS.primary,
-  },
-  uploadButton: {
-    backgroundColor: COLORS.secondary,
-  },
-  documentButton: {
-    backgroundColor: COLORS.tertiary,
-  },
-  statusButton: {
-    backgroundColor: COLORS.quaternary,
-  },
+    button: {
+      flex: 1,
+      padding: 16,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      marginHorizontal: 8,
+    },
 
-  buttonContainer1: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: -15,
-    marginHorizontal: 18,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: -20,
-    marginHorizontal: 18,
-  },
-  doubleWidth: {
-    flex: 1,
-    marginHorizontal: 2,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 15,
-    marginTop: 80,
-    paddingHorizontal: 20,
-    textAlign: "center",
-    color: COLORS.primary,
-  },
-  imageContainer: {
-    marginBottom: 20,
-    paddingHorizontal: 20,
-  },
-  imageWrapper: {
-    position: "relative",
-    marginRight: 10,
-  },
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 10,
-  },
-  icon: {
-    marginRight: 10,
-  },
-  vrButton: {
-    position: "absolute",
-    bottom: 5,
-    left: 5,
-    backgroundColor: COLORS.primary,
-    borderRadius: 5,
-    padding: 5,
-  },
-  vrButtonText: {
-    color: "white",
-  },
-  inputContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
-  inputLabel: {
-    fontSize: 20,
-    color: COLORS.primary,
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-  },
-  multilineInput: {
-    height: 100,
-  },
-  saveButton: {
-    backgroundColor: COLORS.primary,
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-    marginHorizontal: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  statusButton: {
-    backgroundColor: COLORS.primary,
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-    marginHorizontal: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  loadingOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1,
-  },
-});
+    uploadButton: {
+      backgroundColor: COLORS.secondary,
+    },
+    documentButton: {
+      backgroundColor: COLORS.tertiary,
+    },
+    statusButton: {
+      backgroundColor: COLORS.quaternary,
+    },
+
+    buttonContainer1: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: -15,
+      marginHorizontal: 18,
+    },
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: -20,
+      marginHorizontal: 18,
+    },
+    doubleWidth: {
+      flex: 1,
+      marginHorizontal: 2,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: darkMode ? "#333" : "#fff",
+    },
+    scrollContent: {
+      paddingBottom: 100,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "bold",
+      marginBottom: 15,
+      marginTop: 80,
+      paddingHorizontal: 20,
+      textAlign: "center",
+      color: darkMode ? COLORS.primary : COLORS.primary,
+    },
+    imageContainer: {
+      marginBottom: 20,
+      paddingHorizontal: 20,
+    },
+    imageWrapper: {
+      position: "relative",
+      marginRight: 10,
+    },
+    image: {
+      width: 200,
+      height: 200,
+      borderRadius: 10,
+    },
+    icon: {
+      marginRight: 10,
+    },
+    vrButton: {
+      position: "absolute",
+      bottom: 5,
+      left: 5,
+      backgroundColor: COLORS.primary,
+      borderRadius: 5,
+      padding: 5,
+    },
+    vrButtonText: {
+      color: "white",
+    },
+    inputContainer: {
+      paddingHorizontal: 20,
+      marginBottom: 10,
+    },
+    inputLabel: {
+      fontSize: 20,
+      color: COLORS.primary,
+      marginBottom: 5,
+      fontWeight: "bold",
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: darkMode ? "#999" : "#ccc",
+      padding: 10,
+      borderRadius: 5,
+      color: darkMode ? "#fff" : "#000",
+    },
+    multilineInput: {
+      height: 100,
+    },
+    saveButton: {
+      backgroundColor: COLORS.primary,
+      padding: 10,
+      borderRadius: 5,
+      marginTop: 20,
+      marginHorizontal: 10,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    saveButtonText: {
+      color: "white",
+      fontWeight: "bold",
+    },
+    gOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: darkMode ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 1,
+    },
+  });
 
 export default PropertyDetailsDashboard;

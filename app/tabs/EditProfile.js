@@ -14,13 +14,12 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import COLORS from "../../assets/Colors/colors";
 import { getValueFor, urlPath } from "../lib";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { useNavigation } from "@react-navigation/native";
 
-const MyAccountItem = ({ title, value, onPress }) => (
-  <TouchableOpacity onPress={onPress} style={styles.item}>
-    <Text style={styles.label}>{title}</Text>
-    <Text numberOfLines={1} style={styles.value}>
+const MyAccountItem = ({ title, value, onPress, darkMode }) => (
+  <TouchableOpacity onPress={onPress} style={styles(darkMode).item}>
+    <Text style={styles(darkMode).label}>{title}</Text>
+    <Text numberOfLines={1} style={styles(darkMode).value}>
       {value}
     </Text>
     {onPress && (
@@ -28,13 +27,20 @@ const MyAccountItem = ({ title, value, onPress }) => (
         name="edit"
         size={20}
         color={COLORS.primary}
-        style={styles.editIcon}
+        style={styles(darkMode).editIcon}
       />
     )}
   </TouchableOpacity>
 );
 
-const EditFieldModal = ({ visible, onClose, title, value, onSave }) => {
+const EditFieldModal = ({
+  visible,
+  onClose,
+  title,
+  value,
+  onSave,
+  darkMode,
+}) => {
   const [newValue, setNewValue] = useState(value);
 
   useEffect(() => {
@@ -48,24 +54,30 @@ const EditFieldModal = ({ visible, onClose, title, value, onSave }) => {
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Edit {title}</Text>
+      <View style={styles(darkMode).modalContainer}>
+        <View style={styles(darkMode).modalContent}>
+          <Text style={styles(darkMode).modalTitle}>Edit {title}</Text>
           <TextInput
-            style={styles.input}
+            style={styles(darkMode).input}
             value={newValue}
             onChangeText={setNewValue}
             placeholder={`Enter new ${title}`}
-            placeholderTextColor="#aaa" 
+            placeholderTextColor="#aaa"
           />
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
+          <View style={styles(darkMode).buttonContainer}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={styles(darkMode).cancelButton}
+            >
               <MaterialIcons name="cancel" size={26} color="#fff" />
-              <Text style={styles.buttonText}>Cancel</Text>
+              <Text style={styles(darkMode).buttonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
+            <TouchableOpacity
+              onPress={handleSave}
+              style={styles(darkMode).saveButton}
+            >
               <AntDesign name="edit" size={26} color="#fff" />
-              <Text style={styles.buttonText}>Save</Text>
+              <Text style={styles(darkMode).buttonText}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -74,11 +86,11 @@ const EditFieldModal = ({ visible, onClose, title, value, onSave }) => {
   );
 };
 
-const MyAccountScreen = () => {
+const MyAccountScreen = ({ route }) => {
+  const { darkMode, handleDarkModeToggle } = route.params;
   const navigation = useNavigation();
   const [editingField, setEditingField] = useState(null);
   const [userData, setUserData] = useState({});
-  const route = useRoute();
 
   const fetchUserProfileData = async () => {
     try {
@@ -116,7 +128,8 @@ const MyAccountScreen = () => {
 
   const requestMediaLibraryPermissions = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         alert("Sorry, we need camera roll permissions to make this work!");
       }
@@ -167,11 +180,11 @@ const MyAccountScreen = () => {
     try {
       // Request permission to access the photo library
       let { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Permission to access the photo library is required!');
+      if (status !== "granted") {
+        alert("Permission to access the photo library is required!");
         return;
       }
-  
+
       // Launch the image library
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -180,19 +193,17 @@ const MyAccountScreen = () => {
         aspect: [1, 1], // Set aspect ratio to 1:1 for a square crop
         quality: 1,
       });
-  
-     
-  
+
       console.log(result);
       let data = new FormData();
       const token = await getValueFor("token");
-  
+
       data.append("profile-image", {
         uri: result.assets[0].uri, // Use result.uri directly since assets is not defined
         name: `image.png`,
         type: "image/png",
       });
-  
+
       let config = {
         method: "put",
         url: `${urlPath}/user/profile/image`,
@@ -202,54 +213,56 @@ const MyAccountScreen = () => {
         },
         data: data,
       };
-  
+
       const response = await axios.request(config);
       console.log(JSON.stringify(response.data));
-  
+
       setUserData((prevData) => ({
         ...prevData,
         imageUrl: response.data.imageUrl,
       }));
-  
+
       // Fetch updated user profile data to refresh the imageUrl
       await fetchUserProfileData();
-  
+
       // Navigate to the previous screen and refresh the data
       navigation.goBack();
       navigation.navigate("Main", { refresh: true });
-    } catch (error) {
-     
-    }
+    } catch (error) {}
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.touchable} onPress={selectImage}>
-      <View>
-      <Image
-          style={profilestyle.avatar}
-          source={
-            userData.imageUrl && userData.imageUrl !== ""
-              ? { uri: userData.imageUrl }
-              : require("../../assets/images/userD.png")
-          }
-        />
-        
+    <View style={styles(darkMode).container}>
+      <TouchableOpacity
+        style={styles(darkMode).touchable}
+        onPress={selectImage}
+      >
+        <View>
+          <Image
+            style={profilestyle(darkMode).avatar}
+            source={
+              userData.imageUrl && userData.imageUrl !== ""
+                ? { uri: userData.imageUrl }
+                : require("../../assets/images/userD.png")
+            }
+          />
         </View>
       </TouchableOpacity>
-      <Text style={styles.screenTitle}>MY ACCOUNT</Text>
-      <ScrollView style={styles.listContainer}>
+      <Text style={styles(darkMode).screenTitle}>MY ACCOUNT</Text>
+      <ScrollView style={styles(darkMode).listContainer}>
         <MyAccountItem
           key="firstName"
           title="First Name"
           value={userData.firstName}
           onPress={() => handleEdit("firstName")}
+          darkMode={darkMode} // Pass darkMode prop
         />
         <MyAccountItem
           key="lastName"
           title="Last Name"
           value={userData.lastName}
           onPress={() => handleEdit("lastName")}
+          darkMode={darkMode} // Pass darkMode prop
         />
       </ScrollView>
       <EditFieldModal
@@ -258,133 +271,139 @@ const MyAccountScreen = () => {
         title={editingField}
         value={userData[editingField]}
         onSave={(newValue) => handleSave(newValue, editingField)}
+        darkMode={darkMode} // Pass darkMode prop
       />
     </View>
   );
 };
 
-const profilestyle = StyleSheet.create({
-  avatar: {
-    width: 225,
-    height: 225,
-    borderRadius: 9999,
-  },
-  avatarWrapper: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 250,
-    height: 250,
-    borderRadius: 9999,
-    backgroundColor:"#fff", // Fallback background color
-  },
-  icon: {
-    alignSelf: "center",
-  },
-  iconWrapper: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 250,
-    height: 250,
-    borderRadius: 9999,
-    backgroundColor: COLORS.primary,
-  }
-});
+const profilestyle = (darkMode) =>
+  StyleSheet.create({
+    avatar: {
+      width: 225,
+      height: 225,
+      borderRadius: 9999,
+    },
+    avatarWrapper: {
+      justifyContent: "center",
+      alignItems: "center",
+      width: 250,
+      height: 250,
+      borderRadius: 9999,
+      backgroundColor: darkMode ? COLORS.backgroundDark : "#fff", // Dark mode or fallback background color
+    },
+    icon: {
+      alignSelf: "center",
+    },
+    iconWrapper: {
+      justifyContent: "center",
+      alignItems: "center",
+      width: 250,
+      height: 250,
+      borderRadius: 9999,
+      backgroundColor: COLORS.primary, // Adjust this to the appropriate dark mode color
+    },
+  });
 
-const styles = StyleSheet.create({
-  touchable: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-    paddingTop: 70,
-    backgroundColor: "#fff",
-  },
-  screenTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 30,
-  },
-  listContainer: {
-    flex: 1,
-  },
-  item: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  label: {
-    fontSize: 16,
-    color: COLORS.primary,
-    marginBottom: 5,
-  },
-  value: {
-    fontSize: 18,
-    color: "#333",
-  },
-  editIcon: {
-    position: "absolute",
-    right: 10,
-    top: 40,
-    transform: [{ translateY: -10 }],
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    width: "80%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  input: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  cancelButton: {
-    flexDirection: "row",
-    backgroundColor: "red",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    marginRight: 10,
-  },
-  saveButton: {
-    flexDirection: "row",
-    backgroundColor: COLORS.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: "center",
-    marginLeft: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    marginLeft: 5,
-  },
-});
+const styles = (darkMode) =>
+  StyleSheet.create({
+    touchable: {
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    container: {
+      flex: 1,
+      padding: 20,
+      paddingTop: 70,
+      backgroundColor: darkMode ? COLORS.backgroundDark : "#fff", // Dark mode or fallback background color
+    },
+    screenTitle: {
+      fontSize: 24,
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: 30,
+      color: darkMode ? COLORS.white : COLORS.primary, // Dark mode or fallback text color
+    },
+    listContainer: {
+      flex: 1,
+    },
+    item: {
+      backgroundColor: darkMode ? COLORS.backgroundDark : "#fff", // Dark mode or fallback background color
+      padding: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: darkMode ? COLORS.borderDark : "#eee", // Dark mode or fallback border color
+    },
+    label: {
+      fontSize: 16,
+      color: darkMode ? COLORS.primary : COLORS.primary, // Adjust this to the appropriate dark mode color
+      marginBottom: 5,
+    },
+    value: {
+      fontSize: 18,
+      color: darkMode ? COLORS.textDark : "#333", // Dark mode or fallback text color
+    },
+    editIcon: {
+      position: "absolute",
+      right: 10,
+      top: 40,
+      transform: [{ translateY: -10 }],
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+      width: "80%",
+      backgroundColor: darkMode ? COLORS.backgroundDark : "#fff", // Dark mode or fallback background color
+      borderRadius: 10,
+      padding: 20,
+      alignItems: "center",
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 20,
+      color: darkMode ? COLORS.textDark : "#000", // Dark mode or fallback text color
+    },
+    input: {
+      width: "100%",
+      borderWidth: 1,
+      borderColor: darkMode ? COLORS.borderDark : "#ccc", // Dark mode or fallback border color
+      borderRadius: 5,
+      padding: 10,
+      fontSize: 16,
+      marginBottom: 20,
+      color: darkMode ? COLORS.textDark : "#333", // Dark mode or fallback text color
+    },
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+    },
+    cancelButton: {
+      flexDirection: "row",
+      backgroundColor: "red",
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 5,
+      alignItems: "center",
+      marginRight: 10,
+    },
+    saveButton: {
+      flexDirection: "row",
+      backgroundColor: darkMode ? COLORS.primary : COLORS.primary, // Adjust this to the appropriate dark mode color
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 5,
+      alignItems: "center",
+      marginLeft: 10,
+    },
+    buttonText: {
+      color: "#fff",
+      marginLeft: 5,
+    },
+  });
 
 export default MyAccountScreen;

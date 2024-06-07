@@ -17,11 +17,11 @@ import { urlPath, getValueFor } from "../lib";
 
 import MyPropertyCards from "../components/MyPropertyCards";
 
-export default function Myproperty({ navigation }) {
+export default function Myproperty({ navigation, route }) {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
+  const { darkMode, handleDarkModeToggle } = route.params;
   const fetchProperties = async () => {
     console.log("Fetching properties");
     const url = urlPath + "/property/my";
@@ -86,20 +86,28 @@ export default function Myproperty({ navigation }) {
   }, [loading, properties]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <Text style={styles.title}>My Properties</Text>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: darkMode ? COLORS.backgroundDark : COLORS.white,
+      }}
+    >
+      <Text style={styles(darkMode).title}>My Properties</Text>
       <ScrollView
         contentContainerStyle={[
-          styles.container,
-          { paddingBottom: 0, backgroundColor: "#fff" },
+          styles(darkMode).container,
+          { paddingBottom: 0 },
         ]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
         {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
+          <View style={styles(darkMode).loadingContainer}>
+            <ActivityIndicator
+              size="large"
+              color={darkMode ? COLORS.primary : COLORS.primary}
+            />
           </View>
         ) : (
           properties.map((property) => (
@@ -112,22 +120,24 @@ export default function Myproperty({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 15,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 33,
-    fontWeight: "700",
-    color: COLORS.primary,
-    marginTop: 30,
-    textAlign: "center",
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-  },
-});
+const styles = (darkMode) =>
+  StyleSheet.create({
+    container: {
+      padding: 15,
+      backgroundColor: darkMode ? COLORS.backgroundDark : COLORS.white,
+    },
+    title: {
+      fontSize: 33,
+      fontWeight: "700",
+      color: COLORS.primary,
+      marginTop: 30,
+      textAlign: "center",
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 20,
+      backgroundColor: darkMode ? COLORS.backgroundDark : COLORS.white,
+    },
+  });
