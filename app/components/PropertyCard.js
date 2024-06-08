@@ -4,12 +4,12 @@ import { Divider } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import COLORS from "../../assets/Colors/colors";
-import { getStoredBoolValue } from "../tabs/AddScreenStyles";
+import { getStoredBoolValue } from "../../assets/theme";
 
 const PropertyCard = ({ property }) => {
   const navigation = useNavigation();
-  const darkMode = getStoredBoolValue();
-  // Default image URL
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
 
   let imageUrls =
     "https://aqarati-app.s3.me-south-1.amazonaws.com/property-image/153/102.png";

@@ -8,10 +8,11 @@ import ChatScreen from "./ChatScreen";
 import LikeScreen from "./LikeScreen";
 import SearchScreen from "./SearchScreen";
 import MainScreen from "../screens/MainScreen";
-
+import { getStoredBoolValue } from "../../assets/theme";
 const Tab = createBottomTabNavigator();
-
 function Tabs() {
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
   const mainScreenRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -23,24 +24,24 @@ function Tabs() {
     search: SearchScreen,
   };
 
- const handleTabPress = (navigation, screen) => {
-  if (screen === "Main" && mainScreenRef.current) {
-    mainScreenRef.current.scrollToTop();
-    // Trigger animation when scrolling up
-   
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 100,
-      easing: Easing.linear,
-      useNativeDriver: true,
-    }).start(() => {
-      // Navigate to the "Main" screen after animation
+  const handleTabPress = (navigation, screen) => {
+    if (screen === "Main" && mainScreenRef.current) {
+      mainScreenRef.current.scrollToTop();
+      // Trigger animation when scrolling up
+
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start(() => {
+        // Navigate to the "Main" screen after animation
+        navigation.navigate(screen);
+      });
+    } else {
       navigation.navigate(screen);
-    });
-  } else {
-    navigation.navigate(screen);
-  }
-};
+    }
+  };
 
   useEffect(() => {
     // Reset animation value when component unmounts
@@ -80,20 +81,15 @@ function Tabs() {
         },
         headerShown: true,
         tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: "gray",
+        tabBarInactiveTintColor: darkMode ? COLORS.textDark : "gray",
         tabBarStyle: {
-          backgroundColor: "white",
+          backgroundColor: darkMode ? COLORS.darkGray : "white",
           paddingBottom: Platform.OS === "ios" ? 25 : 5,
-          height: 80,
+          height: 90,
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
           position: "absolute",
-          borderRadius: 20,
-          marginLeft: 10,
-          marginRight: 10,
-          marginBottom: 10,
-          marginTop: 10,
         },
       })}
     >

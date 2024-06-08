@@ -7,7 +7,6 @@ import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { LogBox } from "react-native";
 import {
-  StyleSheet,
   SafeAreaView,
   ScrollView,
   Text,
@@ -22,7 +21,7 @@ import {
   Alert,
   StatusBar,
 } from "react-native";
-import { COLORS } from "../../assets/theme";
+import { COLORS, getStoredBoolValue } from "../../assets/theme";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 const Tab = createBottomTabNavigator();
@@ -49,6 +48,7 @@ import {
   items,
 } from "./data";
 LogBox.ignoreAllLogs();
+
 const SelectedValues = [
   {
     images: [],
@@ -69,31 +69,38 @@ const SelectedValues = [
 ];
 
 const DetailsScreen = ({ navigation }) => {
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
   const handlePress = (address) => {
     navigation.push("Detail1", { address: address }); // Pass the address as a parameter
   };
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <Text style={styles.title}>What would you like to advertise?</Text>
-          <Text style={styles.subtitle}>
+    <View style={styles(darkMode).container}>
+      <SafeAreaView style={styles(darkMode).safeArea}>
+        <ScrollView contentContainerStyle={styles(darkMode).scrollViewContent}>
+          <Text style={styles(darkMode).title}>
+            What would you like to advertise?
+          </Text>
+          <Text style={styles(darkMode).subtitle}>
             Choose the appropriate section to add the advertisement
           </Text>
           {items.map(({ img, address }, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.card, index === 0 && { borderTopWidth: 2 }]}
+              style={[
+                styles(darkMode).card,
+                index === 0 && { borderTopWidth: 2 },
+              ]}
               onPress={() => handlePress(address)}
             >
               <Image
                 source={{ uri: img }}
-                style={styles.cardImg}
+                style={styles(darkMode).cardImg}
                 resizeMode="cover"
               />
-              <View style={styles.cardContent}>
-                <Text style={styles.cardTitle}>{address}</Text>
+              <View style={styles(darkMode).cardContent}>
+                <Text style={styles(darkMode).cardTitle}>{address}</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -103,14 +110,19 @@ const DetailsScreen = ({ navigation }) => {
   );
 };
 
-const ListItems = ({ title, onPress }) => (
-  <TouchableOpacity onPress={onPress} style={styles1.item}>
-    <AntDesign name="arrowright" size={20} color="black" />
-    <Text style={styles1.title}>{title}</Text>
+const ListItems = ({ title, onPress, darkMode }) => (
+  <TouchableOpacity onPress={onPress} style={styles1(darkMode).item}>
+    <AntDesign
+      name="arrowright"
+      size={20}
+      color={darkMode ? COLORS.textDark : "black"}
+    />
+    <Text style={styles1(darkMode).title}>{title}</Text>
   </TouchableOpacity>
 );
-
 const DetailsScreen1 = () => {
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
   const navigation = useNavigation(); // Get navigation object using useNavigation hook
   const route = useRoute(); // Get route object using useRoute hook
   const { address } = route.params; // Extract address from route params
@@ -131,8 +143,8 @@ const DetailsScreen1 = () => {
   );
 
   return (
-    <View style={styles1.container}>
-      <Text style={styles1.screenTitle}>Choose the ad type</Text>
+    <View style={styles1(darkMode).container}>
+      <Text style={styles1(darkMode).screenTitle}>Choose the ad type</Text>
       <FlatList
         data={lessons}
         renderItem={renderItem}
@@ -143,6 +155,8 @@ const DetailsScreen1 = () => {
 };
 
 const Detailss = ({ navigation }) => {
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
   const [selectedFeatures, setSelectedFeatures] = useState([]);
   const [selectedNearbyLocations, setSelectedNearbyLocations] = useState([]);
   const [province, setProvince] = useState(null);
@@ -227,22 +241,22 @@ const Detailss = ({ navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={sttyles.dismiss}>
+    <TouchableWithoutFeedback onPress={sttyles(darkMode).dismiss}>
       <KeyboardAwareScrollView
-        contentContainerStyle={sttyles.container}
+        contentContainerStyle={sttyles(darkMode).container}
         showsVerticalScrollIndicator={false}
       >
-        <StatusBar barStyle={"dark-content"} />
-        <Text style={sttyles.title}>Property Selection</Text>
-        <View style={sttyles.card}>
+        <StatusBar barStyle={"ligh-content"} />
+        <Text style={sttyles(darkMode).title}>Property Selection</Text>
+        <View style={sttyles(darkMode).card}>
           <Dropdown
             style={[
-              sttyles.dropdown,
-              isProvinceFocus && { borderColor: "blue" },
+              sttyles(darkMode).dropdown,
+              isProvinceFocus && { borderColor: "gray" },
             ]}
-            placeholderStyle={sttyles.placeholderStyle}
-            selectedTextStyle={sttyles.selectedTextStyle}
-            inputSearchStyle={sttyles.inputSearchStyle}
+            placeholderStyle={sttyles(darkMode).placeholderStyle}
+            selectedTextStyle={sttyles(darkMode).selectedTextStyle}
+            inputSearchStyle={sttyles(darkMode).inputSearchStyle}
             data={provinces}
             search
             maxHeight={300}
@@ -262,13 +276,13 @@ const Detailss = ({ navigation }) => {
           {province && (
             <Dropdown
               style={[
-                sttyles.dropdown,
-                isRegionFocus && { borderColor: "blue" },
+                sttyles(darkMode).dropdown,
+                isRegionFocus && { borderColor: "gray" },
               ]}
-              placeholderStyle={sttyles.placeholderStyle}
-              selectedTextStyle={sttyles.selectedTextStyle}
-              inputSearchStyle={sttyles.inputSearchStyle}
-              iconStyle={sttyles.iconStyle}
+              placeholderStyle={sttyles(darkMode).placeholderStyle}
+              selectedTextStyle={sttyles(darkMode).selectedTextStyle}
+              inputSearchStyle={sttyles(darkMode).inputSearchStyle}
+              iconStyle={sttyles(darkMode).iconStyle}
               data={regions[province]}
               search
               maxHeight={300}
@@ -288,11 +302,11 @@ const Detailss = ({ navigation }) => {
 
           {region && (
             <MultiSelect
-              style={sttyles.Selected}
-              placeholderStyle={sttyles.placeholderStyle}
-              selectedTextStyle={sttyles.selectedTextStyle}
-              inputSearchStyle={sttyles.inputSearchStyle}
-              iconStyle={sttyles.iconStyle}
+              style={sttyles(darkMode).Selected}
+              placeholderStyle={sttyles(darkMode).placeholderStyle}
+              selectedTextStyle={sttyles(darkMode).selectedTextStyle}
+              inputSearchStyle={sttyles(darkMode).inputSearchStyle}
+              iconStyle={sttyles(darkMode).iconStyle}
               search
               data={propertyFeatures}
               labelField="label"
@@ -303,16 +317,16 @@ const Detailss = ({ navigation }) => {
               onChange={(item) => {
                 setSelectedFeatures(item);
               }}
-              selectedStyle={sttyles.selectedStyle}
+              selectedStyle={sttyles(darkMode).selectedStyle}
             />
           )}
           {region && (
             <MultiSelect
-              style={sttyles.Selected}
-              placeholderStyle={sttyles.placeholderStyle}
-              selectedTextStyle={sttyles.selectedTextStyle}
-              inputSearchStyle={sttyles.inputSearchStyle}
-              iconStyle={sttyles.iconStyle}
+              style={sttyles(darkMode).Selected}
+              placeholderStyle={sttyles(darkMode).placeholderStyle}
+              selectedTextStyle={sttyles(darkMode).selectedTextStyle}
+              inputSearchStyle={sttyles(darkMode).inputSearchStyle}
+              iconStyle={sttyles(darkMode).iconStyle}
               search
               data={nearbyLocations}
               labelField="label"
@@ -327,7 +341,7 @@ const Detailss = ({ navigation }) => {
             />
           )}
           <TextInput
-            style={sttyles.input}
+            style={sttyles(darkMode).input}
             value={floor}
             onChangeText={(input = "") => handleFloor(input)}
             keyboardType="numeric"
@@ -336,7 +350,7 @@ const Detailss = ({ navigation }) => {
             placeholderTextColor="#686D76"
           />
           <TextInput
-            style={sttyles.input}
+            style={sttyles(darkMode).input}
             value={numberOfRooms}
             onChangeText={(input = "") => handleNumberOfRooms(input)}
             keyboardType="numeric"
@@ -345,7 +359,7 @@ const Detailss = ({ navigation }) => {
             placeholderTextColor="#686D76"
           />
           <TextInput
-            style={sttyles.input}
+            style={sttyles(darkMode).input}
             value={numberOfBathrooms}
             onChangeText={(input = "") => handleNumberOfBathrooms(input)}
             keyboardType="numeric"
@@ -354,7 +368,7 @@ const Detailss = ({ navigation }) => {
             placeholderTextColor="#686D76"
           />
           <TextInput
-            style={sttyles.input}
+            style={sttyles(darkMode).input}
             value={buildingAge}
             onChangeText={(input = "") => handleBuildingAge(input)}
             keyboardType="numeric"
@@ -363,7 +377,7 @@ const Detailss = ({ navigation }) => {
             placeholderTextColor="#686D76"
           />
           <TextInput
-            style={sttyles.input}
+            style={sttyles(darkMode).input}
             value={PropertyArea}
             onChangeText={(input = "") => handlePropertyArea(input)}
             keyboardType="numeric"
@@ -371,8 +385,11 @@ const Detailss = ({ navigation }) => {
             placeholder="Property Area ( m² )"
             placeholderTextColor="#686D76"
           />
-          <TouchableOpacity style={sttyles.button} onPress={handleNext}>
-            <Text style={sttyles.buttonText}>Next</Text>
+          <TouchableOpacity
+            style={sttyles(darkMode).button}
+            onPress={handleNext}
+          >
+            <Text style={sttyles(darkMode).buttonText}>Next</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
@@ -381,6 +398,8 @@ const Detailss = ({ navigation }) => {
 };
 
 const DetailsScreen2 = ({ navigation }) => {
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
   const initialPhotos = new Array(12).fill(null);
   const [photos, setPhotos] = useState(initialPhotos);
 
@@ -428,17 +447,25 @@ const DetailsScreen2 = ({ navigation }) => {
 
   const renderItem = ({ item, index }) => (
     <TouchableOpacity
-      style={index === 0 ? styles2.firstPhotoBox : styles2.photoBox}
+      style={
+        index === 0
+          ? styles2(darkMode).firstPhotoBox
+          : styles2(darkMode).photoBox
+      }
       onPress={() => handleImagePress(index)}
     >
       {item ? (
         <Image
           source={{ uri: item }}
-          style={[styles2.photo, { resizeMode: "cover" }]}
+          style={[styles2(darkMode).photo, { resizeMode: "cover" }]}
         />
       ) : (
         <View
-          style={index === 0 ? styles2.firstAddIconBox : styles2.addIconBox}
+          style={
+            index === 0
+              ? styles2(darkMode).firstAddIconBox
+              : styles2(darkMode).addIconBox
+          }
         >
           <AntDesign name="pluscircleo" size={24} color={COLORS.primary2} />
         </View>
@@ -447,18 +474,18 @@ const DetailsScreen2 = ({ navigation }) => {
   );
 
   return (
-    <View style={styles2.container}>
-      <Text style={styles2.title}>Add pictures to the advertise</Text>
-      <View style={styles2.dashedBox}>
-        <Text style={styles2.dashedBoxText}>
+    <View style={styles2(darkMode).container}>
+      <Text style={styles2(darkMode).title}>Add pictures to the advertise</Text>
+      <View style={styles2(darkMode).dashedBox}>
+        <Text style={styles2(darkMode).dashedBoxText}>
           <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Up to 12
           photos can be added
         </Text>
-        <Text style={styles2.dashedBoxText}>
+        <Text style={styles2(darkMode).dashedBoxText}>
           <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Pictures
           increase the number of views
         </Text>
-        <Text style={styles2.dashedBoxText}>
+        <Text style={styles2(darkMode).dashedBoxText}>
           <Octicons name="dot-fill" size={14} color={COLORS.primary} /> Hint:
           You can rearrange photos by dragging them from one place to another
         </Text>
@@ -469,22 +496,24 @@ const DetailsScreen2 = ({ navigation }) => {
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         numColumns={3}
-        columnWrapperStyle={styles2.row}
+        columnWrapperStyle={styles2(darkMode).row}
       />
 
       <TouchableOpacity
-        style={styles2.bottomButton}
+        style={styles2(darkMode).bottomButton}
         onPress={() => {
           navigation.push("WhatPriceScreen", { photos: photos });
         }}
       >
-        <Text style={styles2.bottomButtonText}>Next</Text>
+        <Text style={styles2(darkMode).bottomButtonText}>Next</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
 const AdvertisementDetailsScreen = ({ navigation }) => {
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -500,27 +529,27 @@ const AdvertisementDetailsScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-        <ScrollView contentContainerStyle={styles11.container}>
-          <Text style={styles11.title}>
+        <ScrollView contentContainerStyle={styles11(darkMode).container}>
+          <Text style={styles11(darkMode).title}>
             What are the details of the advertisement?
           </Text>
-          <Text style={styles11.subtitle}>
+          <Text style={styles11(darkMode).subtitle}>
             Details increase your chance of getting a suitable tenant
           </Text>
-          <View style={styles11.inputContainer}>
-            <Text style={styles11.label}>Title:</Text>
+          <View style={styles11(darkMode).inputContainer}>
+            <Text style={styles11(darkMode).label}>Title:</Text>
             <TextInput
-              style={styles11.input}
+              style={styles11(darkMode).input}
               placeholder="Example (Furnished Apartment)"
               value={title}
               onChangeText={setTitle}
             />
           </View>
 
-          <View style={styles11.inputContainer}>
-            <Text style={styles11.label}>Description:</Text>
+          <View style={styles11(darkMode).inputContainer}>
+            <Text style={styles11(darkMode).label}>Description:</Text>
             <TextInput
-              style={[styles11.input, { height: 150 }]}
+              style={[styles11(darkMode).input, { height: 150 }]}
               placeholder="Enter your advertisement description"
               multiline={true}
               value={description}
@@ -529,10 +558,10 @@ const AdvertisementDetailsScreen = ({ navigation }) => {
           </View>
 
           <TouchableOpacity
-            style={styles11.bottomButton}
+            style={styles11(darkMode).bottomButton}
             onPress={navigateToNext}
           >
-            <Text style={styles11.bottomButtonText}>Next</Text>
+            <Text style={styles11(darkMode).bottomButtonText}>Next</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -560,6 +589,8 @@ const PostedDeniedToast = () => {
 };
 
 const WhatPriceScreen = ({ navigation, route }) => {
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
   const [price, setPrice] = useState("");
   const { photos } = route.params;
   const navigateToNext = () => {
@@ -698,48 +729,50 @@ const WhatPriceScreen = ({ navigation, route }) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles12.container}>
-        <Text style={styles12.title}>What Price?</Text>
+      <View style={styles12(darkMode).container}>
+        <Text style={styles12(darkMode).title}>What Price?</Text>
 
-        <View style={styles12.subtitleContainer}>
+        <View style={styles12(darkMode).subtitleContainer}>
           <AntDesign
             name="checkcircleo"
             size={24}
             color={COLORS.primary}
-            style={styles12.icon}
+            style={styles12(darkMode).icon}
           />
-          <Text style={[styles12.subtitle, { color: "black" }]}>
+          <Text style={styles12(darkMode).subtitle}>
             Add a realistic price to get more views
           </Text>
         </View>
 
-        <View style={styles12.subtitleContainer}>
+        <View style={styles12(darkMode).subtitleContainer}>
           <AntDesign
             name="checkcircleo"
             size={24}
             color={COLORS.primary}
-            style={styles12.icon}
+            style={styles12(darkMode).icon}
           />
-          <Text style={[styles12.subtitle, { color: "black" }]}>
+          <Text style={styles12(darkMode).subtitle}>
             Make sure to add the full price (example: 100,000)
           </Text>
         </View>
 
-        <View style={styles12.subtitleContainer}>
+        <View style={styles12(darkMode).subtitleContainer}>
           <AntDesign
             name="checkcircleo"
             size={24}
             color={COLORS.primary}
-            style={styles12.icon}
+            style={styles12(darkMode).icon}
           />
-          <Text style={[styles12.subtitle, { color: "black" }]}>
+          <Text style={styles12(darkMode).subtitle}>
             Make sure you do not enter the down payment as the price
           </Text>
         </View>
 
-        <Text style={[styles12.label, { marginTop: 20 }]}>Price:</Text>
+        <Text style={[styles12(darkMode).label, { marginTop: 20 }]}>
+          Price:
+        </Text>
         <TextInput
-          style={styles12.input}
+          style={styles12(darkMode).input}
           placeholder="Add the right price"
           keyboardType="numeric"
           onChangeText={(text) => setPrice(text)}
@@ -748,10 +781,10 @@ const WhatPriceScreen = ({ navigation, route }) => {
 
         {/* Post button */}
         <TouchableOpacity
-          style={styles12.bottomButton}
+          style={styles12(darkMode).bottomButton}
           onPress={navigateToNext}
         >
-          <Text style={styles12.bottomButtonText}>Post</Text>
+          <Text style={styles12(darkMode).bottomButtonText}>Post</Text>
         </TouchableOpacity>
         <Toast />
       </View>

@@ -11,8 +11,10 @@ import { SearchBar, Icon } from "react-native-elements";
 import axios from "axios";
 import PropertyCard from "../components/PropertyCard";
 import { urlPath } from "../lib";
-
+import { getStoredBoolValue } from "../../assets/theme";
 const SearchScreen = () => {
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
   const [search, setSearch] = useState("");
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -75,23 +77,26 @@ const SearchScreen = () => {
 
   return (
     <>
-      <View style={styles.container}>
+      <View style={styles(darkMode).container}>
         <SearchBar
           placeholder="Search here..."
           onChangeText={updateSearch}
           value={search}
-          containerStyle={styles.searchContainer}
-          inputContainerStyle={styles.inputContainer}
-          inputStyle={styles.input}
-          leftIconContainerStyle={styles.leftIcon}
-          rightIconContainerStyle={styles.rightIcon}
+          containerStyle={styles(darkMode).searchContainer}
+          inputContainerStyle={styles(darkMode).inputContainer}
+          inputStyle={styles(darkMode).input}
+          leftIconContainerStyle={styles(darkMode).leftIcon}
+          rightIconContainerStyle={styles(darkMode).rightIcon}
           lightTheme
         />
-        <TouchableOpacity style={styles.searchButton} onPress={handleSubmit}>
+        <TouchableOpacity
+          style={styles(darkMode).searchButton}
+          onPress={handleSubmit}
+        >
           <Icon name="search" size={24} color="#000" />
         </TouchableOpacity>
       </View>
-      <View style={{marginTop:10}} >
+      <View style={{ marginTop: 10 }}>
         {loading ? (
           <ActivityIndicator
             size="50"
@@ -99,12 +104,14 @@ const SearchScreen = () => {
 "
           />
         ) : (
-          <ScrollView style={{marginTop:10}}>
+          <ScrollView style={{ marginTop: 10 }}>
             {noResults ? (
-              <Text style={styles.noResultsText}>No results found</Text>
+              <Text style={styles(darkMode).noResultsText}>
+                No results found
+              </Text>
             ) : (
               properties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
+                <PropertyCard key={property(darkMode).id} property={property} />
               ))
             )}
           </ScrollView>
@@ -114,61 +121,62 @@ const SearchScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff",
-    paddingTop: 70, // Adjust for status bar height
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  searchContainer: {
-    flex: 1,
-    backgroundColor: "#f0f0f0",
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  inputContainer: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-  },
-  input: {
-    color: "#000",
-  },
-  leftIcon: {
-    marginLeft: 10,
-  },
-  rightIcon: {
-    marginRight: 10,
-  },
-  searchButton: {
-    marginLeft: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-    padding: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  noResultsText: {
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
-    color: "#999",
-  },
-});
+const styles = (darkMode) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: darkMode ? "#333" : "#fff", // Adjust background color for dark mode
+      paddingTop: 70, // Adjust for status bar height
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 10,
+      paddingBottom: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: darkMode ? "#555" : "#ccc", // Adjust border color for dark mode
+    },
+    searchContainer: {
+      flex: 1,
+      backgroundColor: darkMode ? "#444" : "#f0f0f0", // Adjust background color for dark mode
+      borderTopWidth: 0,
+      borderBottomWidth: 0,
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      elevation: 5,
+    },
+    inputContainer: {
+      backgroundColor: darkMode ? "#555" : "#fff", // Adjust background color for dark mode
+      borderRadius: 10,
+    },
+    input: {
+      color: darkMode ? "#fff" : "#000", // Adjust text color for dark mode
+    },
+    leftIcon: {
+      marginLeft: 10,
+    },
+    rightIcon: {
+      marginRight: 10,
+    },
+    searchButton: {
+      marginLeft: 10,
+      backgroundColor: darkMode ? "#444" : "#f0f0f0", // Adjust background color for dark mode
+      borderRadius: 10,
+      padding: 10,
+      shadowColor: darkMode ? "#000" : "#000", // Adjust shadow color for dark mode
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      elevation: 5,
+    },
+    noResultsText: {
+      textAlign: "center",
+      marginTop: 20,
+      fontSize: 16,
+      color: darkMode ? "#ccc" : "#999", // Adjust text color for dark mode
+    },
+  });
 
 export default SearchScreen;

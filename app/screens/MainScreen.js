@@ -4,6 +4,7 @@ import React, {
   useEffect,
   forwardRef,
   useImperativeHandle,
+  useFocusEffect,
 } from "react";
 import {
   StyleSheet,
@@ -23,7 +24,7 @@ import COLORS from "../../assets/Colors/colors";
 import { urlPath, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
 import PropertyCard from "../components/PropertyCard";
-import { getStoredBoolValue } from "../tabs/AddScreenStyles";
+import { getStoredBoolValue } from "../../assets/theme";
 const categories = [
   {
     img: "https://img.icons8.com/?size=256&id=J3w76cMS9cUS&format=png",
@@ -58,7 +59,9 @@ const categories = [
 ];
 
 const MainScreen = forwardRef(({ navigation }, ref) => {
-  const darkMode = getStoredBoolValue();
+  const result = getStoredBoolValue();
+  const darkMode = result.storedBoolValue;
+
   const [userData, setUserData] = useState(null);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -143,17 +146,13 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
   useEffect(() => {
     fetchUserProfileData();
     fetchUserPropertyData();
-
-    // const intervalId = setInterval(fetchUserPropertyData, 6000); // Fetch every 60 seconds
-
-    // return () => clearInterval(intervalId); // Clear interval on component unmount
   }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
     fetchUserProfileData();
     fetchUserPropertyData();
-    setRefreshing(false); // Set refreshing to false when manual refresh is done
+    setRefreshing(true); // Set refreshing to false when manual refresh is done
   };
 
   const Message = () => {
@@ -192,7 +191,7 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
             <Text
               style={[
                 styles(darkMode).title,
-                { color: darkMode ? COLORS.textDark : "#1d1d1d" },
+                { color: darkMode ? COLORS.textDark : COLORS.primary },
               ]}
             >
               Places to stay
@@ -234,7 +233,7 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
                     <Text
                       style={[
                         Categories_styles(darkMode).cardLabel,
-                        { color: darkMode ? COLORS.white : "#1d1d1d" },
+                        { color: darkMode ? COLORS.white : COLORS.white },
                       ]}
                     >
                       {label}

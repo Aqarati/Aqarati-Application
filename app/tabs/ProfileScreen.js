@@ -20,7 +20,8 @@ import { urlPath, getValueFor, delete_token } from "../lib";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import COLORS from "../../assets/Colors/colors";
-import { Profilestyles, storeBoolValue } from "./AddScreenStyles";
+import { Profilestyles } from "./AddScreenStyles";
+import { storeBoolValue } from "../../assets/theme";
 const SucessMessage = () => {
   Toast.show({
     type: "success",
@@ -70,9 +71,10 @@ export default function ProfileScreen({ navigation }) {
 
   // Function to handle Dark Mode toggle
   const handleDarkModeToggle = (darkMode) => {
-    setDarkMode(darkMode);
-    saveDarkModeState(darkMode);
-    storeBoolValue(darkMode);
+    console.log(darkMode); // Confirm that the value of darkMode is correct
+    setDarkMode(darkMode); // Update the state immediately to reflect the change
+    storeBoolValue(darkMode); // Store the boolean value in local storage
+    saveDarkModeState(darkMode); // Save the dark mode state (if needed, e.g., in AsyncStorage)
   };
   useEffect(() => {
     loadDarkModeState();
