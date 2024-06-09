@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome } from "@expo/vector-icons";
 import { Platform, Animated, Easing } from "react-native";
@@ -9,10 +9,19 @@ import LikeScreen from "./LikeScreen";
 import SearchScreen from "./SearchScreen";
 import MainScreen from "../screens/MainScreen";
 import { getStoredBoolValue } from "../../assets/theme";
+import { useFocusEffect } from "@react-navigation/native";
+
 const Tab = createBottomTabNavigator();
 function Tabs() {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
+  const [darkMode, setDarkMode] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
+
   const mainScreenRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 

@@ -18,10 +18,17 @@ const users = [
     phone: "+962790543018",
   },
 ];
-
+import { useFocusEffect } from "@react-navigation/native";
 export default function Example() {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
+  const [darkMode, setDarkMode] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
+
   const [input, setInput] = useState("");
   const filteredRows = useMemo(() => {
     const rows = [];

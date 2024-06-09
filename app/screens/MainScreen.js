@@ -4,7 +4,6 @@ import React, {
   useEffect,
   forwardRef,
   useImperativeHandle,
-  useFocusEffect,
 } from "react";
 import {
   StyleSheet,
@@ -25,6 +24,7 @@ import { urlPath, getValueFor } from "../lib";
 import Toast from "react-native-toast-message";
 import PropertyCard from "../components/PropertyCard";
 import { getStoredBoolValue } from "../../assets/theme";
+import { useFocusEffect } from "@react-navigation/native";
 const categories = [
   {
     img: "https://img.icons8.com/?size=256&id=J3w76cMS9cUS&format=png",
@@ -59,20 +59,25 @@ const categories = [
 ];
 
 const MainScreen = forwardRef(({ navigation }, ref) => {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
-
+  const [darkMode, setDarkMode] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
   const [userData, setUserData] = useState(null);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const scrollViewRef = useRef(null);
-  const animation = useRef(new Animated.Value(0)).current; // Create an Animated.Value
+  const animation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(animation, {
-      toValue: 0, // Reset to initial value
-      duration: 500, // Adjust duration as needed
+      toValue: 0,
+      duration: 500,
       easing: Easing.linear,
       useNativeDriver: true,
     }).start();

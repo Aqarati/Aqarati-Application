@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -20,6 +20,8 @@ import {
   Keyboard,
   Alert,
   StatusBar,
+  RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import { COLORS, getStoredBoolValue } from "../../assets/theme";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -47,7 +49,7 @@ import {
   regions,
   items,
 } from "./data";
-LogBox.ignoreAllLogs();
+import { useFocusEffect } from "@react-navigation/native";
 
 const SelectedValues = [
   {
@@ -69,8 +71,15 @@ const SelectedValues = [
 ];
 
 const DetailsScreen = ({ navigation }) => {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
+  const [darkMode, setDarkMode] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
   const handlePress = (address) => {
     navigation.push("Detail1", { address: address }); // Pass the address as a parameter
   };
@@ -121,8 +130,14 @@ const ListItems = ({ title, onPress, darkMode }) => (
   </TouchableOpacity>
 );
 const DetailsScreen1 = () => {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
+  const [darkMode, setDarkMode] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
   const navigation = useNavigation(); // Get navigation object using useNavigation hook
   const route = useRoute(); // Get route object using useRoute hook
   const { address } = route.params; // Extract address from route params
@@ -155,8 +170,14 @@ const DetailsScreen1 = () => {
 };
 
 const Detailss = ({ navigation }) => {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
+  const [darkMode, setDarkMode] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
   const [selectedFeatures, setSelectedFeatures] = useState([]);
   const [selectedNearbyLocations, setSelectedNearbyLocations] = useState([]);
   const [province, setProvince] = useState(null);
@@ -398,8 +419,15 @@ const Detailss = ({ navigation }) => {
 };
 
 const DetailsScreen2 = ({ navigation }) => {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
+  const [darkMode, setDarkMode] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
+
   const initialPhotos = new Array(12).fill(null);
   const [photos, setPhotos] = useState(initialPhotos);
 

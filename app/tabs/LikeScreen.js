@@ -8,17 +8,23 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import { useFocusEffect } from "@react-navigation/native";
+
 import { urlPath, getValueFor } from "../lib";
 import PropertyCard from "../components/PropertyCard";
 import COLORS from "../../assets/Colors/colors";
 import Toast from "react-native-toast-message";
 import { getStoredBoolValue } from "../../assets/theme";
+import { useFocusEffect } from "@react-navigation/native";
 const LikeScreen = () => {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
-
-  const [likedPropertyIds, setLikedPropertyIds] = useState([]);
+  const [darkMode, setDarkMode] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
+  const [LikedPropertyIds, setLikedPropertyIds] = useState([]);
   const [likedProperties, setLikedProperties] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);

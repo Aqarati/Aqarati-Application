@@ -12,9 +12,17 @@ import axios from "axios";
 import PropertyCard from "../components/PropertyCard";
 import { urlPath } from "../lib";
 import { getStoredBoolValue } from "../../assets/theme";
+import { useFocusEffect } from "@react-navigation/native";
 const SearchScreen = () => {
-  const result = getStoredBoolValue();
-  const darkMode = result.storedBoolValue;
+  const [darkMode, setDarkMode] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const result = getStoredBoolValue();
+      const darkMode = result.storedBoolValue;
+      setDarkMode(darkMode);
+    }, [])
+  );
+
   const [search, setSearch] = useState("");
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -111,7 +119,7 @@ const SearchScreen = () => {
               </Text>
             ) : (
               properties.map((property) => (
-                <PropertyCard key={property(darkMode).id} property={property} />
+                <PropertyCard key={property.id} property={property} />
               ))
             )}
           </ScrollView>
