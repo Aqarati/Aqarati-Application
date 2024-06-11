@@ -112,14 +112,6 @@ const PropertyDetailsDashboard = ({ route }) => {
     try {
       const token = await getValueFor("token");
 
-      // Ask for permission to access the photo library
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        throw new Error("Permission to access photo library denied");
-      }
-
-      // Open the device's photo library
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -128,7 +120,7 @@ const PropertyDetailsDashboard = ({ route }) => {
 
       if (!result.cancelled) {
         let data = new FormData();
-        // Append the selected image to FormData
+
         data.append("image", {
           uri: result.assets[0].uri,
           name: `image.png`,
@@ -152,7 +144,7 @@ const PropertyDetailsDashboard = ({ route }) => {
         console.log(JSON.stringify(response.data));
         Toast.show({
           type: "success",
-          text1: "Image saved successfully",
+          text1: "Image Uploaded successfully",
           text2: "The Document Uploaded ..",
         });
       }
