@@ -57,46 +57,151 @@ const PropertyDetails = ({ route }) => {
   };
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>{property.name}</Text>
-        <View style={styles.imageContainer}>
-          <FlatList
-            data={property.propertyImages}
-            renderItem={renderImageItem}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
-        <View style={styles.detailsContainer}>
-          <Text style={styles.description}>{property.description}</Text>
-          <View style={styles.priceContainer}>
-            <MaterialIcons name="attach-money" size={24} color={COLORS.primary} />
-            <Text style={styles.price}>{property.price}</Text>
+    <View style={styles.container}>
+      <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.title}></Text>
+          <View style={styles.imageContainer}>
+            <FlatList
+              data={property.propertyImages}
+              renderItem={renderImageItem}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            />
           </View>
-        </View>
-        <ImageView
-          images={property.propertyImages.map((image) => ({
-            uri: image.imgUrl,
-          }))}
-          imageIndex={currentIndex}
-          visible={visible}
-          onRequestClose={() => setVisible(false)}
-        />
-      </ScrollView>
+          <View style={styles.detailsContainer}>
+            <View style={styles.otherDetailsContainer}>
+              <Text style={styles.otherDetailsTitle}>Apartment Details</Text>
+              <View style={styles.detailsRow}>
+                <View style={styles.detailsItem}>
+                  <MaterialIcons
+                    name="location-city"
+                    size={20}
+                    color={COLORS.primary}
+                    style={styles.detailsIcon}
+                  />
+                  <Text style={styles.otherDetailsText}>
+                    {property.province}
+                  </Text>
+                </View>
+                <View style={styles.detailsItem}>
+                  <MaterialIcons
+                    name="location-on"
+                    size={20}
+                    color={COLORS.primary}
+                    style={styles.detailsIcon}
+                  />
+                  <Text style={styles.otherDetailsText}>{property.region}</Text>
+                </View>
+                <View style={styles.detailsItem}>
+                  <MaterialIcons
+                    name="hotel"
+                    size={20}
+                    color={COLORS.primary}
+                    style={styles.detailsIcon}
+                  />
+                  <Text style={styles.otherDetailsText}>
+                    {property.numberOfRooms}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.detailsRow}>
+                <View style={styles.detailsItem}>
+                  <MaterialIcons
+                    name="bathtub"
+                    size={20}
+                    color={COLORS.primary}
+                    style={styles.detailsIcon}
+                  />
+                  <Text style={styles.otherDetailsText}>
+                    {property.numberOfBathrooms}
+                  </Text>
+                </View>
+                <View style={styles.detailsItem}>
+                  <MaterialIcons
+                    name="date-range"
+                    size={20}
+                    color={COLORS.primary}
+                    style={styles.detailsIcon}
+                  />
+                  <Text style={styles.otherDetailsText}>
+                    {property.buildingAge} years
+                  </Text>
+                </View>
+                <View style={styles.detailsItem}>
+                  <MaterialIcons
+                    name="format-list-numbered"
+                    size={20}
+                    color={COLORS.primary}
+                    style={styles.detailsIcon}
+                  />
+                  <Text style={styles.otherDetailsText}>{property.floor}</Text>
+                </View>
+              </View>
+              <View style={styles.detailsRow}>
+                <View style={styles.detailsItem}>
+                  <MaterialIcons
+                    name="square-foot"
+                    size={20}
+                    color={COLORS.primary}
+                    style={styles.detailsIcon}
+                  />
+                  <Text style={styles.otherDetailsText}>
+                    {property.propertyArea}
+                  </Text>
+                </View>
+                {/* Add additional details items here */}
+              </View>
+            </View>
+            <View style={styles.featuresContainer}>
+              <Text style={styles.featuresTitle}>Features</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.featureList}
+              >
+                {property.features.map((feature, index) => (
+                  <View key={index} style={styles.featureItem}>
+                    <Text style={styles.featureText}>{feature}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+            <View style={styles.nearbyLocationsContainer}>
+              <Text style={styles.nearbyLocationsTitle}>Nearby Locations</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.locationList}
+              >
+                {property.nearbyLocations.map((location, index) => (
+                  <View key={index} style={styles.locationItem}>
+                    <Text style={styles.locationText}>{location}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+          <ImageView
+            images={property.propertyImages.map((image) => ({
+              uri: image.imgUrl,
+            }))}
+            imageIndex={currentIndex}
+            visible={visible}
+            onRequestClose={() => setVisible(false)}
+          />
+        </ScrollView>
+      </Animated.View>
       <View style={styles.likeSectionContainer}>
-        <LikeSection p={property} />
+        <LikeSection p={property} price={property.price} />
       </View>
-    </Animated.View>
+    </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
-    marginTop:0,
-    
-        flex: 1,
+    flex: 1,
     backgroundColor: "#fff",
   },
   scrollContent: {
@@ -111,11 +216,22 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     textAlign: "center",
   },
-  description: {
-    fontSize: 18,
-    color: "#666",
+  adName: {
+    fontSize: 24,
+    fontWeight: "bold",
     marginBottom: 10,
+    color: COLORS.primary,
+  },
+  adDescription: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 20,
+    fontFamily: "Helvetica",
+    fontWeight: "bold",
+  },
+  imageContainer: {
     paddingHorizontal: 20,
+    marginBottom: 20,
   },
   image: {
     width: 300,
@@ -126,16 +242,102 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   detailsContainer: {
-    padding: 20,
+    paddingHorizontal: 20,
   },
-  priceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+
+  featuresContainer: {
+    marginBottom: 20,
   },
-  price: {
+  featuresTitle: {
     fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
     color: COLORS.primary,
-    marginLeft: 5,
+  },
+  featureList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  featureItem: {
+    width: 150,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  featureText: {
+    fontSize: 16,
+    color: COLORS.primary,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  nearbyLocationsContainer: {
+    marginBottom: 20,
+  },
+  nearbyLocationsTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: COLORS.primary,
+  },
+  locationList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  locationItem: {
+    width: 150,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  locationText: {
+    fontSize: 16,
+    color: COLORS.primary,
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  otherDetailsContainer: {
+    marginBottom: 20,
+  },
+  otherDetailsTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: COLORS.primary,
+  },
+  detailsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  detailsItem: {
+    width: "30%",
+    height: 75,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  detailsIcon: {
+    marginBottom: 5,
+  },
+  otherDetailsText: {
+    fontSize: 14,
+    color: COLORS.primary,
+    textAlign: "center",
+    fontWeight: "bold",
   },
   vrButton: {
     position: "absolute",
@@ -151,7 +353,7 @@ const styles = StyleSheet.create({
   },
   likeSectionContainer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 1,
     width: "100%",
     backgroundColor: "#fff",
     borderTopWidth: 1,
@@ -160,5 +362,4 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
 });
-
 export default PropertyDetails;
