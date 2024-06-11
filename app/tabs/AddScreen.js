@@ -51,6 +51,7 @@ import {
 } from "./data";
 import { useFocusEffect } from "@react-navigation/native";
 
+LogBox.ignoreAllLogs();
 const SelectedValues = [
   {
     images: [],
@@ -72,7 +73,7 @@ const SelectedValues = [
 
 const DetailsScreen = ({ navigation }) => {
   const [darkMode, setDarkMode] = useState(false);
-
+  console.log(SelectedValues[0].adtitle);
   useFocusEffect(
     React.useCallback(() => {
       const result = getStoredBoolValue();
@@ -621,15 +622,17 @@ const WhatPriceScreen = ({ navigation, route }) => {
   const darkMode = result.storedBoolValue;
   const [price, setPrice] = useState("");
   const { photos } = route.params;
+
   const navigateToNext = () => {
     const makeitEmpty = (SelectedValues) => {
-      SelectedValues.forEach((item) => {
-        Object.keys(item).forEach((key) => {
-          item[key] = [];
-        });
-      });
-
-      return SelectedValues;
+      if (Array.isArray(SelectedValues) && SelectedValues.length > 0) {
+        const obj = SelectedValues[0];
+        for (const key in obj) {
+          if (Array.isArray(obj[key])) {
+            obj[key] = [];
+          }
+        }
+      }
     };
     const resetToFirstScreen = (navigation) => {
       navigation.reset({
