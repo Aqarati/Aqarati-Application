@@ -12,7 +12,7 @@ import axios from "axios";
 import COLORS from "../../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-const LikeSection = ({ p }) => {
+const LikeSection = ({ p, price }) => {
   const [liked, setLiked] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -83,6 +83,9 @@ const LikeSection = ({ p }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.priceText}>
+        <FontAwesome name="dollar" size={20} color={COLORS.primary} /> {price}
+      </Text>
       <TouchableOpacity style={styles.button} onPress={handleContactPress}>
         <Text style={styles.buttonText}>Contact Owner</Text>
       </TouchableOpacity>
@@ -91,7 +94,11 @@ const LikeSection = ({ p }) => {
           <ActivityIndicator size="small" color={COLORS.primary} />
         ) : (
           <TouchableOpacity onPress={handleLikePress} style={styles.icons}>
-            <FontAwesome name="heart" size={30} color={liked ? "#CD1818" : "white"} />
+            <FontAwesome
+              name="heart"
+              size={30}
+              color={liked ? "#CD1818" : "white"}
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -113,12 +120,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
- marginBottom: 10,
+    marginBottom: 15,
   },
   button: {
     backgroundColor: COLORS.primary,
     padding: 15,
-    paddingHorizontal: 80,
+    paddingHorizontal: 20, // Adjust button width here
     margin: 5,
     borderRadius: 40,
   },
@@ -127,6 +134,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     fontWeight: "bold",
+  },
+  priceText: {
+    fontSize: 20,
+    color: COLORS.primary,
+    marginRight: 10,
+    marginLeft: 15,
   },
   buttonWrapper: {
     marginRight: 20,

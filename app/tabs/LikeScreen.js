@@ -82,6 +82,12 @@ const LikeScreen = () => {
       }
     } catch (error) {
       console.error("Error fetching favorite properties:", error);
+      console.log(error.response);
+      Toast.show({
+        type: "info",
+        text1: "No Liked Properties",
+        text2: "You have no liked properties.",
+      });
       setLoading(false);
       setRefreshing(false);
     }

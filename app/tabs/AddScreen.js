@@ -33,6 +33,7 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { getValueFor, urlPath } from "../lib";
 import Toast from "react-native-toast-message";
+
 import {
   sttyles,
   styles11,
@@ -653,6 +654,21 @@ const WhatPriceScreen = ({ navigation, route }) => {
           text: "Yes",
           onPress: async () => {
             // Handle the case when the user confirms to share the post
+            console.log("---", typeof SelectedValues[0].NearbyLocationLabels);
+            console.log(SelectedValues[0].NearbyLocationLabels);
+            var nearbyLocationLabels = SelectedValues[0].NearbyLocationLabels;
+            var nearbylocation = nearbyLocationLabels
+              .split(/,\s+/)
+              .map(function (label) {
+                return label.trim();
+              });
+            console.log(nearbylocation);
+            var FeatureLabels = SelectedValues[0].FeatureLabels;
+            var FeatureLabelss = FeatureLabels.split(/,\s+/).map(function (
+              label
+            ) {
+              return label.trim();
+            });
 
             SelectedValues[0].adprice = price;
             const handleSavePost = async () => {
@@ -668,19 +684,38 @@ const WhatPriceScreen = ({ navigation, route }) => {
                 SelectedValues[0].FeatureLabels
               );
               if (
-                !SelectedValues[0].adtitle ||
-                !SelectedValues[0].addescription ||
-                !SelectedValues[0].adprice
+                !SelectedValues[0].adtitle //&&
+                // !SelectedValues[0].addescription &&
+                // !SelectedValues[0].adprice &&
+                // !SelectedValues[0].NearbyLocationLabels &&
+                // !SelectedValues[0].Province &&
+                // !SelectedValues[0].PropertyArea &&
+                // !SelectedValues[0].Region &&
+                // !SelectedValues[0].numberOfRooms &&
+                // !SelectedValues[0].numberOfBathrooms &&
+                // !SelectedValues[0].buildingAge &&
+                // !SelectedValues[0].floor &&
+                // !SelectedValues[0].FeatureLabels
               ) {
                 showToast();
                 return;
               }
               const url = urlPath + "/property";
               const token = await getValueFor("token");
+
               let data = JSON.stringify({
                 name: SelectedValues[0].adtitle,
                 description: SelectedValues[0].addescription,
                 price: SelectedValues[0].adprice,
+                features: FeatureLabelss,
+                nearbyLocations: nearbylocation,
+                province: SelectedValues[0].Province,
+                region: SelectedValues[0].Region,
+                numberOfRooms: SelectedValues[0].numberOfRooms,
+                numberOfBathrooms: SelectedValues[0].numberOfBathrooms,
+                buildingAge: SelectedValues[0].buildingAge,
+                floor: SelectedValues[0].floor,
+                propertyArea: SelectedValues[0].PropertyArea,
               });
 
               let config = {
@@ -693,7 +728,7 @@ const WhatPriceScreen = ({ navigation, route }) => {
                 },
                 data: data,
               };
-
+              console.log("fffffffffffffffffffffffffff", data);
               await axios
                 .request(config)
                 .then((response) => {
