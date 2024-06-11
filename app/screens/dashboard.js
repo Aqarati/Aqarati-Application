@@ -42,6 +42,12 @@ export default function MainScreen({ navigation, route }) {
       setProperties(response.data);
       console.log(JSON.stringify(response.data));
     } catch (error) {
+      Toast.show({
+        type: "info",
+        text1: "No properties found",
+        visibilityTime: 3000,
+        autoHide: true,
+      });
       console.log(error);
     } finally {
       setLoading(false);
