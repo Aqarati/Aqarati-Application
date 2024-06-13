@@ -63,7 +63,7 @@ const PropertyDetails = ({ route }) => {
           <Text style={styles.title}></Text>
           <View style={styles.imageContainer}>
             <FlatList
-              data={property.propertyImages}
+              data={property.propertyImages || []}
               renderItem={renderImageItem}
               keyExtractor={(item) => item.id.toString()}
               horizontal
@@ -161,7 +161,7 @@ const PropertyDetails = ({ route }) => {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.featureList}
               >
-                {property.features.map((feature, index) => (
+                {(property.features || []).map((feature, index) => (
                   <View key={index} style={styles.featureItem}>
                     <Text style={styles.featureText}>{feature}</Text>
                   </View>
@@ -175,7 +175,7 @@ const PropertyDetails = ({ route }) => {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.locationList}
               >
-                {property.nearbyLocations.map((location, index) => (
+                {(property.nearbyLocations || []).map((location, index) => (
                   <View key={index} style={styles.locationItem}>
                     <Text style={styles.locationText}>{location}</Text>
                   </View>
@@ -184,7 +184,7 @@ const PropertyDetails = ({ route }) => {
             </View>
           </View>
           <ImageView
-            images={property.propertyImages.map((image) => ({
+            images={(property.propertyImages || []).map((image) => ({
               uri: image.imgUrl,
             }))}
             imageIndex={currentIndex}

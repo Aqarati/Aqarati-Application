@@ -434,6 +434,11 @@ const regions = {
     { label: "Jabal Amman", value: "1-1" },
     { label: "Abdoun", value: "1-2" },
     { label: "Swefieh", value: "1-3" },
+    { label: "Khalda", value: "1-4" },
+    { label: "Tlaa al-ali", value: "1-5" },
+    { label: "Dabouq", value: "1-6" },
+    { label: "Abu nusseir", value: "1-7" },
+    { label: "Tabrbour", value: "1-8" },
   ],
   2: [
     { label: "Zarqa North", value: "2-1" },
