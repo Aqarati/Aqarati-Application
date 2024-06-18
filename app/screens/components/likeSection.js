@@ -12,13 +12,36 @@ import axios from "axios";
 import COLORS from "../../../assets/Colors/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
-const LikeSection = ({ p, price }) => {
+const LikeSection = ({ p, price, userid }) => {
   const [liked, setLiked] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [number, setNumber] = useState(null);
   useEffect(() => {
     const fetchFavouriteIdData = async () => {
       setLoading(true);
+      const url1 = urlPath + "/user/profile/" + userid;
+      let config1 = {
+        method: "get",
+        maxBodyLength: Infinity,
+        url: url1,
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      };
+      console.log(config1);
+      await axios
+        .request(config1)
+        .then((response) => {
+          console.log(
+            "ddddddddddddddddddddddddd",
+            JSON.stringify(response.data.phoneNumber)
+          );
+          setNumber(response.data.phoneNumber);
+          console.log(number);
+        })
+        .catch((error) => {
+          console.log(error.message);
+        });
       console.log("fetch fav id for Like Section");
       const url = urlPath + "/user/favourite";
       const token = await getValueFor("token");
@@ -35,6 +58,7 @@ const LikeSection = ({ p, price }) => {
         .then((response) => {
           const favId = response.data;
           setLiked(favId.includes(p.id));
+          console.log(response.data);
         })
         .catch((error) => {
           console.log(error);
@@ -43,7 +67,6 @@ const LikeSection = ({ p, price }) => {
           setLoading(false);
         });
     };
-
     fetchFavouriteIdData();
   }, [p.id]);
 
@@ -75,7 +98,7 @@ const LikeSection = ({ p, price }) => {
   };
 
   const handleContactPress = () => {
-    const phoneNumber = "1234567890";
+    const phoneNumber = number;
     Linking.openURL(`tel:${phoneNumber}`).catch((error) => {
       console.error("Error:", error);
     });

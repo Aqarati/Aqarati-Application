@@ -54,6 +54,7 @@ const PropertyDetails = ({ route }) => {
   const handleImagePress = (index) => {
     setCurrentIndex(index);
     setVisible(true);
+    console.log(property.userId);
   };
 
   return (
@@ -194,7 +195,11 @@ const PropertyDetails = ({ route }) => {
         </ScrollView>
       </Animated.View>
       <View style={styles.likeSectionContainer}>
-        <LikeSection p={property} price={property.price} />
+        <LikeSection
+          p={property}
+          price={property.price}
+          userid={property.userId}
+        />
       </View>
     </View>
   );

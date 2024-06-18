@@ -20,6 +20,7 @@ const COLORS = {
 
   black: "#000000",
   lightGray: "#f2f2f2",
+  login: "#3d3d3d",
   darkGray: "#3d3d3d",
   gray: "#929292",
   borderGray: "#e3e3e3",
