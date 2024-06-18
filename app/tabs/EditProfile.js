@@ -178,19 +178,11 @@ const MyAccountScreen = ({ route }) => {
 
   const selectImage = async () => {
     try {
-      // Request permission to access the photo library
-      let { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission to access the photo library is required!");
-        return;
-      }
-
-      // Launch the image library
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsMultipleSelection: false,
-        allowsEditing: true, // Enable editing to allow cropping
-        aspect: [1, 1], // Set aspect ratio to 1:1 for a square crop
+        allowsEditing: true,
+        aspect: [1, 1],
         quality: 1,
       });
 
@@ -199,7 +191,7 @@ const MyAccountScreen = ({ route }) => {
       const token = await getValueFor("token");
 
       data.append("profile-image", {
-        uri: result.assets[0].uri, // Use result.uri directly since assets is not defined
+        uri: result.assets[0].uri,
         name: `image.png`,
         type: "image/png",
       });

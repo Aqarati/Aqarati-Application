@@ -140,9 +140,9 @@ const DetailsScreen1 = () => {
       setDarkMode(darkMode);
     }, [])
   );
-  const navigation = useNavigation(); // Get navigation object using useNavigation hook
-  const route = useRoute(); // Get route object using useRoute hook
-  const { address } = route.params; // Extract address from route params
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { address } = route.params;
 
   const handlePress = (item) => {
     const selectedName =
@@ -193,23 +193,23 @@ const Detailss = ({ navigation }) => {
   const [PropertyArea, setPropertyArea] = useState("");
 
   const handleNumberOfRooms = (input = "") => {
-    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    const numericValue = input.replace(/[^0-9]/g, "");
     setNumberOfRooms(numericValue);
   };
   const handlePropertyArea = (input = "") => {
-    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    const numericValue = input.replace(/[^0-9]/g, "");
     setPropertyArea(numericValue);
   };
   const handleFloor = (input = "") => {
-    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    const numericValue = input.replace(/[^0-9]/g, "");
     setFloor(numericValue);
   };
   const handleBuildingAge = (input = "") => {
-    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    const numericValue = input.replace(/[^0-9]/g, "");
     setBuildingAge(numericValue);
   };
   const handleNumberOfBathrooms = (input = "") => {
-    const numericValue = input.replace(/[^0-9]/g, ""); // Only allow numbers
+    const numericValue = input.replace(/[^0-9]/g, "");
     setNumberOfBathrooms(numericValue);
   };
 
@@ -292,7 +292,7 @@ const Detailss = ({ navigation }) => {
             onBlur={() => setIsProvinceFocus(false)}
             onChange={(item) => {
               setProvince(item.value);
-              setRegion(null); // Reset region when province changes
+              setRegion(null);
               setIsProvinceFocus(false);
             }}
           />
@@ -434,7 +434,6 @@ const DetailsScreen2 = ({ navigation }) => {
   const [photos, setPhotos] = useState(initialPhotos);
 
   useEffect(() => {
-    // Request permission to access the camera and photo library
     (async () => {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -448,7 +447,6 @@ const DetailsScreen2 = ({ navigation }) => {
   }, []);
 
   const handleImagePress = async (index) => {
-    // Open the device's photo library
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
@@ -641,7 +639,7 @@ const WhatPriceScreen = ({ navigation, route }) => {
         routes: [{ name: "Details" }], // Replace 'Details' with the name of your first screen
       });
     };
-    // Display a confirmation modal to the user
+
     Alert.alert(
       "Confirm",
       "Are you sure you want to share the post?",
@@ -858,7 +856,7 @@ const WhatPriceScreen = ({ navigation, route }) => {
   );
 };
 
-export default function App() {
+export default function Add() {
   return (
     <NavigationContainer independent={true}>
       <Tab.Navigator screenOptions={{ headerShown: false }}>
