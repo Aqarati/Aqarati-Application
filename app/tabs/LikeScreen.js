@@ -8,28 +8,30 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-
 import { urlPath, getValueFor } from "../lib";
 import PropertyCard from "../components/PropertyCard";
 import COLORS from "../../assets/Colors/colors";
 import Toast from "react-native-toast-message";
 import { getStoredBoolValue } from "../../assets/theme";
 import { useFocusEffect } from "@react-navigation/native";
+
 const LikeScreen = () => {
   const [darkMode, setDarkMode] = useState(false);
-  useFocusEffect(
-    React.useCallback(() => {
-      const result = getStoredBoolValue();
-      const darkMode = result.storedBoolValue;
-      setDarkMode(darkMode);
-    }, [])
-  );
-  const [LikedPropertyIds, setLikedPropertyIds] = useState([]);
+  const [likedPropertyIds, setLikedPropertyIds] = useState([]);
   const [likedProperties, setLikedProperties] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchFavouriteIdData = async () => {
+  useEffect(() => {
+    const loadDarkModeSetting = async () => {
+      const result = await getStoredBoolValue();
+      setDarkMode(result.storedBoolValue);
+    };
+
+    loadDarkModeSetting();
+  }, []);
+
+  const fetchFavouriteIdData = useCallback(async () => {
     try {
       console.log("Fetching favorite IDs for Like Screen");
       const url = `${urlPath}/user/favourite`;
@@ -43,21 +45,27 @@ const LikeScreen = () => {
         },
       };
       const response = await axios.request(config);
-      setLikedPropertyIds(response.data);
-      await fetchFavouriteData(response.data);
+      const ids = response.data;
+      setLikedPropertyIds(ids);
+      await fetchFavouriteData(ids);
     } catch (error) {
       console.error("Error fetching favorite IDs:", error);
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
-  const fetchFavouriteData = async (ids) => {
+  const fetchFavouriteData = useCallback(async (ids) => {
     try {
       if (ids.length === 0) {
         setLikedProperties([]);
         setLoading(false);
         setRefreshing(false);
+        await Toast.show({
+          type: "info",
+          text1: "No Liked Properties",
+          text2: "You have no liked properties.",
+        });
         return;
       }
 
@@ -74,7 +82,7 @@ const LikeScreen = () => {
       setRefreshing(false);
 
       if (response.data.length === 0) {
-        Toast.show({
+        await Toast.show({
           type: "info",
           text1: "No Liked Properties",
           text2: "You have no liked properties.",
@@ -82,28 +90,22 @@ const LikeScreen = () => {
       }
     } catch (error) {
       console.error("Error fetching favorite properties:", error);
-      console.log(error.response);
-      Toast.show({
-        type: "info",
-        text1: "No Liked Properties",
-        text2: "You have no liked properties.",
-      });
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchFavouriteIdData();
-  }, []);
+  }, [fetchFavouriteIdData]);
 
   useFocusEffect(
     useCallback(() => {
       console.log("Like screen focused");
       setLoading(true);
       fetchFavouriteIdData();
-    }, [])
+    }, [fetchFavouriteIdData])
   );
 
   return (
@@ -111,16 +113,6 @@ const LikeScreen = () => {
       <Text style={styles(darkMode).header}>Liked Properties</Text>
       {loading ? (
         <ActivityIndicator size="large" color={COLORS.primary} />
-      ) : likedProperties.length === 0 ? (
-        <ScrollView
-          style={styles(darkMode).scrollView}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles(darkMode).noProperties}></View>
-        </ScrollView>
       ) : (
         <ScrollView
           style={styles(darkMode).scrollView}
@@ -138,12 +130,13 @@ const LikeScreen = () => {
     </View>
   );
 };
+
 const styles = (darkMode) =>
   StyleSheet.create({
     container: {
       flex: 1,
       padding: 20,
-      backgroundColor: darkMode ? COLORS.backgroundDark : "#fff", // Background color of the container
+      backgroundColor: darkMode ? COLORS.backgroundDark : "#fff",
     },
     header: {
       fontSize: 25,
@@ -155,15 +148,6 @@ const styles = (darkMode) =>
     },
     scrollView: {
       marginBottom: 60,
-    },
-    noProperties: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    noPropertiesText: {
-      fontSize: 18,
-      color: darkMode ? COLORS.textDark : COLORS.primary,
     },
   });
 
