@@ -24,7 +24,7 @@ export default function Myproperty({ navigation, route }) {
   const { darkMode, handleDarkModeToggle } = route.params;
   const fetchProperties = async () => {
     console.log("Fetching properties");
-    const url = urlPath + "/property/my";
+    const url = `${urlPath}/property/my`;
     console.log("URL: " + url);
     const token = await getValueFor("token");
 
@@ -39,17 +39,27 @@ export default function Myproperty({ navigation, route }) {
 
     console.log(config);
     try {
+      setLoading(true);
       const response = await axios.request(config);
       setProperties(response.data);
       console.log(JSON.stringify(response.data));
+
+      // Check if response data is empty
+      if (response.data.length === 0) {
+        Toast.show({
+          type: "info",
+          text1: "No properties found",
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching properties:", error);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
-
   const onRefresh = () => {
     setRefreshing(true);
     fetchProperties();
@@ -75,16 +85,14 @@ export default function Myproperty({ navigation, route }) {
   );
 
   useEffect(() => {
-    if (!loading && properties.length === 0) {
-      Toast.show({
-        type: "info",
-        text1: "No properties found",
-        visibilityTime: 3000,
-        autoHide: true,
-      });
-    }
-  }, [loading, properties]);
+    fetchProperties(); // Initial fetch
 
+    const interval = setInterval(() => {
+      fetchProperties(); // Fetch properties every 10 seconds
+    }, 10 * 1000);
+
+    return () => clearInterval(interval); // Clear interval on component unmount
+  }, []);
   return (
     <SafeAreaView
       style={{

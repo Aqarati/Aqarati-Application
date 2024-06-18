@@ -23,7 +23,7 @@ export default function MainScreen({ navigation, route }) {
   const { darkMode, handleDarkModeToggle } = route.params;
   const fetchProperties = async () => {
     console.log("Fetching properties");
-    const url = urlPath + "/property/my";
+    const url = `${urlPath}/property/my`;
     console.log("URL: " + url);
     const token = await getValueFor("token");
 
@@ -39,16 +39,20 @@ export default function MainScreen({ navigation, route }) {
     console.log(config);
     try {
       const response = await axios.request(config);
+      if (response.data.length === 0) {
+        // Show toast message if no properties found
+        Toast.show({
+          type: "info",
+          text1: "No properties found",
+          visibilityTime: 3000,
+          autoHide: true,
+        });
+      }
       setProperties(response.data);
       console.log(JSON.stringify(response.data));
     } catch (error) {
-      await Toast.show({
-        type: "info",
-        text1: "No properties found",
-        visibilityTime: 3000,
-        autoHide: true,
-      });
       console.log(error);
+      // Handle other errors if needed
     } finally {
       setLoading(false);
       setRefreshing(false);
