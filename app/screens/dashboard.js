@@ -42,7 +42,7 @@ export default function MainScreen({ navigation, route }) {
       setProperties(response.data);
       console.log(JSON.stringify(response.data));
     } catch (error) {
-      Toast.show({
+      await Toast.show({
         type: "info",
         text1: "No properties found",
         visibilityTime: 3000,
@@ -78,17 +78,6 @@ export default function MainScreen({ navigation, route }) {
       fetchProperties();
     }, [])
   );
-
-  useEffect(() => {
-    if (!loading && properties.length === 0) {
-      Toast.show({
-        type: "info",
-        text1: "No properties found",
-        visibilityTime: 3000,
-        autoHide: true,
-      });
-    }
-  }, [loading, properties]);
 
   return (
     <SafeAreaView

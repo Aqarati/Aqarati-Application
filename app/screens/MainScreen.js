@@ -138,6 +138,7 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
           (property) => property.propertyStatus === "AVAILABLE"
         );
         setProperties(availableProperties);
+        console.log(JSON.stringify(response.data));
       })
       .catch((error) => {
         console.log(error);
