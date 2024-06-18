@@ -190,7 +190,7 @@ const LoginScreen = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor={COLORS.lightGray}
+                placeholderTextColor={COLORS.login}
                 value={email}
                 onChangeText={(text) => setEmail(text)}
               />
@@ -204,7 +204,7 @@ const LoginScreen = ({ navigation }) => {
               <TextInput
                 style={{ flex: 1, height: 50, padding: 10 }}
                 placeholder="Password"
-                placeholderTextColor={COLORS.lightGray}
+                placeholderTextColor={COLORS.login}
                 secureTextEntry={passwordVisibility}
                 value={password}
                 onChangeText={setPassword}

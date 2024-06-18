@@ -222,7 +222,7 @@ const SignupScreen = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Username"
-                placeholderTextColor={COLORS.lightGray}
+                placeholderTextColor={COLORS.login}
                 value={name}
                 onChangeText={(value) => handleChange("name", value)}
               />
@@ -235,7 +235,7 @@ const SignupScreen = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor={COLORS.lightGray}
+                placeholderTextColor={COLORS.login}
                 value={email}
                 onChangeText={(value) => handleChange("email", value)}
               />
@@ -248,7 +248,7 @@ const SignupScreen = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Phone Number"
-                placeholderTextColor={COLORS.lightGray}
+                placeholderTextColor={COLORS.login}
                 value={phoneNumber}
                 onChangeText={(value) => handleChange("phoneNumber", value)}
                 keyboardType="numeric"
@@ -264,7 +264,7 @@ const SignupScreen = ({ navigation }) => {
               <TextInput
                 style={{ flex: 1, height: 50, padding: 10 }}
                 placeholder="Password"
-                placeholderTextColor={COLORS.lightGray}
+                placeholderTextColor={COLORS.login}
                 secureTextEntry={passwordVisibility}
                 value={password}
                 onChangeText={(value) => handleChange("password", value)}
@@ -288,7 +288,7 @@ const SignupScreen = ({ navigation }) => {
               <TextInput
                 style={{ flex: 1, height: 50, padding: 10 }}
                 placeholder="Confirm Password"
-                placeholderTextColor={COLORS.lightGray}
+                placeholderTextColor={COLORS.login}
                 secureTextEntry={confirmPasswordVisibility}
                 value={rePassword}
                 onChangeText={(value) => handleChange("rePassword", value)}
