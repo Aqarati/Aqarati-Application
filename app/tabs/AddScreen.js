@@ -6,6 +6,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { LogBox } from "react-native";
+import * as ImageManipulator from 'expo-image-manipulator';
+
 import {
   SafeAreaView,
   ScrollView,
@@ -454,21 +456,40 @@ const DetailsScreen2 = ({ navigation }) => {
       aspect: [1, 1],
       quality: 1,
     });
-
+  
     console.log("ImagePicker result:", result);
-
-    if (!result.canceled) {
+  
+    if (!result.cancelled) {
       // If images are selected, update the photo array
       const newPhotos = [...photos];
-      const selectedUris = result.assets.slice(0, 12).map((asset) => asset.uri);
-      selectedUris.forEach((uri, idx) => {
-        if (index + idx < 12) {
-          newPhotos[index + idx] = uri;
+      const selectedAssets = result.assets.slice(0, 12);
+  
+      for (let i = 0; i < selectedAssets.length; i++) {
+        const asset = selectedAssets[i];
+        let resizedUri = asset.uri;
+  
+        try {
+          const manipResult = await ImageManipulator.manipulateAsync(
+            asset.uri,
+            [], 
+            { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+          );
+        
+          resizedUri = manipResult.uri;
+        } catch (e) {
+          console.log("Image resizing error:", e);
         }
-      });
+        
+  
+        if (index + i < 12) {
+          newPhotos[index + i] = resizedUri;
+        }
+      }
+  
       setPhotos(newPhotos);
-
-      // Update selectedDATA with the selected image URIs
+  
+    
+      const selectedUris = selectedAssets.map((asset) => asset.uri);
       SelectedValues[0].images = selectedUris;
     }
   };

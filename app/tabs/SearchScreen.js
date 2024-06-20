@@ -604,7 +604,7 @@ const styles = (darkMode) =>
       color: darkMode ? "#fff" : "#000",
     },
     applyButton: {
-      backgroundColor: COLORS.blue,
+      backgroundColor: COLORS.primary,
       padding: 15,
       borderRadius: 10,
       alignItems: "center",
@@ -615,7 +615,7 @@ const styles = (darkMode) =>
       fontSize: 16,
     },
     closeButton: {
-      backgroundColor: COLORS.red,
+      backgroundColor: COLORS.darkGray,
       padding: 15,
       borderRadius: 10,
       alignItems: "center",

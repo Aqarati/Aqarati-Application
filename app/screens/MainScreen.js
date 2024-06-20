@@ -136,7 +136,12 @@ const MainScreen = forwardRef(({ navigation }, ref) => {
       .then((response) => {
         const availableProperties = response.data.filter(
           (property) => property.propertyStatus === "AVAILABLE"
+          
         );
+        if(availableProperties.verified){
+          console.log(availableProperties.verified);
+          console.log(availableProperties);
+        }
         setProperties(availableProperties);
         console.log(JSON.stringify(response.data));
       })
