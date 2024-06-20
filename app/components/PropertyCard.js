@@ -38,11 +38,14 @@ const PropertyCard = ({ property }) => {
     <TouchableOpacity onPress={handleCardPress}>
       <View style={styles(darkMode).card}>
         <View style={styles(darkMode).cardLikeWrapper}>
-          <TouchableOpacity onPress={handleCardPress}>
-            <View style={styles(darkMode).cardLike}>
-              <MaterialIcons color={COLORS.primary} name="verified" size={22} />
-            </View>
-          </TouchableOpacity>
+        {property.verified && (
+    <TouchableOpacity onPress={handleCardPress}>
+        <View style={styles(darkMode).cardLike}>
+            <MaterialIcons color={COLORS.primary} name="verified" size={22} />
+        </View>
+    </TouchableOpacity>
+)}
+
         </View>
 
         <View style={styles(darkMode).cardTop}>
@@ -60,6 +63,9 @@ const PropertyCard = ({ property }) => {
 
             <Text style={styles(darkMode).cardPrice}>
               <Text style={{ fontWeight: "600" }}>{property.price} JD</Text>
+            </Text>
+            <Text style={styles(darkMode).cardPrice}>
+              <Text style={{ fontWeight: "600" }}>{property.verified} </Text>
             </Text>
           </View>
 
