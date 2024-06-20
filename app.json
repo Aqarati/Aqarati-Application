@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "my-app",
-    "slug": "aqarati",
+    "slug": "aqarati-application",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -36,9 +36,15 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "7cf09474-52a2-4258-8689-617c6f8bf644"
+        "projectId": "2a6b3b9f-2d05-4778-af3f-c410f0d0984f"
       }
     },
-    "owner": "ahamdah"
+    "owner": "aqarati",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7cf09474-52a2-4258-8689-617c6f8bf644"
+    }
   }
 }

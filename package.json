@@ -63,7 +63,8 @@
     "tailwindcss": "^3.4.1",
     "twrnc": "^4.1.0",
     "typescript": "~5.3.3",
-    "undefined": "@/components/icon"
+    "undefined": "@/components/icon",
+    "expo-updates": "~0.25.17"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
